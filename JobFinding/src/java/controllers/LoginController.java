@@ -72,30 +72,30 @@ public class LoginController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
-        String role = request.getParameter("role");
+          String username = request.getParameter("username");
+    String password = request.getParameter("password");
+    String role = request.getParameter("role");
 
-        // Kiểm tra nếu chưa chọn vai trò
-        if (role == null) {
-            request.setAttribute("error", "Please choose your role");
-            request.getRequestDispatcher("login.jsp").forward(request, response);
-            return;
-        }
+    // Kiểm tra nếu chưa chọn vai trò
+    if (role == null) {
+        request.setAttribute("error", "Please choose your role");
+        request.getRequestDispatcher("login.jsp").forward(request, response);
+        return;
+    }
 
-        // Xử lý đăng nhập nếu đã chọn vai trò
-        UserDAO dao = new UserDAO();
-        User user = dao.getUserByUsernameAndPassword(username, password);
+    // Xử lý đăng nhập nếu đã chọn vai trò
+    UserDAO dao = new UserDAO();
+    User user = dao.getUserByUsernameAndPassword(username, password);
 
-        if (user != null) {
-            HttpSession session = request.getSession();
-            session.setAttribute("user", user);
-            session.setAttribute("role", role); // lưu vai trò nếu cần
-            response.sendRedirect("home");
-        } else {
-            request.setAttribute("error", "Invalid username or password");
-            request.getRequestDispatcher("home.jsp").forward(request, response);
-        }
+    if (user != null) {
+        HttpSession session = request.getSession();
+        session.setAttribute("user", user);
+        session.setAttribute("role", role); // lưu vai trò nếu cần
+        response.sendRedirect("home");
+    } else {
+        request.setAttribute("error", "Invalid username or password");
+        request.getRequestDispatcher("home.jsp").forward(request, response);
+    }
     }
 
     /**

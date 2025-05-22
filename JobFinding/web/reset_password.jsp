@@ -8,33 +8,62 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(to right, #f8bbd0, #f48fb1);
+            background: linear-gradient(to right, #c8e6c9, #a5d6a7); /* Xanh lá cây nhạt */
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
         .card {
             border: none;
-            border-radius: 15px;
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            width: 100%;
+            max-width: 420px;
+            background-color: #ffffff;
         }
-        .btn-pink {
-            background-color: #ec407a;
+
+        .card h4 {
+            font-weight: bold;
+            color: #2e7d32; /* Màu xanh đậm */
+        }
+
+        .form-control {
+            border-radius: 10px;
+            border: 1px solid #a5d6a7;
+        }
+
+        .btn-green {
+            background-color: #66bb6a;
             color: white;
+            border-radius: 10px;
+            font-weight: bold;
         }
-        .btn-pink:hover {
-            background-color: #d81b60;
+
+        .btn-green:hover {
+            background-color: #388e3c;
+        }
+
+        .btn-secondary {
+            border-radius: 10px;
+        }
+
+        .alert {
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="card shadow p-4" style="width: 100%; max-width: 400px;">
-        <h4 class="text-center text-dark mb-3">Đặt lại mật khẩu</h4>
+    <div class="card">
+        <h4 class="text-center mb-4">🔐 Đặt lại mật khẩu</h4>
         <form action="reset-password" method="post">
             <div class="mb-3">
                 <input type="email" name="email" class="form-control" placeholder="Nhập email của bạn" required>
             </div>
-            <button type="submit" class="btn btn-pink w-100 mb-2">Gửi mật khẩu mới</button>
+            <button type="submit" class="btn btn-green w-100 mb-2">Gửi mật khẩu mới</button>
 
             <a href="login.jsp" class="btn btn-secondary w-100">Quay về đăng nhập</a>
 
