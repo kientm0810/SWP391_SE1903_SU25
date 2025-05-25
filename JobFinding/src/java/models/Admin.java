@@ -4,142 +4,153 @@
  */
 package models;
 
-import java.sql.Date;
-
 /**
  *
- * @author andin
+ * @author MY PC
  */
+// Admin.java
+
+import java.util.Date;
+
 public class Admin {
     private int id;
-    private String username, password, email, full_name, phone;
-    private Date te_of_birth;
-    private String gender, address, profile_picture;
-    private Date created_at, updated_at;
-    private boolean is_active;
+    private String username;
+    private String password;
+    private String email;
+    private String fullName;
+    private String phone;
+    private Date dateOfBirth;
+    private String gender;
+    private String address;
+    private String profilePicture;
+    private Date createdAt;
+    private Date updatedAt;
+    private boolean isActive;
 
     public Admin() {
     }
 
-    public Admin(int id, String username, String password, String email, String full_name, String phone, Date te_of_birth, String gender, String address, String profile_picture, Date created_at, Date updated_at, boolean is_active) {
+    // Constructor
+    public Admin(int id, String username, String password, String email, String fullName, String phone,
+                 Date dateOfBirth, String gender, String address, String profilePicture, 
+                 Date createdAt, Date updatedAt, boolean isActive) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.email = email;
-        this.full_name = full_name;
+        this.fullName = fullName;
         this.phone = phone;
-        this.te_of_birth = te_of_birth;
+        this.dateOfBirth = dateOfBirth;
         this.gender = gender;
         this.address = address;
-        this.profile_picture = profile_picture;
-        this.created_at = created_at;
-        this.updated_at = updated_at;
-        this.is_active = is_active;
+        this.profilePicture = profilePicture;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.isActive = isActive;
+    }
+
+
+    public int getId() {
+        return id;
     }
 
     public void setId(int id) {
         this.id = id;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setFull_name(String full_name) {
-        this.full_name = full_name;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public void setTe_of_birth(Date te_of_birth) {
-        this.te_of_birth = te_of_birth;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public void setProfile_picture(String profile_picture) {
-        this.profile_picture = profile_picture;
-    }
-
-    public void setCreated_at(Date created_at) {
-        this.created_at = created_at;
-    }
-
-    public void setUpdated_at(Date updated_at) {
-        this.updated_at = updated_at;
-    }
-
-    public void setIs_active(boolean is_active) {
-        this.is_active = is_active;
-    }
-
-    public int getId() {
-        return id;
-    }
-
     public String getUsername() {
         return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
         return password;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public String getEmail() {
         return email;
     }
 
-    public String getFull_name() {
-        return full_name;
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getPhone() {
         return phone;
     }
 
-    public Date getTe_of_birth() {
-        return te_of_birth;
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
     public String getGender() {
         return gender;
     }
 
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
     public String getAddress() {
         return address;
     }
 
-    public String getProfile_picture() {
-        return profile_picture;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
-    public Date getCreated_at() {
-        return created_at;
+    public String getProfilePicture() {
+        return profilePicture;
     }
 
-    public Date getUpdated_at() {
-        return updated_at;
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
     }
 
-    public boolean isIs_active() {
-        return is_active;
+    public Date getCreatedAt() {
+        return createdAt;
     }
-    
-    
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
 }

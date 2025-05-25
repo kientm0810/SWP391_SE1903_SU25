@@ -4,237 +4,257 @@
  */
 package models;
 
-import java.sql.Date;
-
 /**
  *
- * @author andin
+ * @author MY PC
  */
+// Recruiter.java
+
+
+import java.util.Date;
+
 public class Recruiter {
     private int id;
-    private String username, password, email, full_name, phone;
-    private Date date_of_birth;
-    private String gender, address, profile_picture, company_name,
-            company_description, logo, website, company_address,
-            company_size, industry, tax_code;
-    private double loyalty_score;
-    private String verification_status;
-    private Date created_at;
-    private Date updated_at;
-    private boolean is_active;
+    private String username;
+    private String password;
+    private String email;
+    private String fullName;
+    private String phone;
+    private Date dateOfBirth;
+    private String gender;
+    private String address;
+    private String profilePicture;
+    private String companyName;
+    private String companyDescription;
+    private String logo;
+    private String website;
+    private String companyAddress;
+    private String companySize;
+    private String industry;
+    private String taxCode;
+    private double loyaltyScore;
+    private String verificationStatus;
+    private Date createdAt;
+    private Date updatedAt;
+    private boolean isActive;
 
     public Recruiter() {
     }
+    
 
-    public Recruiter(int id, String username, String password, String email, String full_name, String phone, Date date_of_birth, String gender, String address, String profile_picture, String company_name, String company_description, String logo, String website, String company_address, String company_size, String industry, String tax_code, double loyalty_score, String verification_status, Date created_at, Date updated_at, boolean is_active) {
+    public Recruiter(int id, String username, String password, String email, String fullName, String phone,
+                     Date dateOfBirth, String gender, String address, String profilePicture, 
+                     String companyName, String companyDescription, String logo, String website,
+                     String companyAddress, String companySize, String industry, String taxCode,
+                     double loyaltyScore, String verificationStatus, Date createdAt, Date updatedAt, 
+                     boolean isActive) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.email = email;
-        this.full_name = full_name;
+        this.fullName = fullName;
         this.phone = phone;
-        this.date_of_birth = date_of_birth;
+        this.dateOfBirth = dateOfBirth;
         this.gender = gender;
         this.address = address;
-        this.profile_picture = profile_picture;
-        this.company_name = company_name;
-        this.company_description = company_description;
+        this.profilePicture = profilePicture;
+        this.companyName = companyName;
+        this.companyDescription = companyDescription;
         this.logo = logo;
         this.website = website;
-        this.company_address = company_address;
-        this.company_size = company_size;
+        this.companyAddress = companyAddress;
+        this.companySize = companySize;
         this.industry = industry;
-        this.tax_code = tax_code;
-        this.loyalty_score = loyalty_score;
-        this.verification_status = verification_status;
-        this.created_at = created_at;
-        this.updated_at = updated_at;
-        this.is_active = is_active;
+        this.taxCode = taxCode;
+        this.loyaltyScore = loyaltyScore;
+        this.verificationStatus = verificationStatus;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.isActive = isActive;
+    }
+
+    // Getters and Setters
+    public int getId() {
+        return id;
     }
 
     public void setId(int id) {
         this.id = id;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setFull_name(String full_name) {
-        this.full_name = full_name;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public void setDate_of_birth(Date date_of_birth) {
-        this.date_of_birth = date_of_birth;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public void setProfile_picture(String profile_picture) {
-        this.profile_picture = profile_picture;
-    }
-
-    public void setCompany_name(String company_name) {
-        this.company_name = company_name;
-    }
-
-    public void setCompany_description(String company_description) {
-        this.company_description = company_description;
-    }
-
-    public void setLogo(String logo) {
-        this.logo = logo;
-    }
-
-    public void setWebsite(String website) {
-        this.website = website;
-    }
-
-    public void setCompany_address(String company_address) {
-        this.company_address = company_address;
-    }
-
-    public void setCompany_size(String company_size) {
-        this.company_size = company_size;
-    }
-
-    public void setIndustry(String industry) {
-        this.industry = industry;
-    }
-
-    public void setTax_code(String tax_code) {
-        this.tax_code = tax_code;
-    }
-
-    public void setLoyalty_score(double loyalty_score) {
-        this.loyalty_score = loyalty_score;
-    }
-
-    public void setVerification_status(String verification_status) {
-        this.verification_status = verification_status;
-    }
-
-    public void setCreated_at(Date created_at) {
-        this.created_at = created_at;
-    }
-
-    public void setUpdated_at(Date updated_at) {
-        this.updated_at = updated_at;
-    }
-
-    public void setIs_active(boolean is_active) {
-        this.is_active = is_active;
-    }
-
-    public int getId() {
-        return id;
-    }
-
     public String getUsername() {
         return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
         return password;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public String getEmail() {
         return email;
     }
 
-    public String getFull_name() {
-        return full_name;
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getPhone() {
         return phone;
     }
 
-    public Date getDate_of_birth() {
-        return date_of_birth;
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
     public String getGender() {
         return gender;
     }
 
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
     public String getAddress() {
         return address;
     }
 
-    public String getProfile_picture() {
-        return profile_picture;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
-    public String getCompany_name() {
-        return company_name;
+    public String getProfilePicture() {
+        return profilePicture;
     }
 
-    public String getCompany_description() {
-        return company_description;
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    public String getCompanyDescription() {
+        return companyDescription;
+    }
+
+    public void setCompanyDescription(String companyDescription) {
+        this.companyDescription = companyDescription;
     }
 
     public String getLogo() {
         return logo;
     }
 
+    public void setLogo(String logo) {
+        this.logo = logo;
+    }
+
     public String getWebsite() {
         return website;
     }
 
-    public String getCompany_address() {
-        return company_address;
+    public void setWebsite(String website) {
+        this.website = website;
     }
 
-    public String getCompany_size() {
-        return company_size;
+    public String getCompanyAddress() {
+        return companyAddress;
+    }
+
+    public void setCompanyAddress(String companyAddress) {
+        this.companyAddress = companyAddress;
+    }
+
+    public String getCompanySize() {
+        return companySize;
+    }
+
+    public void setCompanySize(String companySize) {
+        this.companySize = companySize;
     }
 
     public String getIndustry() {
         return industry;
     }
 
-    public String getTax_code() {
-        return tax_code;
+    public void setIndustry(String industry) {
+        this.industry = industry;
     }
 
-    public double getLoyalty_score() {
-        return loyalty_score;
+    public String getTaxCode() {
+        return taxCode;
     }
 
-    public String getVerification_status() {
-        return verification_status;
+    public void setTaxCode(String taxCode) {
+        this.taxCode = taxCode;
     }
 
-    public Date getCreated_at() {
-        return created_at;
+    public double getLoyaltyScore() {
+        return loyaltyScore;
     }
 
-    public Date getUpdated_at() {
-        return updated_at;
+    public void setLoyaltyScore(double loyaltyScore) {
+        this.loyaltyScore = loyaltyScore;
     }
 
-    public boolean isIs_active() {
-        return is_active;
+    public String getVerificationStatus() {
+        return verificationStatus;
     }
-    
-    
+
+    public void setVerificationStatus(String verificationStatus) {
+        this.verificationStatus = verificationStatus;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
 }

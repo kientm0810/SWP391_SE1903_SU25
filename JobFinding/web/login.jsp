@@ -4,7 +4,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Đăng nhập</title>
+    <title>Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -47,10 +47,6 @@
             background-color: #388e3c;
         }
 
-        .form-check-inline {
-            margin-right: 15px;
-        }
-
         .radio-group {
             display: flex;
             justify-content: space-between;
@@ -75,23 +71,23 @@
 </head>
 <body>
     <div class="card">
-        <h4 class="text-center mb-4">🔐 Đăng nhập</h4>
+        <h4 class="text-center mb-4">🔐 Login</h4>
         <form action="login" method="post">
             <div class="mb-3">
-                <input type="text" name="username" class="form-control" placeholder="Tên đăng nhập" required>
+                <input type="text" name="username" class="form-control" placeholder="Username" required>
             </div>
             <div class="mb-3">
-                <input type="password" name="password" class="form-control" placeholder="Mật khẩu" required>
+                <input type="password" name="password" class="form-control" placeholder="Password" required>
             </div>
 
             <div class="radio-group mb-3">
                 <div>
                     <input type="radio" id="job-seeker" name="role" value="job-seeker" required>
-                    <label for="job-seeker">Ứng viên</label>
+                    <label for="job-seeker">Job Seeker</label>
                 </div>
                 <div>
-                    <input type="radio" id="employer" name="role" value="employer">
-                    <label for="employer">Nhà tuyển dụng</label>
+                    <input type="radio" id="recruiter" name="role" value="recruiter">
+                    <label for="recruiter">Recruiter</label>
                 </div>
                 <div>
                     <input type="radio" id="admin" name="role" value="admin">
@@ -99,14 +95,26 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-green w-100 mb-3">Đăng nhập</button>
+            <button type="submit" class="btn btn-green w-100 mb-3">Login</button>
 
             <div class="text-center">
-                <a href="reset_password.jsp" class="text-decoration-none text-dark">🔁 Quên mật khẩu?</a>
+                <a href="reset_password.jsp" class="text-decoration-none text-dark">🔁 Forgot password?</a>
             </div>
 
             <c:if test="${not empty error}">
-                <div class="alert alert-danger mt-3" role="alert">${error}</div>
+                <div class="alert alert-danger mt-3" role="alert">
+                    <c:choose>
+                        <c:when test="${error == 'Please fill in all login information'}">
+                            Please enter both username and password
+                        </c:when>
+                        <c:when test="${error == 'Invalid username, password or account status'}">
+                            Invalid credentials or account not active
+                        </c:when>
+                        <c:otherwise>
+                            ${error}
+                        </c:otherwise>
+                    </c:choose>
+                </div>
             </c:if>
         </form>
     </div>

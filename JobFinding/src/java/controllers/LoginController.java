@@ -1,111 +1,159 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controllers;
 
 import daos.UserDAO;
-import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import models.User;
+import java.io.IOException;
+import models.Admin;
+import models.JobSeeker;
+import models.Recruiter;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
-/**
- *
- * @author admin
- */
+@WebServlet(name = "LoginController", urlPatterns = {"/login"})
 public class LoginController extends HttpServlet {
-
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet LoginController</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet LoginController at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+    private static final Logger LOGGER = Logger.getLogger(LoginController.class.getName());
+    private static final int SESSION_TIMEOUT = 30 * 60; // 30 minutes in seconds
+    
+    private UserDAO userDAO;
+    
+    @Override
+    public void init() throws ServletException {
+        try {
+            userDAO = new UserDAO();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Failed to initialize UserDAO", e);
+            throw new ServletException("Failed to initialize UserDAO", e);
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("login.jsp").forward(request, response);
+        HttpSession session = request.getSession(false);
+        if (isUserLoggedIn(session)) {
+            redirectToHomePage(session, response);
+            return;
+        }
+        request.getRequestDispatcher("/login.jsp").forward(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-          String username = request.getParameter("username");
-    String password = request.getParameter("password");
-    String role = request.getParameter("role");
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        String role = request.getParameter("role");
 
-    // Kiểm tra nếu chưa chọn vai trò
-    if (role == null) {
-        request.setAttribute("error", "Please choose your role");
-        request.getRequestDispatcher("login.jsp").forward(request, response);
-        return;
+        if (isInvalidInput(username, password, role)) {
+            handleInvalidInput(request, response);
+            return;
+        }
+
+        try {
+            HttpSession session = request.getSession();
+            Object user = authenticateUser(username, password, role);
+
+            if (user != null) {
+                handleSuccessfulLogin(user, role, session, response);
+            } else {
+                handleFailedLogin(request, response);
+            }
+        } catch (Exception e) {
+            handleLoginError(request, response, e);
+        }
     }
 
-    // Xử lý đăng nhập nếu đã chọn vai trò
-    UserDAO dao = new UserDAO();
-    User user = dao.getUserByUsernameAndPassword(username, password);
+    private boolean isUserLoggedIn(HttpSession session) {
+        return session != null && session.getAttribute("user") != null;
+    }
 
-    if (user != null) {
-        HttpSession session = request.getSession();
+    private boolean isInvalidInput(String username, String password, String role) {
+        return username == null || username.trim().isEmpty() ||
+               password == null || password.trim().isEmpty() ||
+               role == null || role.trim().isEmpty();
+    }
+
+    private void handleInvalidInput(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.setAttribute("error", "Please fill in all login information");
+        request.getRequestDispatcher("/login.jsp").forward(request, response);
+    }
+
+    private Object authenticateUser(String username, String password, String role) {
+        switch (role) {
+            case "admin":
+                Admin admin = userDAO.loginAdmin(username, password);
+                return (admin != null && admin.isActive()) ? admin : null;
+                
+            case "recruiter":
+                Recruiter recruiter = userDAO.loginRecruiter(username, password);
+                return (recruiter != null && recruiter.isActive() && 
+                       "verified".equalsIgnoreCase(recruiter.getVerificationStatus())) 
+                       ? recruiter : null;
+                
+            case "job-seeker":
+                JobSeeker jobSeeker = userDAO.loginJobSeeker(username, password);
+                return (jobSeeker != null && jobSeeker.isActive()) ? jobSeeker : null;
+                
+            default:
+                return null;
+        }
+    }
+
+    private void handleSuccessfulLogin(Object user, String role, 
+                                    HttpSession session, HttpServletResponse response) 
+            throws IOException {
         session.setAttribute("user", user);
-        session.setAttribute("role", role); // lưu vai trò nếu cần
-        response.sendRedirect("home");
-    } else {
-        request.setAttribute("error", "Invalid username or password");
-        request.getRequestDispatcher("home.jsp").forward(request, response);
-    }
+        session.setAttribute("role", role);
+        session.setAttribute("userId", getUserId(user));
+        session.setMaxInactiveInterval(SESSION_TIMEOUT);
+        
+        redirectToHomePage(session, response);
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
+    private Integer getUserId(Object user) {
+        if (user instanceof Admin) {
+            return ((Admin) user).getId();
+        } else if (user instanceof Recruiter) {
+            return ((Recruiter) user).getId();
+        } else if (user instanceof JobSeeker) {
+            return ((JobSeeker) user).getId();
+        }
+        return null;
+    }
+
+    private void handleFailedLogin(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.setAttribute("error", "Invalid username, password, or account status");
+        request.getRequestDispatcher("/login.jsp").forward(request, response);
+    }
+
+    private void handleLoginError(HttpServletRequest request, HttpServletResponse response, 
+                                Exception e) throws ServletException, IOException {
+        LOGGER.log(Level.SEVERE, "Login error", e);
+        request.setAttribute("error", "An error occurred during login");
+        request.getRequestDispatcher("/login.jsp").forward(request, response);
+    }
+
+    private void redirectToHomePage(HttpSession session, HttpServletResponse response) 
+            throws IOException {
+        String role = (String) session.getAttribute("role");
+        String homePage = switch (role) {
+            case "admin" -> "home.jsp";
+            case "recruiter" -> "home.jsp";
+            case "job-seeker" -> "home.jsp";
+            default -> "login";
+        };
+        response.sendRedirect(homePage);
+    }
+
     @Override
     public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
+        return "Handles user authentication and session management";
+    }
 }

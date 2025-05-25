@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 /**
  *
- * @author admin
+ * @author SHD
  */
 public class JobDetailController extends HttpServlet {
 

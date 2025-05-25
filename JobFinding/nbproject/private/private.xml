@@ -2,26 +2,9 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group name="PRJ301">
-            <file>file:/C:/JobFinding/JobFinding/src/java/controllers/HomeController.java</file>
-            <file>file:/C:/JobFinding/JobFinding/web/WEB-INF/web.xml</file>
-            <file>file:/C:/JobFinding/JobFinding/web/header.jsp</file>
-            <file>file:/C:/JobFinding/JobFinding/src/java/controllers/RegisterController.java</file>
-            <file>file:/C:/JobFinding/JobFinding/web/login.jsp</file>
-            <file>file:/C:/JobFinding/JobFinding/src/java/controllers/LoginController.java</file>
-            <file>file:/C:/JobFinding/JobFinding/src/java/controllers/ResetPasswordController.java</file>
-            <file>file:/C:/JobFinding/JobFinding/web/home.jsp</file>
-            <file>file:/C:/JobFinding/JobFinding/src/java/controllers/JobDetailController.java</file>
-            <file>file:/C:/JobFinding/JobFinding/src/java/controllers/JobListingController.java</file>
-            <file>file:/C:/JobFinding/JobFinding/src/java/context/DBContext.java</file>
-        </group>
         <group>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/models/Recruiter.java</file>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/daos/JobSeeker/JobSeekerDAO.java</file>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/models/Admin.java</file>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/models/JobSeeker.java</file>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/daos/Recruiter/RecruiterDAO.java</file>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/daos/Admin/AdminDAO.java</file>
+            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/controllers/CVController.java</file>
+            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/daos/CVDAO.java</file>
         </group>
     </open-files>
 </project-private>

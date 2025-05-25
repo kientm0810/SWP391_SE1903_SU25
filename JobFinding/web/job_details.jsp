@@ -1,7 +1,7 @@
 <%-- 
     Document   : job_details
     Created on : May 18, 2025, 9:32:15 PM
-    Author     : admin
+    Author     : SHD
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>

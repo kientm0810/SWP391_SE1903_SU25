@@ -4,265 +4,281 @@
  */
 package models;
 
-import java.sql.Date;
-
 /**
  *
- * @author andin
+ * @author MY PC
  */
+
+import java.util.Date;
+
 public class JobSeeker {
     private int id;
-    private String username, password, email, full_name, phone;
-    private Date date_of_birth;
-    private String gender, address, profile_picture, cv_file, skills;
-    private int experience_years;
-    private String education, desired_job_title;
-    private double desired_salary;
-    private String job_category, preferred_location, career_level, work_type,
-            profile_summary, portfolio_url, languages;
-    private Date created_at;
-    private Date updated_at;
-    private boolean is_active;
+    private String username;
+    private String password;
+    private String email;
+    private String fullName;
+    private String phone;
+    private Date dateOfBirth;
+    private String gender;
+    private String address;
+    private String profilePicture;
+    private String cvFile;
+    private String skills;
+    private int experienceYears;
+    private String education;
+    private String desiredJobTitle;
+    private double desiredSalary;
+    private String jobCategory;
+    private String preferredLocation;
+    private String careerLevel;
+    private String workType;
+    private String profileSummary;
+    private String portfolioUrl;
+    private String languages;
+    private Date createdAt;
+    private Date updatedAt;
+    private boolean isActive;
 
     public JobSeeker() {
     }
 
-    public JobSeeker(int id, String username, String password, String email, String full_name, String phone, Date date_of_birth, String gender, String address, String profile_picture, String cv_file, String skills, int experience_years, String education, String desired_job_title, double desired_salary, String job_category, String preferred_location, String career_level, String work_type, String profile_summary, String portfolio_url, String languages, Date created_at, Date updated_at, boolean is_active) {
+    public JobSeeker(int id, String username, String password, String email, String fullName, String phone, Date dateOfBirth, String gender, String address, String profilePicture, String cvFile, String skills, int experienceYears, String education, String desiredJobTitle, double desiredSalary, String jobCategory, String preferredLocation, String careerLevel, String workType, String profileSummary, String portfolioUrl, String languages, Date createdAt, Date updatedAt, boolean isActive) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.email = email;
-        this.full_name = full_name;
+        this.fullName = fullName;
         this.phone = phone;
-        this.date_of_birth = date_of_birth;
+        this.dateOfBirth = dateOfBirth;
         this.gender = gender;
         this.address = address;
-        this.profile_picture = profile_picture;
-        this.cv_file = cv_file;
+        this.profilePicture = profilePicture;
+        this.cvFile = cvFile;
         this.skills = skills;
-        this.experience_years = experience_years;
+        this.experienceYears = experienceYears;
         this.education = education;
-        this.desired_job_title = desired_job_title;
-        this.desired_salary = desired_salary;
-        this.job_category = job_category;
-        this.preferred_location = preferred_location;
-        this.career_level = career_level;
-        this.work_type = work_type;
-        this.profile_summary = profile_summary;
-        this.portfolio_url = portfolio_url;
+        this.desiredJobTitle = desiredJobTitle;
+        this.desiredSalary = desiredSalary;
+        this.jobCategory = jobCategory;
+        this.preferredLocation = preferredLocation;
+        this.careerLevel = careerLevel;
+        this.workType = workType;
+        this.profileSummary = profileSummary;
+        this.portfolioUrl = portfolioUrl;
         this.languages = languages;
-        this.created_at = created_at;
-        this.updated_at = updated_at;
-        this.is_active = is_active;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.isActive = isActive;
+    }
+
+
+
+    // Getters and Setters
+    public int getId() {
+        return id;
     }
 
     public void setId(int id) {
         this.id = id;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setFull_name(String full_name) {
-        this.full_name = full_name;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public void setDate_of_birth(Date date_of_birth) {
-        this.date_of_birth = date_of_birth;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public void setProfile_picture(String profile_picture) {
-        this.profile_picture = profile_picture;
-    }
-
-    public void setCv_file(String cv_file) {
-        this.cv_file = cv_file;
-    }
-
-    public void setSkills(String skills) {
-        this.skills = skills;
-    }
-
-    public void setExperience_years(int experience_years) {
-        this.experience_years = experience_years;
-    }
-
-    public void setEducation(String education) {
-        this.education = education;
-    }
-
-    public void setDesired_job_title(String desired_job_title) {
-        this.desired_job_title = desired_job_title;
-    }
-
-    public void setDesired_salary(double desired_salary) {
-        this.desired_salary = desired_salary;
-    }
-
-    public void setJob_category(String job_category) {
-        this.job_category = job_category;
-    }
-
-    public void setPreferred_location(String preferred_location) {
-        this.preferred_location = preferred_location;
-    }
-
-    public void setCareer_level(String career_level) {
-        this.career_level = career_level;
-    }
-
-    public void setWork_type(String work_type) {
-        this.work_type = work_type;
-    }
-
-    public void setProfile_summary(String profile_summary) {
-        this.profile_summary = profile_summary;
-    }
-
-    public void setPortfolio_url(String portfolio_url) {
-        this.portfolio_url = portfolio_url;
-    }
-
-    public void setLanguages(String languages) {
-        this.languages = languages;
-    }
-
-    public void setCreated_at(Date created_at) {
-        this.created_at = created_at;
-    }
-
-    public void setUpdated_at(Date updated_at) {
-        this.updated_at = updated_at;
-    }
-
-    public void setIs_active(boolean is_active) {
-        this.is_active = is_active;
-    }
-
-    public int getId() {
-        return id;
-    }
-
     public String getUsername() {
         return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
         return password;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public String getEmail() {
         return email;
     }
 
-    public String getFull_name() {
-        return full_name;
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getPhone() {
         return phone;
     }
 
-    public Date getDate_of_birth() {
-        return date_of_birth;
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
     public String getGender() {
         return gender;
     }
 
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
     public String getAddress() {
         return address;
     }
 
-    public String getProfile_picture() {
-        return profile_picture;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
-    public String getCv_file() {
-        return cv_file;
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
+    public String getCvFile() {
+        return cvFile;
+    }
+
+    public void setCvFile(String cvFile) {
+        this.cvFile = cvFile;
     }
 
     public String getSkills() {
         return skills;
     }
 
-    public int getExperience_years() {
-        return experience_years;
+    public void setSkills(String skills) {
+        this.skills = skills;
+    }
+
+    public int getExperienceYears() {
+        return experienceYears;
+    }
+
+    public void setExperienceYears(int experienceYears) {
+        this.experienceYears = experienceYears;
     }
 
     public String getEducation() {
         return education;
     }
 
-    public String getDesired_job_title() {
-        return desired_job_title;
+    public void setEducation(String education) {
+        this.education = education;
     }
 
-    public double getDesired_salary() {
-        return desired_salary;
+    public String getDesiredJobTitle() {
+        return desiredJobTitle;
     }
 
-    public String getJob_category() {
-        return job_category;
+    public void setDesiredJobTitle(String desiredJobTitle) {
+        this.desiredJobTitle = desiredJobTitle;
     }
 
-    public String getPreferred_location() {
-        return preferred_location;
+    public double getDesiredSalary() {
+        return desiredSalary;
     }
 
-    public String getCareer_level() {
-        return career_level;
+    public void setDesiredSalary(double desiredSalary) {
+        this.desiredSalary = desiredSalary;
     }
 
-    public String getWork_type() {
-        return work_type;
+    public String getJobCategory() {
+        return jobCategory;
     }
 
-    public String getProfile_summary() {
-        return profile_summary;
+    public void setJobCategory(String jobCategory) {
+        this.jobCategory = jobCategory;
     }
 
-    public String getPortfolio_url() {
-        return portfolio_url;
+    public String getPreferredLocation() {
+        return preferredLocation;
+    }
+
+    public void setPreferredLocation(String preferredLocation) {
+        this.preferredLocation = preferredLocation;
+    }
+
+    public String getCareerLevel() {
+        return careerLevel;
+    }
+
+    public void setCareerLevel(String careerLevel) {
+        this.careerLevel = careerLevel;
+    }
+
+    public String getWorkType() {
+        return workType;
+    }
+
+    public void setWorkType(String workType) {
+        this.workType = workType;
+    }
+
+    public String getProfileSummary() {
+        return profileSummary;
+    }
+
+    public void setProfileSummary(String profileSummary) {
+        this.profileSummary = profileSummary;
+    }
+
+    public String getPortfolioUrl() {
+        return portfolioUrl;
+    }
+
+    public void setPortfolioUrl(String portfolioUrl) {
+        this.portfolioUrl = portfolioUrl;
     }
 
     public String getLanguages() {
         return languages;
     }
 
-    public Date getCreated_at() {
-        return created_at;
+    public void setLanguages(String languages) {
+        this.languages = languages;
     }
 
-    public Date getUpdated_at() {
-        return updated_at;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public boolean isIs_active() {
-        return is_active;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
-    
-    
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
 }
