@@ -16,17 +16,12 @@
             <file>file:/C:/JobFinding/JobFinding/src/java/context/DBContext.java</file>
         </group>
         <group>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/controllers/LoginController.java</file>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/context/DBContext.java</file>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/controllers/ResetPasswordController.java</file>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/web/header.jsp</file>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/controllers/HomeController.java</file>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/web/reset_password.jsp</file>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/controllers/RegisterController.java</file>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/controllers/LogoutController.java</file>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/daos/UserDAO.java</file>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/nbproject/build-impl.xml</file>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/models/User.java</file>
+            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/models/Recruiter.java</file>
+            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/daos/JobSeeker/JobSeekerDAO.java</file>
+            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/models/Admin.java</file>
+            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/models/JobSeeker.java</file>
+            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/daos/Recruiter/RecruiterDAO.java</file>
+            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/daos/Admin/AdminDAO.java</file>
         </group>
     </open-files>
 </project-private>

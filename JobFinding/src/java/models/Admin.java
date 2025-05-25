@@ -18,6 +18,9 @@ public class Admin {
     private Date created_at, updated_at;
     private boolean is_active;
 
+    public Admin() {
+    }
+
     public Admin(int id, String username, String password, String email, String full_name, String phone, Date te_of_birth, String gender, String address, String profile_picture, Date created_at, Date updated_at, boolean is_active) {
         this.id = id;
         this.username = username;

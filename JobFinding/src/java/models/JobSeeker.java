@@ -24,6 +24,9 @@ public class JobSeeker {
     private Date updated_at;
     private boolean is_active;
 
+    public JobSeeker() {
+    }
+
     public JobSeeker(int id, String username, String password, String email, String full_name, String phone, Date date_of_birth, String gender, String address, String profile_picture, String cv_file, String skills, int experience_years, String education, String desired_job_title, double desired_salary, String job_category, String preferred_location, String career_level, String work_type, String profile_summary, String portfolio_url, String languages, Date created_at, Date updated_at, boolean is_active) {
         this.id = id;
         this.username = username;

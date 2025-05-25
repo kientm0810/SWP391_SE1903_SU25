@@ -23,6 +23,9 @@ public class Recruiter {
     private Date updated_at;
     private boolean is_active;
 
+    public Recruiter() {
+    }
+
     public Recruiter(int id, String username, String password, String email, String full_name, String phone, Date date_of_birth, String gender, String address, String profile_picture, String company_name, String company_description, String logo, String website, String company_address, String company_size, String industry, String tax_code, double loyalty_score, String verification_status, Date created_at, Date updated_at, boolean is_active) {
         this.id = id;
         this.username = username;
