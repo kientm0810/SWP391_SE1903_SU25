@@ -9,12 +9,91 @@ import context.DBContext;
 import java.sql.*;
 import models.JobSeeker;
 import context.DBContext;
+import java.util.Vector;
 
 /**
  *
  * @author thaison
  */
 public class JobSeekerDAO extends DBContext {
+
+    private String getAll = "SELECT *\n"
+            + "  FROM [project_SWP391].[dbo].[Job_Seekers]";
+
+    public JobSeekerDAO() {
+    }
+    
+    public Vector<JobSeeker> getAllJobSeeker() {
+        String sql = getAll;
+        Vector<JobSeeker> listJobSeekers = new Vector<>();
+        try {
+            PreparedStatement ptm = connection.prepareStatement(sql);
+            ResultSet res = ptm.executeQuery();
+            while (res.next()) {
+                JobSeeker p = new JobSeeker(res.getInt(1),
+                        res.getString(2),
+                        res.getString(3),
+                        res.getString(4),
+                        res.getString(5),
+                        res.getString(6),
+                        res.getDate(7),
+                        res.getString(8),
+                        res.getString(9),
+                        res.getString(10),
+                        res.getString(11),
+                        res.getString(12),
+                        res.getInt(13),
+                        res.getString(14),
+                        res.getString(15),
+                        res.getDouble(16),
+                        res.getString(17),
+                        res.getString(18),
+                        res.getString(19),
+                        res.getString(20),
+                        res.getString(21),
+                        res.getString(22),
+                        res.getString(23),
+                        res.getDate(24),
+                        res.getDate(25),
+                        res.getBoolean(26));
+
+                listJobSeekers.add(p);
+            }
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            ex.getStackTrace();
+        }
+
+                /*
+                private int id;
+            private String username;
+            private String password;
+            private String email;
+            private String fullName;
+            private String phone;
+            private Date dateOfBirth;
+            private String gender;
+            private String address;
+            private String profilePicture;
+            private String cvFile;
+            private String skills;
+            private int experienceYears;
+            private String education;
+            private String desiredJobTitle;
+            private double desiredSalary;
+            private String jobCategory;
+            private String preferredLocation;
+            private String careerLevel;
+            private String workType;
+            private String profileSummary;
+            private String portfolioUrl;
+            private String languages;
+            private Date createdAt;
+            private Date updatedAt;
+            private boolean isActive;
+                 */
+        return listJobSeekers;
+    }
 
     public boolean isUsernameTaken(String username) {
         String sql = "INSERT INTO JobSeeker "
