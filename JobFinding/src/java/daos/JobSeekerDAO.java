@@ -174,9 +174,9 @@ public class JobSeekerDAO extends DBContext {
                 + "           ,[is_active])\n"
                 + "     VALUES\n"
                 + "           (?, ?, ?, ?, ?)";
-        
+
         int n = 0;
-        
+
         try {
             PreparedStatement ptm = connection.prepareStatement(sql);
             ptm.setString(1, p.getUsername());
@@ -192,7 +192,21 @@ public class JobSeekerDAO extends DBContext {
         } catch (SQLException ex) {
             ex.getStackTrace();
         }
-        
+
         return n;
+    }
+
+    public void changeStatus(int ID, boolean status) {
+        String sql = "UPDATE [dbo].[Job_Seekers]\n"
+                + "   SET [is_active] = ?\n"
+                + " WHERE id = ?";
+        try {
+            PreparedStatement ptm = connection.prepareStatement(sql);
+            ptm.setBoolean(1, status == true ? false : true);
+            ptm.setInt(2, ID);
+            ptm.executeUpdate();
+        } catch (SQLException ex) {
+            ex.getStackTrace();
+        }
     }
 }

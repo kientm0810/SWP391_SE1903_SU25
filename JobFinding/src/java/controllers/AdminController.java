@@ -116,6 +116,14 @@ public class AdminController extends HttpServlet {
 
                 }
                
+            } else if (service.equals("Ban")){
+                int ID = Integer.parseInt(request.getParameter("ID"));
+                boolean status = Boolean.parseBoolean(request.getParameter("status"));
+                
+                JobSeekerDAO dao = new JobSeekerDAO();
+                dao.changeStatus(ID, status);
+                
+                response.sendRedirect("AdminController?target=JobSeeker");
             }
         } else {
             
