@@ -22,7 +22,7 @@ public class JobSeekerDAO extends DBContext {
 
     public JobSeekerDAO() {
     }
-    
+
     public Vector<JobSeeker> getAllJobSeeker() {
         String sql = getAll;
         Vector<JobSeeker> listJobSeekers = new Vector<>();
@@ -64,7 +64,7 @@ public class JobSeekerDAO extends DBContext {
             ex.getStackTrace();
         }
 
-                /*
+        /*
                 private int id;
             private String username;
             private String password;
@@ -91,7 +91,7 @@ public class JobSeekerDAO extends DBContext {
             private Date createdAt;
             private Date updatedAt;
             private boolean isActive;
-                 */
+         */
         return listJobSeekers;
     }
 
@@ -163,5 +163,36 @@ public class JobSeekerDAO extends DBContext {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public int insertJobSeeker(JobSeeker p) {
+        String sql = "INSERT INTO [dbo].[Job_Seekers]\n"
+                + "           ([username]\n"
+                + "           ,[password]\n"
+                + "           ,[email]\n"
+                + "           ,[full_name]\n"
+                + "           ,[is_active])\n"
+                + "     VALUES\n"
+                + "           (?, ?, ?, ?, ?)";
+        
+        int n = 0;
+        
+        try {
+            PreparedStatement ptm = connection.prepareStatement(sql);
+            ptm.setString(1, p.getUsername());
+            ptm.setString(2, p.getPassword());
+            ptm.setString(3, p.getEmail());
+            ptm.setString(4, p.getFullName());
+            ptm.setBoolean(5, p.isActive());
+//            ptm.setDate(6, p.getImportDate());
+//            ptm.setDate(7, p.getUsingDate());
+//            ptm.setInt(8, p.getStatus());
+            n = ptm.executeUpdate();
+            //System.out.println("vcl " + n);
+        } catch (SQLException ex) {
+            ex.getStackTrace();
+        }
+        
+        return n;
     }
 }

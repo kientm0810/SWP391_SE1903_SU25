@@ -26,16 +26,28 @@
                     <th>Profile picture</th>
                     <th>Full name</th>
                     <th>View detail</th>
+                    <th>Ban/ Reassign</th>
                 </tr>
             </thead>
             <tbody>
-                <%for (Products product : list) {%>                   
+                <%for (JobSeeker i : vec) {%>                   
                 <tr>
-                    <td><%=product.getProductID()%></td>
-                    <td><%=product.getProductName()%></td>
+                    <td><%=i.getId()%></td>
+                    <td><%=i.getProfilePicture()%></td>
+                    <td><%=i.getFullName()%></td>
+                    <td></td>
+                    <td>
+                        <button>
+                            <a href="AdminController?target=JobSeeker&service=Ban&ID=<%=i.getId()%>">
+                                <%=i.isActive() == true ? "Ban" : "Reassign"%>
+                            </a>
+                        </button>
+                    </td>
                 </tr>
                 <%}%>
             </tbody>
         </table>
+            
+        <p><a href="AdminController?target=JobSeeker&service=Add">Add JobSeeker</a></p>
     </body>
 </html>

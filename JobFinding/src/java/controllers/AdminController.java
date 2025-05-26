@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Vector;
+import java.sql.Date;
 
 /**
  *
@@ -64,6 +65,57 @@ public class AdminController extends HttpServlet {
                 request.setAttribute("vec", vec);
                 
                 request.getRequestDispatcher("admin_manage_jobseeker.jsp").forward(request, response);
+            } else if (service.equals("Add")){
+                JobSeekerDAO dao = new JobSeekerDAO();
+                
+                String submit = request.getParameter("submit");
+                if (submit == null){
+                    request.getRequestDispatcher("admin_add_jobseeker.jsp").forward(request, response);
+                } else {
+                    String username = request.getParameter("username");
+                    String password = request.getParameter("password");
+                    String email = request.getParameter("email");
+                    String fullName = request.getParameter("fullName");
+                    String phone = request.getParameter("phone");
+                    String dateOfBirthStr = request.getParameter("dateOfBirth"); // cần parse sang Date
+                    String gender = request.getParameter("gender");
+                    String address = request.getParameter("address");
+                    String profilePicture = request.getParameter("profilePicture");
+                    String cvFile = request.getParameter("cvFile");
+                    String skills = request.getParameter("skills");
+                    String experienceYearsStr = request.getParameter("experienceYears"); // cần parse int
+                    String education = request.getParameter("education");
+                    String desiredJobTitle = request.getParameter("desiredJobTitle");
+                    String desiredSalaryStr = request.getParameter("desiredSalary"); // cần parse double
+                    String jobCategory = request.getParameter("jobCategory");
+                    String preferredLocation = request.getParameter("preferredLocation");
+                    String careerLevel = request.getParameter("careerLevel");
+                    String workType = request.getParameter("workType");
+                    String profileSummary = request.getParameter("profileSummary");
+                    String portfolioUrl = request.getParameter("portfolioUrl");
+                    String languages = request.getParameter("languages");
+                    String createdAtStr = request.getParameter("createdAt"); // cần parse Date
+                    String updatedAtStr = request.getParameter("updatedAt"); // cần parse Date
+                    String isActiveStr = request.getParameter("isActive"); // cần parse boolean
+                    Date dateOfBirth = Date.valueOf(dateOfBirthStr); // nếu format là yyyy-MM-dd
+                    int experienceYears = Integer.parseInt(experienceYearsStr);
+                    double desiredSalary = Double.parseDouble(desiredSalaryStr);
+                    boolean isActive = Boolean.parseBoolean(isActiveStr);
+                    Date createdAt = Date.valueOf(createdAtStr);
+                    Date updatedAt = Date.valueOf(updatedAtStr);
+                    
+                    JobSeeker p = new JobSeeker(username, password, email, fullName, phone, 
+                            dateOfBirth, gender, address, profilePicture, cvFile, skills, 
+                            experienceYears, education, desiredJobTitle, desiredSalary, 
+                            jobCategory, preferredLocation, careerLevel, workType, 
+                            profileSummary, portfolioUrl, languages, createdAt, updatedAt, isActive);
+                    
+                    dao.insertJobSeeker(p);
+                    
+                    response.sendRedirect("AdminController?target=JobSeeker");
+
+                }
+               
             }
         } else {
             
