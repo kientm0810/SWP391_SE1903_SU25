@@ -118,8 +118,8 @@
                 </tr>
                 <tr>
                     <td>isActive</td>
-                    <td><input type="radio" name="isActive" value="1" checked>Active
-                        <input type="radio" name="isActive" value="0">DeActive
+                    <td><input type="radio" name="isActive" value="true" checked>Active
+                        <input type="radio" name="isActive" value="false">DeActive
                     </td>
                 </tr>
                 <tr>
