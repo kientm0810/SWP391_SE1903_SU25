@@ -2,15 +2,6 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/web/admin_dashboard.jsp</file>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/web/admin_home.jsp</file>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/web/admin_manage_jobseeker.jsp</file>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/web/admin_add_jobseeker.jsp</file>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/daos/JobSeekerDAO.java</file>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/models/JobSeeker.java</file>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/controllers/AdminController.java</file>
-            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/web/error.jsp</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>
