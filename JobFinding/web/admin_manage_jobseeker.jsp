@@ -38,7 +38,7 @@
                     <td></td>
                     <td>
                         <button>
-                            <a href="AdminController?target=JobSeeker&service=Ban&ID=<%=i.getId()%>">
+                            <a href="AdminController?target=JobSeeker&service=Ban&ID=<%=i.getId()%>&status=<%=i.isActive() == true ? true : false%>">
                                 <%=i.isActive() == true ? "Ban" : "Reassign"%>
                             </a>
                         </button>
