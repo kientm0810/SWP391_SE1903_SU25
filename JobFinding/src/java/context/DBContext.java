@@ -17,10 +17,13 @@ public class DBContext {
     public DBContext() {
         try {
             // Thông tin kết nối cơ sở dữ liệu
-            String user = "sa";
-            String pass = "123";
-            //String url = "jdbc:sqlserver://NHOTUNG\\SQLEXPRESS:1433;databaseName=project_SWP391";
-            String url = "jdbc:sqlserver://MSI:1433;databaseName=project_SWP391";
+//            String user = "sa";
+//            String pass = "123";
+              String user = "hungld";
+              String pass = "12345";
+            
+            //String url = "jdbc:sqlserver://localhost:1433;databaseName=project_SWP391";
+            String url = "jdbc:sqlserver://localhost:1433;databaseName=project_SWP391";
             
             // Đăng ký driver
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");

@@ -1,12 +1,13 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package daos;
 
 import context.DBContext;
 import models.CV;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -14,112 +15,129 @@ import org.slf4j.LoggerFactory;
 
 public class CVDAO extends DBContext {
     private static final Logger logger = LoggerFactory.getLogger(CVDAO.class);
+    protected Connection connection; // Define connection field
 
-    public boolean createCV(CV cv) {
-        String cvSql = "INSERT INTO Job_Seeker_CVs (job_seeker_id, title, summary, education, experience, created_at, updated_at) " +
-                       "VALUES (?, ?, ?, ?, ?, GETDATE(), GETDATE())";
-        String skillSql = "INSERT INTO CV_Skills (cv_id, skill_name, proficiency_level) VALUES (?, ?, 'intermediate')";
-        try (Connection conn = getConnection();
-             PreparedStatement cvPs = conn.prepareStatement(cvSql, Statement.RETURN_GENERATED_KEYS)) {
-            cvPs.setInt(1, cv.getJobSeekerId());
-            cvPs.setString(2, cv.getTitle());
-            cvPs.setString(3, cv.getSummary());
-            cvPs.setString(4, cv.getEducation());
-            cvPs.setString(5, cv.getExperience());
-            int affectedRows = cvPs.executeUpdate();
-            if (affectedRows == 0) {
-                return false;
+    public CVDAO() {
+        try {
+            if (connection == null || connection.isClosed()) {
+                connection = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=project_SWP391", "hungld", "12345");
             }
-            try (ResultSet generatedKeys = cvPs.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    int cvId = generatedKeys.getInt(1);
-                    if (cv.getSkills() != null) {
-                        try (PreparedStatement skillPs = conn.prepareStatement(skillSql)) {
-                            for (String skill : cv.getSkills()) {
-                                skillPs.setInt(1, cvId);
-                                skillPs.setString(2, skill);
-                                skillPs.addBatch();
-                            }
-                            skillPs.executeBatch();
-                        }
-                    }
-                }
-            }
-            return true;
         } catch (SQLException e) {
-            logger.error("Lỗi khi tạo CV cho job_seeker_id: {}", cv.getJobSeekerId(), e);
-            return false;
+            logger.error("Failed to initialize connection", e);
         }
+    }
+    public boolean createCV(CV cv) {
+        String cvSql = "INSERT INTO Job_Seeker_CVs (job_seeker_id, title, summary, education, experience, created_at, updated_at, is_active) " +
+                       "VALUES (?, ?, ?, ?, ?, ?, ?, 1)";
+        String skillSql = "INSERT INTO CV_Skills (cv_id, skill_name, proficiency_level) VALUES (?, ?, ?)";
+        
+        try (Connection conn = getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement ps = conn.prepareStatement(cvSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                ps.setInt(1, cv.getJobSeekerId());
+                ps.setString(2, cv.getTitle());
+                ps.setString(3, cv.getSummary());
+                ps.setString(4, cv.getEducation());
+                ps.setString(5, cv.getExperience());
+                ps.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
+                ps.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
+                ps.executeUpdate();
+
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    int cvId = rs.getInt(1);
+                    cv.setId(cvId);
+                    try (PreparedStatement skillPs = conn.prepareStatement(skillSql)) {
+                        for (String skill : cv.getSkills()) {
+                            skillPs.setInt(1, cvId);
+                            skillPs.setString(2, skill.trim());
+                            skillPs.setString(3, "intermediate");
+                            skillPs.addBatch();
+                        }
+                        skillPs.executeBatch();
+                    }
+                    conn.commit();
+                    return true;
+                }
+            } catch (SQLException e) {
+                conn.rollback();
+                logger.error("Error creating CV", e);
+            }
+        } catch (SQLException e) {
+            logger.error("Connection error", e);
+        }
+        return false;
     }
 
     public boolean updateCV(CV cv) {
-        String cvSql = "UPDATE Job_Seeker_CVs SET title = ?, summary = ?, education = ?, experience = ?, updated_at = GETDATE() WHERE id = ? AND job_seeker_id = ?";
+        String cvSql = "UPDATE Job_Seeker_CVs SET title = ?, summary = ?, education = ?, experience = ?, updated_at = ? WHERE id = ? AND job_seeker_id = ?";
         String deleteSkillsSql = "DELETE FROM CV_Skills WHERE cv_id = ?";
-        String insertSkillSql = "INSERT INTO CV_Skills (cv_id, skill_name, proficiency_level) VALUES (?, ?, 'intermediate')";
-        try (Connection conn = getConnection();
-             PreparedStatement cvPs = conn.prepareStatement(cvSql)) {
-            cvPs.setString(1, cv.getTitle());
-            cvPs.setString(2, cv.getSummary());
-            cvPs.setString(3, cv.getEducation());
-            cvPs.setString(4, cv.getExperience());
-            cvPs.setInt(5, cv.getId());
-            cvPs.setInt(6, cv.getJobSeekerId());
-            int affectedRows = cvPs.executeUpdate();
-            if (affectedRows == 0) {
-                return false;
-            }
-            // Xóa kỹ năng cũ
-            try (PreparedStatement deletePs = conn.prepareStatement(deleteSkillsSql)) {
-                deletePs.setInt(1, cv.getId());
-                deletePs.executeUpdate();
-            }
-            // Thêm kỹ năng mới
-            if (cv.getSkills() != null) {
-                try (PreparedStatement insertPs = conn.prepareStatement(insertSkillSql)) {
-                    for (String skill : cv.getSkills()) {
-                        insertPs.setInt(1, cv.getId());
-                        insertPs.setString(2, skill);
-                        insertPs.addBatch();
-                    }
-                    insertPs.executeBatch();
+        String insertSkillSql = "INSERT INTO CV_Skills (cv_id, skill_name, proficiency_level) VALUES (?, ?, ?)";
+        
+        try (Connection conn = getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement ps = conn.prepareStatement(cvSql)) {
+                ps.setString(1, cv.getTitle());
+                ps.setString(2, cv.getSummary());
+                ps.setString(3, cv.getEducation());
+                ps.setString(4, cv.getExperience());
+                ps.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
+                ps.setInt(6, cv.getId());
+                ps.setInt(7, cv.getJobSeekerId());
+                ps.executeUpdate();
+
+                try (PreparedStatement deletePs = conn.prepareStatement(deleteSkillsSql)) {
+                    deletePs.setInt(1, cv.getId());
+                    deletePs.executeUpdate();
                 }
+
+                try (PreparedStatement skillPs = conn.prepareStatement(insertSkillSql)) {
+                    for (String skill : cv.getSkills()) {
+                        skillPs.setInt(1, cv.getId());
+                        skillPs.setString(2, skill.trim());
+                        skillPs.setString(3, "intermediate");
+                        skillPs.addBatch();
+                    }
+                    skillPs.executeBatch();
+                }
+                conn.commit();
+                return true;
+            } catch (SQLException e) {
+                conn.rollback();
+                logger.error("Error updating CV", e);
             }
-            return true;
         } catch (SQLException e) {
-            logger.error("Lỗi khi cập nhật CV id: {}", cv.getId(), e);
-            return false;
+            logger.error("Connection error", e);
         }
+        return false;
     }
 
     public boolean deleteCV(int cvId, int jobSeekerId) {
-        String skillSql = "DELETE FROM CV_Skills WHERE cv_id = ?";
-        String cvSql = "DELETE FROM Job_Seeker_CVs WHERE id = ? AND job_seeker_id = ?";
+        String sql = "DELETE FROM Job_Seeker_CVs WHERE id = ? AND job_seeker_id = ?";
         try (Connection conn = getConnection();
-             PreparedStatement skillPs = conn.prepareStatement(skillSql);
-             PreparedStatement cvPs = conn.prepareStatement(cvSql)) {
-            skillPs.setInt(1, cvId);
-            skillPs.executeUpdate();
-            cvPs.setInt(1, cvId);
-            cvPs.setInt(2, jobSeekerId);
-            return cvPs.executeUpdate() > 0;
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, cvId);
+            ps.setInt(2, jobSeekerId);
+            int rows = ps.executeUpdate();
+            return rows > 0;
         } catch (SQLException e) {
-            logger.error("Lỗi khi xóa CV id: {} cho job_seeker_id: {}", cvId, jobSeekerId, e);
-            return false;
+            logger.error("Error deleting CV", e);
         }
+        return false;
     }
 
     public List<CV> searchCVs(int jobSeekerId, String keyword) {
         List<CV> cvs = new ArrayList<>();
-        String sql = "SELECT c.id, c.job_seeker_id, c.title, c.summary, c.education, c.experience, c.created_at, c.updated_at " +
-                     "FROM Job_Seeker_CVs c " +
-                     "LEFT JOIN CV_Skills s ON c.id = s.cv_id " +
-                     "WHERE c.job_seeker_id = ? AND (c.title LIKE ? OR s.skill_name LIKE ?)";
+        String sql = "SELECT * FROM Job_Seeker_CVs WHERE job_seeker_id = ? AND is_active = 1 " +
+                     "AND (title LIKE ? OR summary LIKE ? OR education LIKE ? OR experience LIKE ?)";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            String searchPattern = "%" + keyword + "%";
+            String searchTerm = "%" + (keyword != null ? keyword : "") + "%";
             ps.setInt(1, jobSeekerId);
-            ps.setString(2, searchPattern);
-            ps.setString(3, searchPattern);
+            ps.setString(2, searchTerm);
+            ps.setString(3, searchTerm);
+            ps.setString(4, searchTerm);
+            ps.setString(5, searchTerm);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 CV cv = new CV();
@@ -131,12 +149,11 @@ public class CVDAO extends DBContext {
                 cv.setExperience(rs.getString("experience"));
                 cv.setCreatedAt(rs.getTimestamp("created_at"));
                 cv.setUpdatedAt(rs.getTimestamp("updated_at"));
-                // Lấy kỹ năng
                 cv.setSkills(getSkillsForCV(cv.getId(), conn));
                 cvs.add(cv);
             }
         } catch (SQLException e) {
-            logger.error("Lỗi khi tìm kiếm CV cho job_seeker_id: {}, keyword: {}", jobSeekerId, keyword, e);
+            logger.error("Error searching CVs", e);
         }
         return cvs;
     }
@@ -152,9 +169,5 @@ public class CVDAO extends DBContext {
             }
         }
         return skills;
-    }
-
-    private Connection getConnection() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }
