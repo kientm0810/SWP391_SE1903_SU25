@@ -123,7 +123,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><input type="submit" name="submit" value="Add Product"></td>
+                    <td><input type="submit" name="submit" value="Add JobSeeker"></td>
                     <td><input type="reset" value="Reset">
                         <input type="hidden" name="service" value="Add">
                         <input type="hidden" name="target" value="JobSeeker">

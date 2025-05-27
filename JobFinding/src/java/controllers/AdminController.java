@@ -6,7 +6,10 @@
 package controllers;
 
 import models.JobSeeker;
+import models.Recruiter;
 import daos.JobSeekerDAO;
+import daos.RecruiterDAO;
+import daos.UserDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -66,7 +69,7 @@ public class AdminController extends HttpServlet {
                 
                 request.getRequestDispatcher("admin_manage_jobseeker.jsp").forward(request, response);
             } else if (service.equals("Add")){
-                JobSeekerDAO dao = new JobSeekerDAO();
+                UserDAO dao = new UserDAO();
                 
                 String submit = request.getParameter("submit");
                 if (submit == null){
@@ -110,7 +113,7 @@ public class AdminController extends HttpServlet {
                             jobCategory, preferredLocation, careerLevel, workType, 
                             profileSummary, portfolioUrl, languages, createdAt, updatedAt, isActive);
                     
-                    dao.insertJobSeeker(p);
+                    dao.registerJobSeeker(p);
                     
                     response.sendRedirect("AdminController?target=JobSeeker");
 
@@ -124,9 +127,97 @@ public class AdminController extends HttpServlet {
                 dao.changeStatus(ID, status);
                 
                 response.sendRedirect("AdminController?target=JobSeeker");
+            } else if (service.equals("Detail")){
+                int ID = Integer.parseInt(request.getParameter("ID"));
+                
+                JobSeekerDAO dao = new JobSeekerDAO();
+                JobSeeker p = dao.getSpeccificJobSeeker(ID);
+                
+                request.setAttribute("JobSeeker", p);
+                
+                request.getRequestDispatcher("admin_detail_jobseeker.jsp").forward(request, response);
             }
-        } else {
+        } else if (target.equals("Recruiter")){
             
+            String service = request.getParameter("service");
+            if (service == null){
+                service = "list";
+            }
+            
+            if (service.equals("list")){
+                RecruiterDAO dao = new RecruiterDAO();
+                Vector<Recruiter> vec = dao.getAllRecruiter();
+                
+                request.setAttribute("vec", vec);
+                
+                request.getRequestDispatcher("admin_manage_recruiter.jsp").forward(request, response);
+            } else if (service.equals("Add")){
+                UserDAO dao = new UserDAO();
+                
+                String submit = request.getParameter("submit");
+                if (submit == null){
+                    request.getRequestDispatcher("admin_add_recruiter.jsp").forward(request, response);
+                } else {
+                    String username = request.getParameter("username");
+                    String password = request.getParameter("password");
+                    String email = request.getParameter("email");
+                    String fullName = request.getParameter("fullName");
+                    String phone = request.getParameter("phone");
+                    String dateOfBirthStr = request.getParameter("dateOfBirth");
+                    String gender = request.getParameter("gender");
+                    String address = request.getParameter("address");
+                    String profilePicture = request.getParameter("profilePicture");
+                    String companyName = request.getParameter("companyName");
+                    String companyDescription = request.getParameter("companyDescription");
+                    String logo = request.getParameter("logo");
+                    String website = request.getParameter("website");
+                    String companyAddress = request.getParameter("companyAddress");
+                    String companySize = request.getParameter("companySize");
+                    String industry = request.getParameter("industry");
+                    String taxCode = request.getParameter("taxCode");
+                    String loyaltyScoreStr = request.getParameter("loyaltyScore");
+                    String verificationStatus = request.getParameter("verificationStatus");
+                    String createdAtStr = request.getParameter("createdAt");
+                    String updatedAtStr = request.getParameter("updatedAt");
+                    String isActiveStr = request.getParameter("isActive");
+                    Date createdAt = Date.valueOf(createdAtStr);
+                    Date updatedAt = Date.valueOf(updatedAtStr);
+                    Date dateOfBirth = Date.valueOf(dateOfBirthStr); // hoặc dùng SimpleDateFormat nếu khác định dạng
+                    double loyaltyScore = Double.parseDouble(loyaltyScoreStr);
+                    boolean isActive = Boolean.parseBoolean(isActiveStr);
+
+
+                    
+                    Recruiter p = new Recruiter(username, password, email, fullName, phone, 
+                            dateOfBirth, gender, address, profilePicture, companyName, 
+                            companyDescription, logo, website, companyAddress, companySize, 
+                            industry, taxCode, loyaltyScore, verificationStatus, 
+                            createdAt, updatedAt, isActive);
+                    
+                    dao.registerRecruiter(p);
+                    
+                    response.sendRedirect("AdminController?target=Recruiter");
+
+                }
+               
+            } else if (service.equals("Ban")){
+                int ID = Integer.parseInt(request.getParameter("ID"));
+                boolean status = Boolean.parseBoolean(request.getParameter("status"));
+                
+                RecruiterDAO dao = new RecruiterDAO();
+                dao.changeStatus(ID, status);
+                
+                response.sendRedirect("AdminController?target=Recruiter");
+            } else if (service.equals("Detail")){
+                int ID = Integer.parseInt(request.getParameter("ID"));
+                
+                RecruiterDAO dao = new RecruiterDAO();
+                Recruiter p = dao.getSpeccificRecruiter(ID);
+                
+                request.setAttribute("Recruiter", p);
+                
+                request.getRequestDispatcher("admin_detail_recruiter.jsp").forward(request, response);
+            }
         }
 
     } 
