@@ -35,7 +35,13 @@
                     <td><%=i.getId()%></td>
                     <td><%=i.getProfilePicture()%></td>
                     <td><%=i.getFullName()%></td>
-                    <td></td>
+                    <td>
+                        <button>
+                            <a href="AdminController?target=JobSeeker&service=Detail&ID=<%=i.getId()%>">
+                                View
+                            </a>
+                        </button>
+                    </td>
                     <td>
                         <button>
                             <a href="AdminController?target=JobSeeker&service=Ban&ID=<%=i.getId()%>&status=<%=i.isActive() == true ? true : false%>">

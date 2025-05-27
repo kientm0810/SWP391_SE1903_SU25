@@ -9,7 +9,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Add jobseeker</title>
+        <title>Add Recruiter</title>
     </head>
     <body>
         <h1>Hello World!</h1>
@@ -56,58 +56,50 @@
                     <td>profilePicture</td>
                     <td><input type="text" name="profilePicture"></td>
                 </tr>
+                
+                
                 <tr>
-                    <td>cvFile</td>
-                    <td><input type="text" name="cvFile"></td>
+                    <td>companyName</td>
+                    <td><input type="text" name="companyName"></td>
                 </tr>
                 <tr>
-                    <td>skills</td>
-                    <td><input type="text" name="skills"></td>
+                    <td>companyDescription</td>
+                    <td><input type="text" name="companyDescription"></td>
                 </tr>
                 <tr>
-                    <td>experienceYears</td>
-                    <td><input type="text" name="experienceYears"></td>
+                    <td>logo</td>
+                    <td><input type="text" name="logo"></td>
                 </tr>
                 <tr>
-                    <td>education</td>
-                    <td><input type="text" name="education"></td>
+                    <td>website</td>
+                    <td><input type="text" name="website"></td>
                 </tr>
                 <tr>
-                    <td>desiredJobTitle</td>
-                    <td><input type="text" name="desiredJobTitle"></td>
+                    <td>companyAddress</td>
+                    <td><input type="text" name="companyAddress"></td>
                 </tr>
                 <tr>
-                    <td>desiredSalary</td>
-                    <td><input type="text" name="desiredSalary"></td>
+                    <td>companySize</td>
+                    <td><input type="text" name="companySize"></td>
                 </tr>
                 <tr>
-                    <td>jobCategory</td>
-                    <td><input type="text" name="jobCategory"></td>
+                    <td>industry</td>
+                    <td><input type="text" name="industry"></td>
                 </tr>
                 <tr>
-                    <td>preferredLocation</td>
-                    <td><input type="text" name="preferredLocation"></td>
+                    <td>taxCode</td>
+                    <td><input type="text" name="taxCode"></td>
                 </tr>
                 <tr>
-                    <td>careerLevel</td>
-                    <td><input type="text" name="careerLevel"></td>
+                    <td>loyaltyScore</td>
+                    <td><input type="text" name="loyaltyScore"></td>
                 </tr>
                 <tr>
-                    <td>workType</td>
-                    <td><input type="text" name="workType"></td>
+                    <td>verificationStatus</td>
+                    <td><input type="text" name="verificationStatus"></td>
                 </tr>
-                <tr>
-                    <td>profileSummary</td>
-                    <td><input type="text" name="profileSummary"></td>
-                </tr>
-                <tr>
-                    <td>portfolioUrl</td>
-                    <td><input type="text" name="portfolioUrl"></td>
-                </tr>
-                <tr>
-                    <td>languages</td>
-                    <td><input type="text" name="languages"></td>
-                </tr>
+                
+                
                 <tr>
                     <td>createdAt</td>
                     <td><input type="date" name="createdAt"></td>
@@ -123,10 +115,10 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><input type="submit" name="submit" value="Add JobSeeker"></td>
+                    <td><input type="submit" name="submit" value="Add Recruiter"></td>
                     <td><input type="reset" value="Reset">
                         <input type="hidden" name="service" value="Add">
-                        <input type="hidden" name="target" value="JobSeeker">
+                        <input type="hidden" name="target" value="Recruiter">
                     </td>
                 </tr>
             </table>

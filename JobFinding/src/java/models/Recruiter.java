@@ -40,8 +40,32 @@ public class Recruiter {
 
     public Recruiter() {
     }
-    
 
+    public Recruiter(String username, String password, String email, String fullName, String phone, Date dateOfBirth, String gender, String address, String profilePicture, String companyName, String companyDescription, String logo, String website, String companyAddress, String companySize, String industry, String taxCode, double loyaltyScore, String verificationStatus, Date createdAt, Date updatedAt, boolean isActive) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.fullName = fullName;
+        this.phone = phone;
+        this.dateOfBirth = dateOfBirth;
+        this.gender = gender;
+        this.address = address;
+        this.profilePicture = profilePicture;
+        this.companyName = companyName;
+        this.companyDescription = companyDescription;
+        this.logo = logo;
+        this.website = website;
+        this.companyAddress = companyAddress;
+        this.companySize = companySize;
+        this.industry = industry;
+        this.taxCode = taxCode;
+        this.loyaltyScore = loyaltyScore;
+        this.verificationStatus = verificationStatus;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.isActive = isActive;
+    }
+    
     public Recruiter(int id, String username, String password, String email, String fullName, String phone,
                      Date dateOfBirth, String gender, String address, String profilePicture, 
                      String companyName, String companyDescription, String logo, String website,
