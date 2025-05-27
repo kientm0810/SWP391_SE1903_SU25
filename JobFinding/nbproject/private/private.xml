@@ -2,6 +2,12 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/daos/JobSeekerDAO.java</file>
+            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/models/Recruiter.java</file>
+            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/daos/RecruiterDAO.java</file>
+            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/daos/UserDAO.java</file>
+            <file>file:/C:/Users/andin/OneDrive/Desktop/ProjectSWP391/JobFinding/src/java/controllers/AdminController.java</file>
+        </group>
     </open-files>
 </project-private>
