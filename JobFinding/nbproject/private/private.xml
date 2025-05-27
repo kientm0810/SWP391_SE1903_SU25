@@ -2,6 +2,44 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/web/error.jsp</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/web/applications.jsp</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/web/posts.jsp</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/web/reset_password.jsp</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/src/java/controllers/ResetPasswordController.java</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/web/header.jsp</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/web/my_posts.jsp</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/web/job_search.jsp</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/src/java/controllers/RegisterController.java</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/web/job_form.jsp</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/src/java/controllers/JobDetailController.java</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/web/home.jsp</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/src/java/context/DBContext.java</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/web/settings.jsp</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/web/job_listing.jsp</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/src/java/models/JobListing.java</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/src/java/controllers/LoginController.java</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/src/java/controllers/PostController.java</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/web/recruiter_home.jsp</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/src/java/controllers/HomeController.java</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/web/saved_jobs.jsp</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/web/post_detail.jsp</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/web/login.jsp</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/web/create_post.jsp</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/src/java/controllers/LogoutController.java</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/web/edit_post.jsp</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/src/java/daos/UserDAO.java</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/src/java/models/Application.java</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/web/job_details.jsp</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/src/java/models/Admin.java</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/src/java/models/Posts.java</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/src/java/daos/PostsDAO.java</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/web/register.jsp</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/src/java/models/JobSeeker.java</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/src/java/models/Recruiter.java</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/web/admin_home.jsp</file>
+            <file>file:/C:/Users/MY%20PC/Downloads/JobFinding/JobFinding/web/jobseeker_home.jsp</file>
+        </group>
     </open-files>
 </project-private>
