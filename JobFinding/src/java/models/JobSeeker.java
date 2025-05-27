@@ -42,34 +42,6 @@ public class JobSeeker {
     public JobSeeker() {
     }
 
-    public JobSeeker(String username, String password, String email, String fullName, String phone, Date dateOfBirth, String gender, String address, String profilePicture, String cvFile, String skills, int experienceYears, String education, String desiredJobTitle, double desiredSalary, String jobCategory, String preferredLocation, String careerLevel, String workType, String profileSummary, String portfolioUrl, String languages, Date createdAt, Date updatedAt, boolean isActive) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.fullName = fullName;
-        this.phone = phone;
-        this.dateOfBirth = dateOfBirth;
-        this.gender = gender;
-        this.address = address;
-        this.profilePicture = profilePicture;
-        this.cvFile = cvFile;
-        this.skills = skills;
-        this.experienceYears = experienceYears;
-        this.education = education;
-        this.desiredJobTitle = desiredJobTitle;
-        this.desiredSalary = desiredSalary;
-        this.jobCategory = jobCategory;
-        this.preferredLocation = preferredLocation;
-        this.careerLevel = careerLevel;
-        this.workType = workType;
-        this.profileSummary = profileSummary;
-        this.portfolioUrl = portfolioUrl;
-        this.languages = languages;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.isActive = isActive;
-    }
-
     public JobSeeker(int id, String username, String password, String email, String fullName, String phone, Date dateOfBirth, String gender, String address, String profilePicture, String cvFile, String skills, int experienceYears, String education, String desiredJobTitle, double desiredSalary, String jobCategory, String preferredLocation, String careerLevel, String workType, String profileSummary, String portfolioUrl, String languages, Date createdAt, Date updatedAt, boolean isActive) {
         this.id = id;
         this.username = username;

@@ -151,4 +151,6 @@ public class Posts {
     public void setDeletedAt(Timestamp deletedAt) {
         this.deletedAt = deletedAt;
     }
+
+   
 }

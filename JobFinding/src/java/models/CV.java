@@ -35,7 +35,6 @@ public class CV {
         this.updatedAt = updatedAt;
     }
 
-    // Getters and Setters
     public int getId() {
         return id;
     }
@@ -107,4 +106,6 @@ public class CV {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    
 }

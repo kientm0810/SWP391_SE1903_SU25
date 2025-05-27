@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+
 import java.io.IOException;
 import models.Admin;
 import models.JobSeeker;
@@ -34,7 +35,7 @@ public class LoginController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
+        HttpSession session = request.getSession(true);
         if (isUserLoggedIn(session)) {
             redirectToHomePage(session, response);
             return;
@@ -111,6 +112,7 @@ public class LoginController extends HttpServlet {
         session.setAttribute("user", user);
         session.setAttribute("role", role);
         session.setAttribute("userId", getUserId(user));
+        session.setAttribute("userType", role);
         session.setMaxInactiveInterval(SESSION_TIMEOUT);
         
         redirectToHomePage(session, response);
