@@ -263,11 +263,39 @@ CREATE TABLE Reports (
     created_at DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (generated_by) REFERENCES Admin(id)
 );
+--Posts Table
+CREATE TABLE Posts (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    user_id INT NOT NULL,
+    user_type VARCHAR(20) NOT NULL CHECK (user_type IN ('admin', 'recruiter', 'job_seeker')),
+    parent_id INT NULL,  -- Dùng để liên kết comments với post gốc
+    post_type VARCHAR(20) NOT NULL CHECK (post_type IN ('post', 'comment', 'like')), -- Phân biệt loại
+    title VARCHAR(255) NULL,  -- NULL cho comments và likes
+    content TEXT NULL,        -- NULL cho likes
+    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'deleted')),
+    view_count INT DEFAULT 0,
+    like_count INT DEFAULT 0,
+    comment_count INT DEFAULT 0,
+    created_at DATETIME DEFAULT GETDATE(),
+    updated_at DATETIME DEFAULT GETDATE(),
+    deleted_at DATETIME NULL,
+  
+    FOREIGN KEY (user_id) REFERENCES Recruiter(id)
+);
+
+
 
 -- Indexes for performance
 CREATE INDEX idx_job_listings_recruiter_id ON Job_Listings(recruiter_id);
 CREATE INDEX idx_applications_job_listing_id ON Applications(job_listing_id);
 CREATE INDEX idx_applications_job_seeker_id ON Applications(job_seeker_id);
+
+-- Tạo các chỉ mục để tối ưu truy vấn
+CREATE INDEX idx_posts_user ON Posts(user_id, user_type);
+CREATE INDEX idx_posts_parent ON Posts(parent_id);
+CREATE INDEX idx_posts_type ON Posts(post_type);
+CREATE INDEX idx_posts_status ON Posts(status);
+CREATE INDEX idx_posts_created_at ON Posts(created_at DESC);
 
 
 -- Insert data into Admin table
@@ -483,3 +511,10 @@ VALUES
 }', 
 'Nguyen Van D - Java Developer CV', 
 1);
+
+INSERT INTO Posts (id, user_id, user_type, parent_id, post_type, title, content, status, view_count, like_count, comment_count, created_at, updated_at, deleted_at)
+VALUES 
+(4, 1, 'recruiter', NULL, 'post', N'Tuyển dụng Developer tại FPT Software', N'Chúng tôi đang tìm kiếm những developer tài năng...', 'active', 0, 0, 0, '2025-05-25 23:18:38.147', '2025-05-25 23:18:38.147', NULL),
+
+(7, 1, 'recruiter', NULL, 'post', N'Tuyển dụng Developer tại FPT Software', N'Chúng tôi đang tìm kiếm những developer tài năng...', 'active', 0, 0, 0, '2025-05-25 23:20:43.017', '2025-05-25 23:20:43.017', NULL);
+
