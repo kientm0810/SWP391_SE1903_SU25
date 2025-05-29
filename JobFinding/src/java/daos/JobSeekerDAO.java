@@ -95,6 +95,52 @@ public class JobSeekerDAO extends DBContext {
         return listJobSeekers;
     }
 
+    public Vector<JobSeeker> getJobSeekerByName(String name) {
+        String sql = "SELECT *"
+                + "  FROM [project_SWP391].[dbo].[Job_Seekers]"
+                + "WHERE [full_name] like N'%" + name + "%'";
+        
+        Vector<JobSeeker> listJobSeekers = new Vector<>();
+        try {
+            PreparedStatement ptm = connection.prepareStatement(sql);
+            ResultSet res = ptm.executeQuery();
+            while (res.next()) {
+                JobSeeker p = new JobSeeker(res.getInt(1),
+                        res.getString(2),
+                        res.getString(3),
+                        res.getString(4),
+                        res.getString(5),
+                        res.getString(6),
+                        res.getDate(7),
+                        res.getString(8),
+                        res.getString(9),
+                        res.getString(10),
+                        res.getString(11),
+                        res.getString(12),
+                        res.getInt(13),
+                        res.getString(14),
+                        res.getString(15),
+                        res.getDouble(16),
+                        res.getString(17),
+                        res.getString(18),
+                        res.getString(19),
+                        res.getString(20),
+                        res.getString(21),
+                        res.getString(22),
+                        res.getString(23),
+                        res.getDate(24),
+                        res.getDate(25),
+                        res.getBoolean(26));
+
+                listJobSeekers.add(p);
+            }
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            ex.getStackTrace();
+        }
+        return listJobSeekers;
+    }
+
     public boolean isUsernameTaken(String username) {
         String sql = "INSERT INTO JobSeeker "
                 + "(username, password, email, full_name, phone, date_of_birth, gender, address, resume, skills, experience, education_level) "
@@ -209,12 +255,12 @@ public class JobSeekerDAO extends DBContext {
             ex.getStackTrace();
         }
     }
-    
-    public JobSeeker getSpeccificJobSeeker(int id){
+
+    public JobSeeker getSpeccificJobSeeker(int id) {
         String sql = "SELECT *\n"
-            + "  FROM [project_SWP391].[dbo].[Job_Seekers]"
-            + " WHERE id = ?";
-        
+                + "  FROM [project_SWP391].[dbo].[Job_Seekers]"
+                + " WHERE id = ?";
+
         JobSeeker p = new JobSeeker();
         try {
             PreparedStatement ptm = connection.prepareStatement(sql);
@@ -253,7 +299,7 @@ public class JobSeekerDAO extends DBContext {
             //System.out.println(ex);
             ex.getStackTrace();
         }
-        
+
         return p;
     }
 }

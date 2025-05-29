@@ -1,8 +1,10 @@
 ﻿DROP DATABASE IF EXISTS project_SWP391;
+GO
 CREATE DATABASE project_SWP391;
+GO
 
 USE project_SWP391;
-
+GO
 
 
 -- Admin Table

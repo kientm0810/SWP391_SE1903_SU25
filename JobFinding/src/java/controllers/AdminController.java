@@ -62,10 +62,24 @@ public class AdminController extends HttpServlet {
             }
             
             if (service.equals("list")){
-                JobSeekerDAO dao = new JobSeekerDAO();
-                Vector<JobSeeker> vec = dao.getAllJobSeeker();
+                String submit = request.getParameter("submit");
+                if (submit == null){
+                    submit = "";
+                }
                 
-                request.setAttribute("vec", vec);
+                if (submit.equals("Search")){
+                    String name = (String)request.getParameter("JobSeekerName");
+                    
+                    JobSeekerDAO dao = new JobSeekerDAO();
+                    Vector<JobSeeker> vec = dao.getJobSeekerByName(name);
+                
+                    request.setAttribute("vec", vec);
+                } else {
+                    JobSeekerDAO dao = new JobSeekerDAO();
+                    Vector<JobSeeker> vec = dao.getAllJobSeeker();
+                
+                    request.setAttribute("vec", vec);
+                }
                 
                 request.getRequestDispatcher("admin_manage_jobseeker.jsp").forward(request, response);
             } else if (service.equals("Add")){
@@ -145,10 +159,24 @@ public class AdminController extends HttpServlet {
             }
             
             if (service.equals("list")){
-                RecruiterDAO dao = new RecruiterDAO();
-                Vector<Recruiter> vec = dao.getAllRecruiter();
+               String submit = request.getParameter("submit");
+                if (submit == null){
+                    submit = "";
+                }
                 
-                request.setAttribute("vec", vec);
+                if (submit.equals("Search")){
+                    String name = (String)request.getParameter("RecruiterName");
+                    
+                    RecruiterDAO dao = new RecruiterDAO();
+                    Vector<Recruiter> vec = dao.getRecruiterByName(name);
+                
+                    request.setAttribute("vec", vec);
+                } else {
+                    RecruiterDAO dao = new RecruiterDAO();
+                    Vector<Recruiter> vec = dao.getAllRecruiter();
+                
+                    request.setAttribute("vec", vec);
+                }
                 
                 request.getRequestDispatcher("admin_manage_recruiter.jsp").forward(request, response);
             } else if (service.equals("Add")){

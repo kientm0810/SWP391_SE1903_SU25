@@ -17,6 +17,22 @@
         <title>JSP Page</title>
     </head>
     <body>
+        <%
+            String RecruiterName = (String) request.getAttribute("RecruiterName");
+            if (RecruiterName == null){
+                RecruiterName = "";
+            }
+        %>
+        
+        <form action="AdminController">
+            <p>Search Recruiter by name:
+                <input type="text" name="RecruiterName" value="<%=RecruiterName%>">
+                <input type="submit" name="submit" value="Search">
+                <input type="reset" value="Reset">
+                <input type="hidden" name="service" value="list">
+                <input type="hidden" name="target" value="Recruiter">
+            </p>
+        </form>
         <h1>Hello World!</h1>
         
         <table border="1">

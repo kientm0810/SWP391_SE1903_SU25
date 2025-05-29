@@ -84,6 +84,75 @@ public class RecruiterDAO extends DBContext {
          */
         return listRecruiters;
     }
+    
+    public Vector<Recruiter> getRecruiterByName(String name) {
+        String sql = "SELECT *"
+                + "  FROM [project_SWP391].[dbo].[Recruiter]"
+                + "WHERE [full_name] like N'%" + name + "%'";
+        
+        Vector<Recruiter> listRecruiters = new Vector<>();
+        try {
+            PreparedStatement ptm = connection.prepareStatement(sql);
+            ResultSet res = ptm.executeQuery();
+            while (res.next()) {
+                Recruiter p = new Recruiter(res.getInt(1),
+                        res.getString(2),
+                        res.getString(3),
+                        res.getString(4),
+                        res.getString(5),
+                        res.getString(6),
+                        res.getDate(7),
+                        res.getString(8),
+                        res.getString(9),
+                        res.getString(10),
+                        res.getString(11),
+                        res.getString(12),
+                        res.getString(13),
+                        res.getString(14),
+                        res.getString(15),
+                        res.getString(16),
+                        res.getString(17),
+                        res.getString(18),
+                        res.getDouble(19),
+                        res.getString(20),
+                        res.getDate(21),
+                        res.getDate(22),
+                        res.getBoolean(23));
+
+                listRecruiters.add(p);
+            }
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            ex.getStackTrace();
+        }
+
+        /*
+            private int id;
+            private String username;
+            private String password;
+            private String email;
+            private String fullName;
+            private String phone;
+            private Date dateOfBirth;
+            private String gender;
+            private String address;
+            private String profilePicture;
+            private String companyName;
+            private String companyDescription;
+            private String logo;
+            private String website;
+            private String companyAddress;
+            private String companySize;
+            private String industry;
+            private String taxCode;
+            private double loyaltyScore;
+            private String verificationStatus;
+            private Date createdAt;
+            private Date updatedAt;
+            private boolean isActive;
+         */
+        return listRecruiters;
+    }
 
     public boolean isUsernameTaken(String username) {
         String sql = "SELECT username FROM Recruiter WHERE username = ?";
