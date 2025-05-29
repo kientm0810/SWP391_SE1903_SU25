@@ -1,10 +1,8 @@
 ﻿DROP DATABASE IF EXISTS project_SWP391;
-GO
 CREATE DATABASE project_SWP391;
-GO
 
 USE project_SWP391;
-GO
+
 
 
 -- Admin Table
@@ -230,14 +228,20 @@ CREATE TABLE CV_Skills (
 CREATE INDEX idx_skill_name ON CV_Skills(skill_name);
 
 -- CV_Templates Table
-CREATE TABLE CV_Templates (
+CREATE TABLE cv_templates (
     id INT PRIMARY KEY IDENTITY(1,1),
-    name VARCHAR(100) NOT NULL,
-    template_file VARCHAR(255) NOT NULL,
-    category VARCHAR(50),
-    description TEXT,
-    is_premium BIT DEFAULT 0,
-    created_at DATETIME DEFAULT GETDATE()
+    job_seeker_id INT NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    job_position VARCHAR(100) NOT NULL,
+    phone VARCHAR(20),
+    email VARCHAR(100) NOT NULL,
+    address VARCHAR(255),
+    certificates TEXT,
+    work_experience TEXT,
+	image_path VARCHAR(255),
+    created_at DATETIME DEFAULT GETDATE(),
+    updated_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (job_seeker_id) REFERENCES Job_Seekers(id)
 );
 
 -- Job_Seeker_CVs Table
@@ -265,7 +269,11 @@ CREATE TABLE Reports (
     created_at DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (generated_by) REFERENCES Admin(id)
 );
---Posts Table
+
+
+
+-- Tạo bảng Posts với đầy đủ thông tin
+-- Tạo bảng Posts với khóa ngoại tham chiếu đến Recruiter
 CREATE TABLE Posts (
     id INT PRIMARY KEY IDENTITY(1,1),
     user_id INT NOT NULL,
@@ -281,9 +289,11 @@ CREATE TABLE Posts (
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT GETDATE(),
     deleted_at DATETIME NULL,
-  
+    FOREIGN KEY (parent_id) REFERENCES Posts(id),
     FOREIGN KEY (user_id) REFERENCES Recruiter(id)
 );
+
+
 
 
 
@@ -513,10 +523,3 @@ VALUES
 }', 
 'Nguyen Van D - Java Developer CV', 
 1);
-
-INSERT INTO Posts (id, user_id, user_type, parent_id, post_type, title, content, status, view_count, like_count, comment_count, created_at, updated_at, deleted_at)
-VALUES 
-(4, 1, 'recruiter', NULL, 'post', N'Tuyển dụng Developer tại FPT Software', N'Chúng tôi đang tìm kiếm những developer tài năng...', 'active', 0, 0, 0, '2025-05-25 23:18:38.147', '2025-05-25 23:18:38.147', NULL),
-
-(7, 1, 'recruiter', NULL, 'post', N'Tuyển dụng Developer tại FPT Software', N'Chúng tôi đang tìm kiếm những developer tài năng...', 'active', 0, 0, 0, '2025-05-25 23:20:43.017', '2025-05-25 23:20:43.017', NULL);
-
