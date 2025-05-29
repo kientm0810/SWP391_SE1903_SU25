@@ -395,7 +395,8 @@
                             </div>
                         </c:if>
 
-                        <form action="post" method="POST" class="needs-validation" id="postForm" novalidate>
+                        <form action="${pageContext.request.contextPath}/post" method="POST" class="needs-validation"
+                            id="postForm" novalidate>
                             <input type="hidden" name="action" value="${param.parentId != null ? 'comment' : 'create'}">
                             <input type="hidden" name="draft_id" id="draftId">
 

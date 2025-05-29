@@ -1,5 +1,6 @@
 package daos;
 
+import context.DBContext;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,12 +9,13 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
-
-import context.DBContext;
-import java.util.Vector;
 import models.Posts;
 
 public class PostsDAO extends DBContext {
+
+    public PostsDAO() {
+        super(); // Gọi constructor của DBContext để khởi tạo connection
+    }
 
     // Lấy danh sách bài viết của người dùng có phân trang
     public List<Posts> getUserPosts(int userId, String userType, int page, int pageSize) throws SQLException {
@@ -131,53 +133,7 @@ public class PostsDAO extends DBContext {
         }
     }
 
-    // Cập nhật bài viết
-    public boolean updatePost(Posts post) throws SQLException {
-        validatePostType(post.getPostType());
-        validateUserType(post.getUserType());
-        
-        String sql = "UPDATE Posts SET title = ?, content = ?, status = ?, updated_at = CURRENT_TIMESTAMP " +
-                    "WHERE id = ? AND user_id = ? AND status != 'deleted'";
-        
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, post.getTitle());
-            ps.setString(2, post.getContent());
-            ps.setString(3, post.getStatus());
-            ps.setInt(4, post.getId());
-            ps.setInt(5, post.getUserId());
-            
-            return ps.executeUpdate() > 0;
-        }
-    }
-
-    // Xoá bài viết (xoá mềm)
-    public boolean deletePost(int postId, int userId) throws SQLException {
-        String sql = "UPDATE Posts SET status = 'deleted', deleted_at = CURRENT_TIMESTAMP " +
-                    "WHERE (id = ? OR parent_id = ?) AND user_id = ? AND status != 'deleted'";
-        
-        try (Connection conn = getConnection()) {
-            conn.setAutoCommit(false);
-            
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setInt(1, postId);
-                ps.setInt(2, postId);
-                ps.setInt(3, userId);
-                
-                boolean success = ps.executeUpdate() > 0;
-                if (success) {
-                    conn.commit();
-                    return true;
-                }
-                
-                conn.rollback();
-                return false;
-            } catch (SQLException e) {
-                conn.rollback();
-                throw e;
-            }
-        }
-    }
+   
 
     // Kiểm tra người dùng đã like bài viết chưa
     private boolean hasUserLiked(int postId, int userId) throws SQLException {
@@ -513,7 +469,133 @@ public class PostsDAO extends DBContext {
         return 0;
     }
 
-    
+   // Update post
+public boolean updatePost(Posts post) throws SQLException {
+    if (!isConnected()) {
+        throw new SQLException("Database connection is not available");
+    }
+    // Chỉ update bài viết gốc, không update comment/like
+    String sql = "UPDATE Posts SET title = ?, content = ?, updated_at = GETDATE() " +
+                 "WHERE id = ? AND user_id = ? AND post_type = 'post' AND status = 'active'";
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        ps.setString(1, post.getTitle());
+        ps.setString(2, post.getContent());
+        ps.setInt(3, post.getId());
+        ps.setInt(4, post.getUserId());
+        return ps.executeUpdate() > 0;
+    }
+}
 
-   
+// Delete post (soft delete)
+public boolean deletePost(int postId, int userId) throws SQLException {
+    if (!isConnected()) {
+        throw new SQLException("Database connection is not available");
+    }
+    String sql = "DELETE FROM Posts WHERE id = ? AND user_id = ?";
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        ps.setInt(1, postId);
+        ps.setInt(2, userId);
+        return ps.executeUpdate() > 0;
+    }
+}
+
+
+
+    // Check if user owns the post
+    public boolean isPostOwner(int postId, int userId) throws SQLException {
+        if (!isConnected()) {
+            throw new SQLException("Database connection is not available");
+        }
+
+        String sql = "SELECT COUNT(*) FROM Posts WHERE id = ? AND user_id = ? AND status != 'deleted'";
+        
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, postId);
+            ps.setInt(2, userId);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
+
+    // Get posts with filters and pagination
+    public List<Posts> getPostsWithFilters(String category, String search, int page, int pageSize) throws SQLException {
+        List<Posts> posts = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+            "SELECT * FROM Posts WHERE post_type = 'post' AND status != 'deleted' "
+        );
+        
+        List<Object> params = new ArrayList<>();
+        
+        if (category != null && !category.isEmpty()) {
+            sql.append("AND category = ? ");
+            params.add(category);
+        }
+        
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append("AND (title LIKE ? OR content LIKE ?) ");
+            String searchPattern = "%" + search.trim() + "%";
+            params.add(searchPattern);
+            params.add(searchPattern);
+        }
+        
+        sql.append("ORDER BY created_at DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+        params.add((page - 1) * pageSize);
+        params.add(pageSize);
+        
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    posts.add(mapPost(rs));
+                }
+            }
+        }
+        return posts;
+    }
+
+    // Get total posts count with filters
+    public int getTotalPostsWithFilters(String category, String search) throws SQLException {
+        StringBuilder sql = new StringBuilder(
+            "SELECT COUNT(*) FROM Posts WHERE post_type = 'post' AND status != 'deleted' "
+        );
+        
+        List<Object> params = new ArrayList<>();
+        
+        if (category != null && !category.isEmpty()) {
+            sql.append("AND category = ? ");
+            params.add(category);
+        }
+        
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append("AND (title LIKE ? OR content LIKE ?) ");
+            String searchPattern = "%" + search.trim() + "%";
+            params.add(searchPattern);
+            params.add(searchPattern);
+        }
+        
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
 }
