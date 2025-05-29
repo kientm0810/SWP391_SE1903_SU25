@@ -228,14 +228,20 @@ CREATE TABLE CV_Skills (
 CREATE INDEX idx_skill_name ON CV_Skills(skill_name);
 
 -- CV_Templates Table
-CREATE TABLE CV_Templates (
+CREATE TABLE cv_templates (
     id INT PRIMARY KEY IDENTITY(1,1),
-    name VARCHAR(100) NOT NULL,
-    template_file VARCHAR(255) NOT NULL,
-    category VARCHAR(50),
-    description TEXT,
-    is_premium BIT DEFAULT 0,
-    created_at DATETIME DEFAULT GETDATE()
+    job_seeker_id INT NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    job_position VARCHAR(100) NOT NULL,
+    phone VARCHAR(20),
+    email VARCHAR(100) NOT NULL,
+    address VARCHAR(255),
+    certificates TEXT,
+    work_experience TEXT,
+	image_path VARCHAR(255),
+    created_at DATETIME DEFAULT GETDATE(),
+    updated_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (job_seeker_id) REFERENCES Job_Seekers(id)
 );
 
 -- Job_Seeker_CVs Table

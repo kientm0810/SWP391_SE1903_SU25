@@ -78,6 +78,11 @@
                                         </a>
                                     </li>
                                     <li>
+                                        <a class="dropdown-item" href="list_cv">
+                                            <i class="fas fa-user"></i> My CV
+                                        </a>
+                                    </li>
+                                    <li>
                                         <a class="dropdown-item" href="my-posts">
                                             <i class="fas fa-file-alt"></i> My Posts
                                         </a>
