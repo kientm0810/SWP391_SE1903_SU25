@@ -40,6 +40,7 @@ public class Posts {
         this.deletedAt = deletedAt;
     }
 
+    // Getters and Setters
     public int getId() {
         return id;
     }
@@ -151,6 +152,4 @@ public class Posts {
     public void setDeletedAt(Timestamp deletedAt) {
         this.deletedAt = deletedAt;
     }
-
-   
 }
