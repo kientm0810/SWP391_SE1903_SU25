@@ -19,7 +19,7 @@ public class PostsDAO {
         }
     }
 
-    // Get all posts
+    // Lấy list all posts
     public List<Posts> getAllPosts() {
         List<Posts> posts = new ArrayList<>();
         String query = "SELECT * FROM Posts WHERE deleted_at IS NULL ORDER BY created_at DESC";
@@ -50,7 +50,7 @@ public class PostsDAO {
         return posts;
     }
 
-    // Get posts by user ID
+    // Lấy list posts tbeo User_id
     public List<Posts> getPostsByUserId(int userId) {
         List<Posts> posts = new ArrayList<>();
         String query = "SELECT * FROM Posts WHERE user_id = ? AND deleted_at IS NULL ORDER BY created_at DESC";
@@ -152,7 +152,7 @@ public class PostsDAO {
         }
     }
 
-    // Delete post (soft delete)
+    // Delete post 
     public boolean deletePost(int id) {
         String query = "UPDATE Posts SET deleted_at = GETDATE() WHERE id = ? AND deleted_at IS NULL";
         try {
@@ -165,7 +165,7 @@ public class PostsDAO {
         }
     }
 
-    // Increment view count
+    // Tăng luot xem post
     public boolean incrementViewCount(int id) {
         String query = "UPDATE Posts SET view_count = view_count + 1 WHERE id = ? AND deleted_at IS NULL";
         try {
