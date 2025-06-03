@@ -238,7 +238,6 @@ CREATE TABLE cv_templates (
     address VARCHAR(255),
     certificates TEXT,
     work_experience TEXT,
-	image_path VARCHAR(255),
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (job_seeker_id) REFERENCES Job_Seekers(id)

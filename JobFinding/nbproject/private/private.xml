@@ -3,27 +3,21 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/web/header.jsp</file>
+            <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/src/java/controllers/JobDetailController.java</file>
+            <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/web/create_post.jsp</file>
             <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/src/java/controllers/CVCreateController.java</file>
             <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/web/update_cv.jsp</file>
-            <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/src/java/daos/AdminDAO.java</file>
-            <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/src/java/models/Application.java</file>
             <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/web/cv_templates.jsp</file>
-            <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/web/admin_add_jobseeker.jsp</file>
             <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/src/java/controllers/CVUpdateController.java</file>
-            <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/src/java/daos/CVTemplateDAO.java</file>
+            <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/src/java/controllers/HomeController.java</file>
             <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/src/java/controllers/CVListController.java</file>
-            <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/web/admin_manage_jobseeker.jsp</file>
+            <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/src/java/daos/CVTemplateDAO.java</file>
             <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/web/WEB-INF/web.xml</file>
-            <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/web/admin_dashboard.jsp</file>
-            <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/src/java/controllers/AdminController.java</file>
-            <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/web/list_cv.jsp</file>
             <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/web/create_cv.jsp</file>
+            <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/web/list_cv.jsp</file>
             <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/src/java/daos/ApplicationDAO.java</file>
-            <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/src/java/utils/Constants.java</file>
-            <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/web/login.jsp</file>
-            <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/src/java/context/DBContext.java</file>
             <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/src/java/models/CVTemplate.java</file>
+            <file>file:/C:/Users/PC/OneDrive/Documents/Project_SWP/JobFinding/src/java/context/DBContext.java</file>
         </group>
     </open-files>
 </project-private>
