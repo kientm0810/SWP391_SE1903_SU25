@@ -1,8 +1,5 @@
 package controllers;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
 import daos.PostsDAO;
 import java.io.*;
 import java.sql.Date;
@@ -15,7 +12,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.io.PrintWriter;
 import jakarta.servlet.http.Part;
 import models.Posts;
 
@@ -39,7 +35,16 @@ public class PostController extends HttpServlet {
             uploadDir.mkdirs();
         }
     }
+    
+    
 
+    /**
+     *
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -56,12 +61,14 @@ public class PostController extends HttpServlet {
             int id = Integer.parseInt(request.getParameter("id"));
             Posts post = postsDAO.getPostById(id);
             if (post != null) {
-                postsDAO.incrementViewCount(id); // Increment view count
+                postsDAO.incrementViewCount(id); // tang so luot xem
                 request.setAttribute("post", post);
                 request.getRequestDispatcher("/view-post.jsp").forward(request, response);
             } else {
                 response.sendRedirect(request.getContextPath() + "/post");
             }
+            
+            
         } else if (path.equals("/edit")) {
             // Show edit form
             int id = Integer.parseInt(request.getParameter("id"));
@@ -89,22 +96,20 @@ public class PostController extends HttpServlet {
                     request.setAttribute("error", "Failed to delete post");
                     request.getRequestDispatcher("/post").forward(request, response);
                 }
-                
-                // Increment view count
-                postsDAO.incrementViewCount(postId);
-                
-                // Get comments
-                List<Posts> comments = postsDAO.getPostComments(postId);
-                
-                request.setAttribute("post", post);
-                request.setAttribute("comments", comments);
-                request.getRequestDispatcher("/post_detail.jsp").forward(request, response);
             } else {
                 response.sendRedirect(request.getContextPath() + "/post");
             }
         }
     }
 
+    
+    /**
+     *
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -227,7 +232,7 @@ public class PostController extends HttpServlet {
                 response.getWriter().write("{\"success\":false,\"message\":\"Có lỗi xảy ra khi tạo bài đăng: " + e.getMessage() + "\"}");
             }
         } else if (path.equals("/update")) {
-            // Update existing post
+            // Update post
             try {
                 int id = Integer.parseInt(request.getParameter("id"));
                 Posts post = postsDAO.getPostById(id);
@@ -295,6 +300,7 @@ public class PostController extends HttpServlet {
         }
     }
 
+    
     private String getSubmittedFileName(Part part) {
         String contentDisp = part.getHeader("content-disposition");
         String[] tokens = contentDisp.split(";");

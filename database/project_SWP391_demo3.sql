@@ -272,6 +272,7 @@ CREATE TABLE Reports (
 
 
 
+
 -- Tạo bảng Posts với đầy đủ thông tin
 -- Tạo bảng Posts với khóa ngoại tham chiếu đến Recruiter
 CREATE TABLE Posts (
@@ -281,7 +282,7 @@ CREATE TABLE Posts (
     parent_id INT NULL,  -- Dùng để liên kết comments với post gốc
     post_type VARCHAR(20) NOT NULL CHECK (post_type IN ('post', 'comment', 'like')), -- Phân biệt loại
     title VARCHAR(255) NULL,  -- NULL cho comments và likes
-    content TEXT NULL,        -- NULL cho likes
+    content NVARCHAR(MAX),        -- NULL cho likes
     status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'deleted')),
     view_count INT DEFAULT 0,
     like_count INT DEFAULT 0,
@@ -289,9 +290,34 @@ CREATE TABLE Posts (
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT GETDATE(),
     deleted_at DATETIME NULL,
-    FOREIGN KEY (parent_id) REFERENCES Posts(id),
+  
     FOREIGN KEY (user_id) REFERENCES Recruiter(id)
 );
+
+ALTER TABLE posts
+ADD 
+
+    company_name NVARCHAR(255),
+	company_logo VARCHAR(500),
+    salary NVARCHAR(100),
+    location NVARCHAR(255),
+    job_type NVARCHAR(50),
+    experience VARCHAR(100),
+    deadline DATE,
+    working_time NVARCHAR(200),
+    job_description TEXT,
+    requirements TEXT,
+    benefits TEXT,
+    contact_address NVARCHAR(500),
+    application_method TEXT;
+	
+-- Bước 1: Đổi từ TEXT sang VARCHAR(MAX)
+ALTER TABLE Posts
+ALTER COLUMN content VARCHAR(MAX);
+
+-- Bước 2: Đổi từ VARCHAR(MAX) sang NVARCHAR(MAX)
+ALTER TABLE Posts
+ALTER COLUMN title NVARCHAR(MAX);
 
 
 
@@ -455,12 +481,16 @@ VALUES
 (3, 'Data Analysis', 'Advanced');
 
 -- Insert data into CV_Templates table
-INSERT INTO CV_Templates (name, template_file, category, description, is_premium)
+INSERT INTO CV_Templates (job_seeker_id, full_name, job_position, phone, email, address, certificates, work_experience, image_path)
 VALUES
-('Professional Blue', 'template1.docx', 'Professional', 'Clean and professional design with blue accents', 0),
-('Modern Red', 'template2.docx', 'Modern', 'Contemporary design with red highlights', 1),
-('Creative', 'template3.docx', 'Creative', 'Unique layout for creative professionals', 1),
-('Simple Elegant', 'template4.docx', 'Professional', 'Minimalist elegant design', 0);
+(1, 'Nguyen Van D', 'Java Developer', '0912345681', 'nguyen.dev@gmail.com', 'Cau Giay, Hanoi', 
+ 'Java Certification, AWS Certified Developer', 'Backend Developer at FPT Software (2019-2022)', 'template1.jpg'),
+(2, 'Linh Thi E', 'UI/UX Designer', '0912345682', 'linh.designer@yahoo.com', 'Ba Dinh, Hanoi', 
+ 'Figma Certification, Adobe XD Proficiency', 'UI Designer at Viettel (2020-2022)', 'template2.jpg'),
+(3, 'Hoang Van F', 'Data Scientist', '0912345683', 'hoang.ba@outlook.com', 'District 1, HCMC', 
+ 'Python Certification, Machine Learning Specialization', 'Data Scientist at VinAI (2018-2023)', 'template3.jpg');
+
+
 
 -- Insert data into Job_Seeker_CVs table
 INSERT INTO Job_Seeker_CVs (job_seeker_id, cv_template_id, cv_content, title, is_default)
@@ -523,3 +553,5 @@ VALUES
 }', 
 'Nguyen Van D - Java Developer CV', 
 1);
+
+

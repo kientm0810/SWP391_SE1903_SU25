@@ -50,3 +50,6 @@ JobFinding/build/
 
 ### Mac OS ###
 .DS_Store
+JobFinding/src/java/context/DBContext.java
+JobFinding/pom.xml
+JobFinding/pom.xml
