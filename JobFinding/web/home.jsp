@@ -251,6 +251,7 @@
             <link rel="stylesheet" href="assets/css/slick.css">
             <link rel="stylesheet" href="assets/css/nice-select.css">
             <link rel="stylesheet" href="assets/css/style.css">
+
         </head>
 
         <body>
@@ -456,98 +457,44 @@
                             </div>
                             <div class="row justify-content-center">
                                 <div class="col-xl-10">
-                                    <!-- single-job-content -->
-                                    <div class="single-job-items mb-30">
-                                        <div class="job-items">
-                                            <div class="company-img">
-                                                <a href="job_details.html"><img src="assets/img/icon/job-list1.png"
-                                                        alt=""></a>
+                                    <!-- Loop through user's posts -->
+                                    <c:forEach items="${userPosts}" var="post">
+                                        <!-- single-job-content -->
+                                        <div class="single-job-items mb-30">
+                                            <div class="job-items">
+                                                <div class="company-img">
+                                                    <a
+                                                        href="${pageContext.request.contextPath}/post/view?id=${post.id}">
+                                                        <img src="${post.companyLogo != null ? post.companyLogo : 'assets/img/icon/job-list1.png'}"
+                                                            alt="">
+                                                    </a>
+                                                </div>
+                                                <div class="job-tittle">
+                                                    <a
+                                                        href="${pageContext.request.contextPath}/post/view?id=${post.id}">
+                                                        <h4>${post.title}</h4>
+                                                    </a>
+                                                    <ul>
+                                                        <li>${post.companyName}</li>
+                                                        <li><i class="fas fa-map-marker-alt"></i>${post.location}</li>
+                                                        <li>${post.salary}</li>
+                                                    </ul>
+                                                </div>
                                             </div>
-                                            <div class="job-tittle">
-                                                <a href="job_details.html">
-                                                    <h4>Digital Marketer</h4>
-                                                </a>
-                                                <ul>
-                                                    <li>Creative Agency</li>
-                                                    <li><i class="fas fa-map-marker-alt"></i>Athens, Greece</li>
-                                                    <li>$3500 - $4000</li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <div class="items-link f-right">
-                                            <a href="job_details.html">Full Time</a>
-                                            <span>7 hours ago</span>
-                                        </div>
-                                    </div>
-                                    <!-- single-job-content -->
-                                    <div class="single-job-items mb-30">
-                                        <div class="job-items">
-                                            <div class="company-img">
-                                                <a href="job_details.html"><img src="assets/img/icon/job-list2.png"
-                                                        alt=""></a>
-                                            </div>
-                                            <div class="job-tittle">
-                                                <a href="job_details.html">
-                                                    <h4>Digital Marketer</h4>
-                                                </a>
-                                                <ul>
-                                                    <li>Creative Agency</li>
-                                                    <li><i class="fas fa-map-marker-alt"></i>Athens, Greece</li>
-                                                    <li>$3500 - $4000</li>
-                                                </ul>
+                                            <div class="items-link f-right">
+                                                <a
+                                                    href="${pageContext.request.contextPath}/post/view?id=${post.id}">${post.jobType}</a>
+                                                <span>${post.postedDate}</span>
                                             </div>
                                         </div>
-                                        <div class="items-link f-right">
-                                            <a href="job_details.html">Full Time</a>
-                                            <span>7 hours ago</span>
+                                    </c:forEach>
+
+                                    <!-- Display message if no posts found -->
+                                    <c:if test="${empty userPosts}">
+                                        <div class="text-center">
+                                            <p>No posts found for this user.</p>
                                         </div>
-                                    </div>
-                                    <!-- single-job-content -->
-                                    <div class="single-job-items mb-30">
-                                        <div class="job-items">
-                                            <div class="company-img">
-                                                <a href="job_details.html"><img src="assets/img/icon/job-list3.png"
-                                                        alt=""></a>
-                                            </div>
-                                            <div class="job-tittle">
-                                                <a href="job_details.html">
-                                                    <h4>Digital Marketer</h4>
-                                                </a>
-                                                <ul>
-                                                    <li>Creative Agency</li>
-                                                    <li><i class="fas fa-map-marker-alt"></i>Athens, Greece</li>
-                                                    <li>$3500 - $4000</li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <div class="items-link f-right">
-                                            <a href="job_details.html">Full Time</a>
-                                            <span>7 hours ago</span>
-                                        </div>
-                                    </div>
-                                    <!-- single-job-content -->
-                                    <div class="single-job-items mb-30">
-                                        <div class="job-items">
-                                            <div class="company-img">
-                                                <a href="job_details.html"><img src="assets/img/icon/job-list4.png"
-                                                        alt=""></a>
-                                            </div>
-                                            <div class="job-tittle">
-                                                <a href="job_details.html">
-                                                    <h4>Digital Marketer</h4>
-                                                </a>
-                                                <ul>
-                                                    <li>Creative Agency</li>
-                                                    <li><i class="fas fa-map-marker-alt"></i>Athens, Greece</li>
-                                                    <li>$3500 - $4000</li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <div class="items-link f-right">
-                                            <a href="job_details.html">Full Time</a>
-                                            <span>7 hours ago</span>
-                                        </div>
-                                    </div>
+                                    </c:if>
                                 </div>
                             </div>
                         </div>

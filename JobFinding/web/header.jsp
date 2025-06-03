@@ -33,11 +33,11 @@
                                 <i class="fas fa-users"></i> Community
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="communityDropdown">
-                                <li>
+<!--                                <li>
                                     <a class="dropdown-item" href="post">
                                         <i class="fas fa-list-ul"></i> All Posts
                                     </a>
-                                </li>
+                                </li>-->
                                 <li>
                                     <a class="dropdown-item" href="create-post.jsp">
                                         <i class="fas fa-edit"></i> Create Post
