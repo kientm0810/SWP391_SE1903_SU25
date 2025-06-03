@@ -53,3 +53,7 @@ JobFinding/build/
 JobFinding/src/java/context/DBContext.java
 JobFinding/pom.xml
 JobFinding/pom.xml
+JobFinding/nbproject/build-impl.xml
+JobFinding/nbproject/genfiles.properties
+JobFinding/nbproject/project.properties
+JobFinding/nbproject/project.xml
