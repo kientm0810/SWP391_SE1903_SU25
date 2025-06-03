@@ -4,67 +4,90 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import daos.PostsDAO;
+import java.io.*;
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.PrintWriter;
+import jakarta.servlet.http.Part;
 import models.Posts;
 
-@WebServlet(name = "PostController", urlPatterns = {"/post"})
+@WebServlet(name = "PostController", urlPatterns = {"/post/*"})
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024, // 1 MB
+    maxFileSize = 1024 * 1024 * 10,  // 10 MB
+    maxRequestSize = 1024 * 1024 * 15 // 15 MB
+)
 public class PostController extends HttpServlet {
+
     private PostsDAO postsDAO;
+    private static final String UPLOAD_DIRECTORY = "uploads/company_logos";
 
     @Override
     public void init() throws ServletException {
-        super.init();
         postsDAO = new PostsDAO();
-    }
-
-    private boolean isRecruiter(HttpSession session) {
-        String role = (String) session.getAttribute("role");
-        return "recruiter".equals(role);
+        // Create upload directory if it doesn't exist
+        File uploadDir = new File(getServletContext().getRealPath("") + File.separator + UPLOAD_DIRECTORY);
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        if (session == null) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Please login first");
-            return;
-        }
-
-        Integer userId = (Integer) session.getAttribute("userId");
-        String userType = (String) session.getAttribute("userType");
-        
-        if (userId == null || userType == null) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid user session");
-            return;
-        }
-
-        String pathInfo = request.getPathInfo();
-        
-        try {
-            if (pathInfo == null || pathInfo.equals("/")) {
-                // List user's posts with pagination
-                int page = parsePageNumber(request.getParameter("page"));
-                int pageSize = 10;
-                
-                List<Posts> posts = postsDAO.getUserPosts(userId, userType, page, pageSize);
-                request.setAttribute("posts", posts);
-                request.getRequestDispatcher("/posts.jsp").forward(request, response);
-            } 
-            else if (pathInfo.matches("/\\d+")) {
-                // View single post
-                int postId = Integer.parseInt(pathInfo.substring(1));
-                Posts post = postsDAO.getPostDetail(postId);
-                
-                if (post == null) {
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "Post not found");
-                    return;
+        String path = request.getPathInfo();
+        if (path == null || path.equals("/")) {
+            // List all posts
+            request.setAttribute("posts", postsDAO.getAllPosts());
+            request.getRequestDispatcher("/posts.jsp").forward(request, response);
+        } else if (path.equals("/create")) {
+            // Show create post form
+            request.getRequestDispatcher("/create-post.jsp").forward(request, response);
+        } else if (path.equals("/view")) {
+            // View single post
+            int id = Integer.parseInt(request.getParameter("id"));
+            Posts post = postsDAO.getPostById(id);
+            if (post != null) {
+                postsDAO.incrementViewCount(id); // Increment view count
+                request.setAttribute("post", post);
+                request.getRequestDispatcher("/view-post.jsp").forward(request, response);
+            } else {
+                response.sendRedirect(request.getContextPath() + "/post");
+            }
+        } else if (path.equals("/edit")) {
+            // Show edit form
+            int id = Integer.parseInt(request.getParameter("id"));
+            Posts post = postsDAO.getPostById(id);
+            HttpSession session = request.getSession();
+            Integer userId = (Integer) session.getAttribute("userId");
+            
+            if (post != null && userId != null && post.getUserId() == userId) {
+                request.setAttribute("post", post);
+                request.getRequestDispatcher("/edit-post.jsp").forward(request, response);
+            } else {
+                response.sendRedirect(request.getContextPath() + "/post");
+            }
+        } else if (path.equals("/delete")) {
+            // Delete post
+            int id = Integer.parseInt(request.getParameter("id"));
+            HttpSession session = request.getSession();
+            Integer userId = (Integer) session.getAttribute("userId");
+            Posts post = postsDAO.getPostById(id);
+            
+            if (post != null && userId != null && post.getUserId() == userId) {
+                if (postsDAO.deletePost(id)) {
+                    response.sendRedirect(request.getContextPath() + "/post");
+                } else {
+                    request.setAttribute("error", "Failed to delete post");
+                    request.getRequestDispatcher("/post").forward(request, response);
                 }
                 
                 // Increment view count
@@ -77,294 +100,209 @@ public class PostController extends HttpServlet {
                 request.setAttribute("comments", comments);
                 request.getRequestDispatcher("/post_detail.jsp").forward(request, response);
             } else {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                response.sendRedirect(request.getContextPath() + "/post");
             }
-        } catch (SQLException e) {
-            handleDatabaseError(e, response);
-        } catch (NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid post ID format");
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        if (session == null) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Please login first");
-            return;
-        }
-
+        String path = request.getPathInfo();
+        HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
         String userType = (String) session.getAttribute("userType");
-        
-        if (userId == null || userType == null) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid user session");
-            return;
-        }
 
-        String action = request.getParameter("action");
-        if (action == null) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Action parameter is required");
-            return;
-        }
-        
-        try {
-            switch (action.toLowerCase()) {
-                case "create":
-                    createPost(request, response, session, userId, userType);
-                    break;
-                case "update":
-                    updatePost(request, response, userId);
-                    break;
-                case "delete":
-                    deletePost(request, response, userId);
-                    break;
-                case "comment":
-                    createComment(request, response, userId, userType);
-                    break;
-                case "like":
-                    toggleLike(request, response, userId, userType);
-                    break;
-                case "reject":
-                    rejectPost(request, response, userId, userType);
-                    break;
-                default:
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid action");
-                    break;
-            }
-        } catch (SQLException e) {
-            handleDatabaseError(e, response);
-        } catch (NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid numeric parameter");
-        }
-    }
-
-    private void createPost(HttpServletRequest request, HttpServletResponse response, 
-            HttpSession session, int userId, String userType) 
-            throws ServletException, IOException, SQLException {
-        if (!isRecruiter(session)) {
-            if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
-                response.setContentType("application/json");
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                response.getWriter().write("{\"success\":false,\"message\":\"Only recruiters can create posts\"}");
-                return;
-            } else {
-                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Only recruiters can create posts");
-                return;
-            }
-        }
-
-        String title = request.getParameter("title");
-        String content = request.getParameter("content");
-        String category = request.getParameter("category");
-        
-        if (title == null || title.trim().isEmpty() || 
-            content == null || content.trim().isEmpty()) {
-            if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
-                response.setContentType("application/json");
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.getWriter().write("{\"success\":false,\"message\":\"Title and content are required\"}");
-                return;
-            } else {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Title and content are required");
-                return;
-            }
-        }
-
-        Posts post = new Posts();
-        post.setUserId(userId);
-        post.setUserType(userType);
-        post.setTitle(title);
-        post.setContent(content);
-        post.setPostType("post");
-        post.setStatus("active");
-
-        boolean created = postsDAO.createPost(post);
-        if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+        if (userId == null) {
             response.setContentType("application/json");
-            if (created) {
-                response.getWriter().write("{\"success\":true,\"message\":\"Post published successfully!\"}");
-            } else {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.getWriter().write("{\"success\":false,\"message\":\"Failed to create post\"}");
+            response.getWriter().write("{\"success\":false,\"message\":\"Please login to create a post\"}");
+            return;
+        }
+
+        if (path == null || path.equals("/")) {
+            // List all posts
+            request.setAttribute("posts", postsDAO.getAllPosts());
+            request.getRequestDispatcher("/posts.jsp").forward(request, response);
+        } else if (path.equals("/create")) {
+            try {
+                // Create new post object
+                Posts post = new Posts();
+                post.setUserId(userId);
+                post.setUserType("recruiter");
+                post.setParentId(null);
+                post.setPostType("post");
+                post.setTitle(request.getParameter("title").trim());
+                post.setStatus("active");
+                post.setViewCount(0);
+                post.setLikeCount(0);
+                post.setCommentCount(0);
+                post.setCompanyName(request.getParameter("companyName").trim());
+                post.setLocation(request.getParameter("location").trim());
+                post.setSalary(request.getParameter("salary").trim());
+                post.setJobType(request.getParameter("jobType").trim());
+                post.setExperience(request.getParameter("experience").trim());
+                
+                // Handle company logo upload
+                try {
+                    Part filePart = request.getPart("companyLogo");
+                    if (filePart != null && filePart.getSize() > 0) {
+                        String fileName = System.currentTimeMillis() + "_" + getSubmittedFileName(filePart);
+                        String uploadPath = getServletContext().getRealPath("") + File.separator + UPLOAD_DIRECTORY;
+                        File uploadDir = new File(uploadPath);
+                        if (!uploadDir.exists()) {
+                            uploadDir.mkdirs();
+                        }
+                        
+                        filePart.write(uploadPath + File.separator + fileName);
+                        post.setCompanyLogo(UPLOAD_DIRECTORY + "/" + fileName);
+                    } else {
+                        response.setContentType("application/json");
+                        response.getWriter().write("{\"success\":false,\"message\":\"Vui lòng chọn logo công ty\"}");
+                        return;
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error handling file upload: " + e.getMessage());
+                    e.printStackTrace();
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"success\":false,\"message\":\"Lỗi khi tải lên logo: " + e.getMessage() + "\"}");
+                    return;
+                }
+                
+                // Parse deadline date
+                String deadlineStr = request.getParameter("deadline");
+                if (deadlineStr != null && !deadlineStr.isEmpty()) {
+                    try {
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                        post.setDeadline(new Date(sdf.parse(deadlineStr).getTime()));
+                    } catch (ParseException e) {
+                        response.setContentType("application/json");
+                        response.getWriter().write("{\"success\":false,\"message\":\"Định dạng ngày không hợp lệ\"}");
+                        return;
+                    }
+                } else {
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"success\":false,\"message\":\"Vui lòng chọn hạn nộp hồ sơ\"}");
+                    return;
+                }
+                
+                post.setWorkingTime(request.getParameter("workingTime").trim());
+                post.setJobDescription(request.getParameter("jobDescription").trim());
+                post.setRequirements(request.getParameter("requirements").trim());
+                post.setBenefits(request.getParameter("benefits").trim());
+                post.setContactAddress(request.getParameter("contactAddress").trim());
+                post.setApplicationMethod(request.getParameter("applicationMethod").trim());
+
+                // Validate all required fields
+                if (post.getTitle() == null || post.getTitle().trim().isEmpty() ||
+                    post.getCompanyName() == null || post.getCompanyName().trim().isEmpty() ||
+                    post.getSalary() == null || post.getSalary().trim().isEmpty() ||
+                    post.getLocation() == null || post.getLocation().trim().isEmpty() ||
+                    post.getJobType() == null || post.getJobType().trim().isEmpty() ||
+                    post.getExperience() == null || post.getExperience().trim().isEmpty() ||
+                    post.getWorkingTime() == null || post.getWorkingTime().trim().isEmpty() ||
+                    post.getJobDescription() == null || post.getJobDescription().trim().isEmpty() ||
+                    post.getRequirements() == null || post.getRequirements().trim().isEmpty() ||
+                    post.getBenefits() == null || post.getBenefits().trim().isEmpty() ||
+                    post.getContactAddress() == null || post.getContactAddress().trim().isEmpty() ||
+                    post.getApplicationMethod() == null || post.getApplicationMethod().trim().isEmpty()) {
+                    
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"success\":false,\"message\":\"Vui lòng điền đầy đủ thông tin\"}");
+                    return;
+                }
+
+                // Try to create the post
+                boolean success = postsDAO.createPost(post);
+                
+                response.setContentType("application/json");
+                if (success) {
+                    response.getWriter().write("{\"success\":true,\"message\":\"Đăng tin thành công\"}");
+                } else {
+                    response.getWriter().write("{\"success\":false,\"message\":\"Không thể tạo tin. Vui lòng kiểm tra lại thông tin.\"}");
+                }
+            } catch (Exception e) {
+                System.err.println("Error creating post: " + e.getMessage());
+                e.printStackTrace();
+                response.setContentType("application/json");
+                response.getWriter().write("{\"success\":false,\"message\":\"Có lỗi xảy ra khi tạo bài đăng: " + e.getMessage() + "\"}");
             }
-            return;
-        }
+        } else if (path.equals("/update")) {
+            // Update existing post
+            try {
+                int id = Integer.parseInt(request.getParameter("id"));
+                Posts post = postsDAO.getPostById(id);
+                
+                if (post != null && post.getUserId() == userId) {
+                    post.setTitle(request.getParameter("title").trim());
+                    post.setStatus(request.getParameter("status"));
+                    post.setCompanyName(request.getParameter("companyName").trim());
+                    post.setLocation(request.getParameter("location").trim());
+                    post.setSalary(request.getParameter("salary").trim());
+                    post.setJobType(request.getParameter("jobType").trim());
+                    post.setExperience(request.getParameter("experience").trim());
+                    
+                    // Handle company logo upload
+                    Part filePart = request.getPart("companyLogo");
+                    if (filePart != null && filePart.getSize() > 0) {
+                        String fileName = System.currentTimeMillis() + "_" + getSubmittedFileName(filePart);
+                        String uploadPath = getServletContext().getRealPath("") + File.separator + UPLOAD_DIRECTORY;
+                        File uploadDir = new File(uploadPath);
+                        if (!uploadDir.exists()) {
+                            uploadDir.mkdirs();
+                        }
+                        
+                        // Delete old logo if exists
+                        if (post.getCompanyLogo() != null) {
+                            File oldFile = new File(getServletContext().getRealPath("") + File.separator + post.getCompanyLogo());
+                            if (oldFile.exists()) {
+                                oldFile.delete();
+                            }
+                        }
+                        
+                        filePart.write(uploadPath + File.separator + fileName);
+                        post.setCompanyLogo(UPLOAD_DIRECTORY + "/" + fileName);
+                    }
+                    
+                    // Parse deadline date
+                    String deadlineStr = request.getParameter("deadline");
+                    if (deadlineStr != null && !deadlineStr.isEmpty()) {
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                        post.setDeadline(new Date(sdf.parse(deadlineStr).getTime()));
+                    }
+                    
+                    post.setWorkingTime(request.getParameter("workingTime").trim());
+                    post.setJobDescription(request.getParameter("jobDescription").trim());
+                    post.setRequirements(request.getParameter("requirements").trim());
+                    post.setBenefits(request.getParameter("benefits").trim());
+                    post.setContactAddress(request.getParameter("contactAddress").trim());
+                    post.setApplicationMethod(request.getParameter("applicationMethod").trim());
 
-        if (created) {
-            session.setAttribute("successMessage", "Post published successfully!");
-            session.setAttribute("lastCreatedPost", post);
-            String destination = request.getParameter("destination");
-            if ("my_posts".equals(destination)) {
-                response.sendRedirect(request.getContextPath() + "/my_posts.jsp");
-            } else {
-                response.sendRedirect(request.getContextPath() + "/home.jsp");
+                    if (postsDAO.updatePost(post)) {
+                        response.setContentType("application/json");
+                        response.getWriter().write("{\"success\":true,\"message\":\"Post updated successfully\"}");
+                    } else {
+                        response.setContentType("application/json");
+                        response.getWriter().write("{\"success\":false,\"message\":\"Failed to update post\"}");
+                    }
+                } else {
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"success\":false,\"message\":\"Post not found or unauthorized\"}");
+                }
+            } catch (ParseException e) {
+                response.setContentType("application/json");
+                response.getWriter().write("{\"success\":false,\"message\":\"Invalid date format\"}");
             }
-        } else {
-            request.setAttribute("error", "Failed to create post");
-            request.getRequestDispatcher("/create_post.jsp").forward(request, response);
         }
     }
 
-    private void createComment(HttpServletRequest request, HttpServletResponse response, 
-            int userId, String userType) 
-            throws ServletException, IOException, SQLException {
-        
-        String content = request.getParameter("content");
-        String parentIdParam = request.getParameter("parentId");
-        
-        if (content == null || content.trim().isEmpty() || parentIdParam == null) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Content and parent ID are required");
-            return;
+    private String getSubmittedFileName(Part part) {
+        String contentDisp = part.getHeader("content-disposition");
+        String[] tokens = contentDisp.split(";");
+        for (String token : tokens) {
+            if (token.trim().startsWith("filename")) {
+                return token.substring(token.indexOf("=") + 2, token.length() - 1);
+            }
         }
-
-        int parentId = Integer.parseInt(parentIdParam);
-        Posts comment = new Posts();
-        comment.setUserId(userId);
-        comment.setUserType(userType);
-        comment.setParentId(parentId);
-        comment.setContent(content);
-        comment.setPostType("comment");
-        comment.setStatus("active");
-
-        if (postsDAO.createPost(comment)) {
-            response.sendRedirect(request.getContextPath() + "/post/" + parentId);
-        } else {
-            request.setAttribute("error", "Failed to create comment");
-            response.sendRedirect(request.getContextPath() + "/post/" + parentId);
-        }
-    }
-
-    private void toggleLike(HttpServletRequest request, HttpServletResponse response, 
-            int userId, String userType) 
-            throws ServletException, IOException, SQLException {
-        
-        String postIdParam = request.getParameter("postId");
-        if (postIdParam == null) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Post ID is required");
-            return;
-        }
-
-        int postId = Integer.parseInt(postIdParam);
-        
-        if (postsDAO.toggleLike(postId, userId, userType)) {
-            response.sendRedirect(request.getContextPath() + "/post/" + postId);
-        } else {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to toggle like");
-        }
-    }
-
-    private void rejectPost(HttpServletRequest request, HttpServletResponse response, 
-            int userId, String userType) 
-            throws ServletException, IOException, SQLException {
-        
-        if (!isRecruiter(request.getSession(false))) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Only recruiters can reject posts");
-            return;
-        }
-
-        String rejectReason = request.getParameter("rejectReason");
-        if (rejectReason == null || rejectReason.trim().isEmpty()) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Reject reason is required");
-            return;
-        }
-
-        String title = request.getParameter("title");
-        String content = request.getParameter("content");
-        
-        if (title == null || title.trim().isEmpty() || 
-            content == null || content.trim().isEmpty()) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Title and content are required");
-            return;
-        }
-
-        Posts post = new Posts();
-        post.setUserId(userId);
-        post.setUserType(userType);
-        post.setTitle(title);
-        post.setContent(content);
-        post.setPostType("post");
-        post.setStatus("rejected");
-
-        response.setContentType("application/json");
-        PrintWriter out = response.getWriter();
-        
-        if (postsDAO.createPost(post)) {
-            out.write("{\"success\":true,\"message\":\"Post has been rejected successfully\"}");
-        } else {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write("{\"success\":false,\"message\":\"Failed to reject post\"}");
-        }
-    }
-
-    private void updatePost(HttpServletRequest request, HttpServletResponse response, int userId)
-            throws ServletException, IOException, SQLException {
-        
-        String postIdParam = request.getParameter("postId");
-        String title = request.getParameter("title");
-        String content = request.getParameter("content");
-        
-        if (postIdParam == null || title == null || content == null || 
-            title.trim().isEmpty() || content.trim().isEmpty()) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Post ID, title and content are required");
-            return;
-        }
-
-        int postId = Integer.parseInt(postIdParam);
-        Posts post = new Posts();
-        post.setId(postId);
-        post.setUserId(userId);
-        post.setTitle(title);
-        post.setContent(content);
-
-        response.setContentType("application/json");
-        PrintWriter out = response.getWriter();
-        
-        if (postsDAO.updatePost(post)) {
-            out.write("{\"success\":true,\"message\":\"Post updated successfully\"}");
-        } else {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write("{\"success\":false,\"message\":\"Failed to update post\"}");
-        }
-    }
-
-    private void deletePost(HttpServletRequest request, HttpServletResponse response, int userId)
-            throws IOException, SQLException {
-        String postIdParam = request.getParameter("postId");
-        response.setContentType("application/json");
-        PrintWriter out = response.getWriter();
-        if (postIdParam == null) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            out.write("{\"success\":false,\"message\":\"Post ID is required\"}");
-            return;
-        }
-        int postId = Integer.parseInt(postIdParam);
-        if (postsDAO.deletePost(postId, userId)) {
-            out.write("{\"success\":true,\"message\":\"Post deleted successfully\"}");
-        } else {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write("{\"success\":false,\"message\":\"Failed to delete post\"}");
-        }
-    }
-
-    private int parsePageNumber(String pageParam) {
-        try {
-            int page = Integer.parseInt(pageParam);
-            return page > 0 ? page : 1;
-        } catch (NumberFormatException e) {
-            return 1;
-        }
-    }
-
-    private void handleDatabaseError(SQLException e, HttpServletResponse response) throws IOException {
-        e.printStackTrace();
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
-            "Database error occurred: " + e.getMessage());
-    }
-
-    @Override
-    public String getServletInfo() {
-        return "Post Controller handles post, comment, and like management";
+        return "";
     }
 }

@@ -77,6 +77,13 @@
                                             <i class="fas fa-user"></i> My Profile
                                         </a>
                                     </li>
+                                    <c:if test="${sessionScope.role == 'recruiter'}">
+                                        <li>
+                                            <a class="dropdown-item" href="post">
+                                                <i class="fas fa-file-alt"></i> My Posts
+                                            </a>
+                                        </li>
+                                    </c:if>
                                     <li>
                                         <a class="dropdown-item" href="list_cv">
                                             <i class="fas fa-user"></i> My CV
