@@ -57,3 +57,5 @@ JobFinding/nbproject/build-impl.xml
 JobFinding/nbproject/genfiles.properties
 JobFinding/nbproject/project.properties
 JobFinding/nbproject/project.xml
+*.xml
+*.properties
