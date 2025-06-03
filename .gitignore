@@ -1,4 +1,7 @@
 /JobFinding/dist/
 /JobFinding/nbproject/private/private.xml
-/JobFinding/nbproject/private/
-JobFinding/nbproject/private/private.properties
+JobFinding\nbproject
+\JobFinding\nbproject
+JobFinding\nbproject\
+\JobFinding\nbproject\*
+\JobFinding\nbproject\
