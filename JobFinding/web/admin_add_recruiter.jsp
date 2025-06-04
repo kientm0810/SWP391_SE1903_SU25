@@ -1,127 +1,67 @@
-<%-- 
-    Document   : admin_add_jobseeker
-    Created on : May 26, 2025, 10:46:21 AM
-    Author     : andin
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Add Recruiter</title>
-    </head>
-    <body>
-        <h1>Hello World!</h1>
+<head>
+    <meta charset="UTF-8">
+    <title>Add Recruiter</title>
+    <link rel="stylesheet" href="assets/css/admin_add_recruiter.css">
+</head>
+<body>
+    <div class="form-container">
+        <a class="back-link" href="AdminController?target=Recruiter">← Back to List Recruiters</a>
+        <h1>Add New Recruiter</h1>
         <form action="AdminController" method="POST">
-            <table>
-                <tr>              
-                    <td>username</td>
-                    <td><input type="text" name="username"></td>
-                </tr>
-                <tr>
-                    <td>password</td>
-                    <td><input type="text" name="password"></td>
-                </tr>
-                <tr>
-                    <td>email</td>
-                    <td><input type="text" name="email"></td>
-                </tr>
-                <tr>
-                    <td>fullName</td>
-                    <td><input type="text" name="fullName"></td>
-                </tr>
-                <tr>
-                    <td>phone</td>
-                    <td><input type="text" name="phone"></td>
-                </tr>
-                <tr>
-                    <td>dateOfBirth</td>
-                    <td><input type="date" name="dateOfBirth"></td>
-                </tr>
-                <tr>
-                    <td>gender</td>
-                    <td>
-                        <select name="gender">                 
-                            <option value="male">male</option> 
-                            <option value="female">female</option> 
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>address</td>
-                    <td><input type="text" name="address"></td>
-                </tr>
-                <tr>
-                    <td>profilePicture</td>
-                    <td><input type="text" name="profilePicture"></td>
-                </tr>
-                
-                
-                <tr>
-                    <td>companyName</td>
-                    <td><input type="text" name="companyName"></td>
-                </tr>
-                <tr>
-                    <td>companyDescription</td>
-                    <td><input type="text" name="companyDescription"></td>
-                </tr>
-                <tr>
-                    <td>logo</td>
-                    <td><input type="text" name="logo"></td>
-                </tr>
-                <tr>
-                    <td>website</td>
-                    <td><input type="text" name="website"></td>
-                </tr>
-                <tr>
-                    <td>companyAddress</td>
-                    <td><input type="text" name="companyAddress"></td>
-                </tr>
-                <tr>
-                    <td>companySize</td>
-                    <td><input type="text" name="companySize"></td>
-                </tr>
-                <tr>
-                    <td>industry</td>
-                    <td><input type="text" name="industry"></td>
-                </tr>
-                <tr>
-                    <td>taxCode</td>
-                    <td><input type="text" name="taxCode"></td>
-                </tr>
-                <tr>
-                    <td>loyaltyScore</td>
-                    <td><input type="text" name="loyaltyScore"></td>
-                </tr>
-                <tr>
-                    <td>verificationStatus</td>
-                    <td><input type="text" name="verificationStatus"></td>
-                </tr>
-                
-                
-                <tr>
-                    <td>createdAt</td>
-                    <td><input type="date" name="createdAt"></td>
-                </tr>
-                <tr>
-                    <td>updatedAt</td>
-                    <td><input type="date" name="updatedAt"></td>
-                </tr>
-                <tr>
-                    <td>isActive</td>
-                    <td><input type="radio" name="isActive" value="true" checked>Active
-                        <input type="radio" name="isActive" value="false">DeActive
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="submit" name="submit" value="Add Recruiter"></td>
-                    <td><input type="reset" value="Reset">
-                        <input type="hidden" name="service" value="Add">
-                        <input type="hidden" name="target" value="Recruiter">
-                    </td>
-                </tr>
-            </table>
+            <div class="form-section">
+                <h2>Personal Info</h2>
+                <div class="form-group"><label>Username</label><input type="text" name="username"></div>
+                <div class="form-group"><label>Password</label><input type="text" name="password"></div>
+                <div class="form-group"><label>Email</label><input type="text" name="email"></div>
+                <div class="form-group"><label>Full Name</label><input type="text" name="fullName"></div>
+                <div class="form-group"><label>Phone</label><input type="text" name="phone"></div>
+                <div class="form-group"><label>Date of Birth</label><input type="date" name="dateOfBirth"></div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select name="gender">
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Address</label><input type="text" name="address"></div>
+                <div class="form-group"><label>Profile Picture (URL)</label><input type="text" name="profilePicture"></div>
+            </div>
+
+            <div class="form-section">
+                <h2>Company Info</h2>
+                <div class="form-group"><label>Company Name</label><input type="text" name="companyName"></div>
+                <div class="form-group"><label>Company Description</label><input type="text" name="companyDescription"></div>
+                <div class="form-group"><label>Logo (URL)</label><input type="text" name="logo"></div>
+                <div class="form-group"><label>Website</label><input type="text" name="website"></div>
+                <div class="form-group"><label>Company Address</label><input type="text" name="companyAddress"></div>
+                <div class="form-group"><label>Company Size</label><input type="text" name="companySize"></div>
+                <div class="form-group"><label>Industry</label><input type="text" name="industry"></div>
+                <div class="form-group"><label>Tax Code</label><input type="text" name="taxCode"></div>
+                <div class="form-group"><label>Loyalty Score</label><input type="text" name="loyaltyScore"></div>
+                <div class="form-group"><label>Verification Status</label><input type="text" name="verificationStatus"></div>
+            </div>
+
+            <div class="form-section">
+                <h2>System Info</h2>
+                <div class="form-group"><label>Created At</label><input type="date" name="createdAt"></div>
+                <div class="form-group"><label>Updated At</label><input type="date" name="updatedAt"></div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <label><input type="radio" name="isActive" value="true" checked> Active</label>
+                    <label><input type="radio" name="isActive" value="false"> DeActive</label>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <input type="submit" value="Add Recruiter" class="btn-green">
+                <input type="reset" value="Reset" class="btn-gray">
+                <input type="hidden" name="service" value="Add">
+                <input type="hidden" name="target" value="Recruiter">
+            </div>
         </form>
-    </body>
+    </div>
+</body>
 </html>

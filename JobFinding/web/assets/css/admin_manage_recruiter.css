@@ -1,0 +1,113 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f4fdf7;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+
+h1 {
+    color: #2e7d32; /* xanh lá đậm */
+    margin-bottom: 20px;
+}
+
+.back-link {
+    text-decoration: none;
+    color: #2e7d32;
+    margin-bottom: 15px;
+    display: inline-block;
+}
+
+.search-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    flex: 1 1 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+input[type=text], input[type=number], select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn, .btn-secondary {
+    background-color: #43a047; /* xanh lá */
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background-color: #ccc;
+    color: #333;
+}
+
+.recruiter-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.recruiter-table th, .recruiter-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+
+.recruiter-table th {
+    background-color: #2e7d32;
+    color: white;
+}
+
+.logo {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.btn-small {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+.btn-link {
+    background-color: #2e7d32;
+    color: white;
+    padding: 6px 14px;
+    text-decoration: none;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+.add-link {
+    display: inline-block;
+    margin-top: 20px;
+    color: #2e7d32;
+    text-decoration: underline;
+}

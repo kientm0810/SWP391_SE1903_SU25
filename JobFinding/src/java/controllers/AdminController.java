@@ -19,6 +19,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Vector;
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -68,10 +70,154 @@ public class AdminController extends HttpServlet {
                 }
                 
                 if (submit.equals("Search")){
-                    String name = (String)request.getParameter("JobSeekerName");
+                    String idStr = request.getParameter("id");
+                    String username = request.getParameter("username");
+                    String email = request.getParameter("email");
+                    String fullName = request.getParameter("fullName");
+                    String phone = request.getParameter("phone");
+                    String gender = request.getParameter("gender");
+                    String address = request.getParameter("address");
+                    String experienceStr = request.getParameter("experienceYears");
+                    String education = request.getParameter("education");
+                    String salaryStr = request.getParameter("desiredSalary");
+                    String jobCategory = request.getParameter("jobCategory");
+                    String languages = request.getParameter("languages");
+                    String isActiveStr = request.getParameter("isActive");
+
+                    JobSeeker criteria = new JobSeeker();
+                    if (idStr != null && !idStr.isEmpty()) {
+                        criteria.setId(Integer.parseInt(idStr));
+                    }
+                    if (username != null && !username.isEmpty()) {
+                        criteria.setUsername(username);
+                    }
+                    if (email != null && !email.isEmpty()) {
+                        criteria.setEmail(email);
+                    }
+                    if (fullName != null && !fullName.isEmpty()) {
+                        criteria.setFullName(fullName);
+                    }
+                    if (phone != null && !phone.isEmpty()) {
+                        criteria.setPhone(phone);
+                    }
+                    if (gender != null && !gender.isEmpty()) {
+                        criteria.setGender(gender);
+                    }
+                    if (address != null && !address.isEmpty()) {
+                        criteria.setAddress(address);
+                    }
+                    if (experienceStr != null && !experienceStr.isEmpty()) {
+                        criteria.setExperienceYears(Integer.parseInt(experienceStr));
+                    }
+                    if (education != null && !education.isEmpty()) {
+                        criteria.setEducation(education);
+                    }
+                    if (salaryStr != null && !salaryStr.isEmpty()) {
+                        criteria.setDesiredSalary(Double.parseDouble(salaryStr));
+                    }
+                    if (jobCategory != null && !jobCategory.isEmpty()) {
+                        criteria.setJobCategory(jobCategory);
+                    }
+                    if (languages != null && !languages.isEmpty()) {
+                        criteria.setLanguages(languages);
+                    }
+                    criteria.setActive(true);
+                    if (isActiveStr != null && !isActiveStr.isEmpty()) {
+                        criteria.setActive(Boolean.parseBoolean(isActiveStr));
+                    }
                     
+                    StringBuilder sql = new StringBuilder("SELECT * FROM [project_SWP391].[dbo].[Job_Seekers] WHERE 1=1");
+                    List<Object> params = new ArrayList<>();
+
+                    if (criteria.getId() != 0) {
+                        sql.append(" AND id = ?");
+                        params.add(criteria.getId());
+                    }
+                    if (criteria.getUsername() != null) {
+                        sql.append(" AND username LIKE ?");
+                        params.add("%" + criteria.getUsername() + "%");
+                    }
+                    if (criteria.getEmail() != null) {
+                        sql.append(" AND email LIKE ?");
+                        params.add("%" + criteria.getEmail() + "%");
+                    }
+                    if (criteria.getFullName() != null) {
+                        sql.append(" AND full_name LIKE ?");
+                        params.add("%" + criteria.getFullName() + "%");
+                    }
+                    if (criteria.getPhone() != null) {
+                        sql.append(" AND phone LIKE ?");
+                        params.add("%" + criteria.getPhone() + "%");
+                    }
+                    if (criteria.getGender() != null) {
+                        sql.append(" AND gender = ?");
+                        params.add(criteria.getGender());
+                    }
+                    if (criteria.getAddress() != null) {
+                        sql.append(" AND address LIKE ?");
+                        params.add("%" + criteria.getAddress() + "%");
+                    }
+                    if (criteria.getExperienceYears() != 0) {
+                        sql.append(" AND experience_years = ?");
+                        params.add(criteria.getExperienceYears());
+                    }
+                    if (criteria.getEducation() != null) {
+                        sql.append(" AND education LIKE ?");
+                        params.add("%" + criteria.getEducation() + "%");
+                    }
+                    if (criteria.getDesiredSalary() != 0) {
+                        sql.append(" AND desired_salary >= ?");
+                        params.add(criteria.getDesiredSalary());
+                    }
+                    if (criteria.getJobCategory() != null) {
+                        sql.append(" AND job_category LIKE ?");
+                        params.add("%" + criteria.getJobCategory() + "%");
+                    }
+                    if (criteria.getLanguages() != null) {
+                        sql.append(" AND languages LIKE ?");
+                        params.add("%" + criteria.getLanguages() + "%");
+                    }
+
+                    sql.append(" AND is_active = ?");
+                    params.add(criteria.isActive());
+                    
+//                    try (PrintWriter out = response.getWriter()) {
+//                        /* TODO output your page here. You may use following sample code. */
+//                        out.println("<!DOCTYPE html>");
+//                        out.println("<html>");
+//                        out.println("<head>");
+//                        out.println("<title>Servlet AdminController</title>");  
+//                        out.println("</head>");
+//                        out.println("<body>");
+//                        out.println("<h1>Servlet AdminController at " + request.getContextPath () + "</h1>");
+//                        out.println("ID: " + criteria.getId());
+//                        out.println("Username: " + criteria.getUsername());
+//                        out.println("Email: " + criteria.getEmail());
+//                        out.println("Full Name: " + criteria.getFullName());
+//                        out.println("Phone: " + criteria.getPhone());
+//                        out.println("Gender: " + criteria.getGender());
+//                        out.println("Address: " + criteria.getAddress());
+//                        out.println("Experience Years: " + criteria.getExperienceYears());
+//                        out.println("Education: " + criteria.getEducation());
+//                        out.println("Desired Salary: " + criteria.getDesiredSalary());
+//                        out.println("Job Category: " + criteria.getJobCategory());
+//                        out.println("Languages: " + criteria.getLanguages());
+//                        out.println("Is Active: " + criteria.isActive());
+//                        out.println("</br>");
+//                        out.println(sql);
+//                        
+//                        out.println("</body>");
+//                        out.println("</html>");
+//                    }
+//                    return;
+
                     JobSeekerDAO dao = new JobSeekerDAO();
-                    Vector<JobSeeker> vec = dao.getJobSeekerByName(name);
+                    Vector<JobSeeker> vec = dao.searchJobSeekers(criteria);
+                    
+//                    String name = (String)request.getParameter("JobSeekerName");
+//                    
+//                    JobSeekerDAO dao = new JobSeekerDAO();
+//                    Vector<JobSeeker> vec = dao.getJobSeekerByName(name);
                 
                     request.setAttribute("vec", vec);
                 } else {
@@ -165,10 +311,60 @@ public class AdminController extends HttpServlet {
                 }
                 
                 if (submit.equals("Search")){
-                    String name = (String)request.getParameter("RecruiterName");
+                    
+                    String idStr = request.getParameter("id");
+                    String username = request.getParameter("username");
+                    String email = request.getParameter("email");
+                    String phone = request.getParameter("phone");
+                    String companyName = request.getParameter("companyName");
+                    String companyAddress = request.getParameter("companyAddress");
+                    String companySize = request.getParameter("companySize");
+                    String industry = request.getParameter("industry");
+                    String loyaltyStr = request.getParameter("loyaltyScore");
+                    String verificationStatus = request.getParameter("verificationStatus");
+                    String isActiveStr = request.getParameter("isActive");
+
+                    Recruiter criteria = new Recruiter();
+
+                    if (idStr != null && !idStr.isEmpty()) {
+                        criteria.setId(Integer.parseInt(idStr));
+                    }
+                    if (username != null && !username.isEmpty()) {
+                        criteria.setUsername(username);
+                    }
+                    if (email != null && !email.isEmpty()) {
+                        criteria.setEmail(email);
+                    }
+                    if (phone != null && !phone.isEmpty()) {
+                        criteria.setPhone(phone);
+                    }
+                    if (companyName != null && !companyName.isEmpty()) {
+                        criteria.setCompanyName(companyName);
+                    }
+                    if (companyAddress != null && !companyAddress.isEmpty()) {
+                        criteria.setCompanyAddress(companyAddress);
+                    }
+                    if (companySize != null && !companySize.isEmpty()) {
+                        criteria.setCompanySize(companySize);
+                    }
+                    if (industry != null && !industry.isEmpty()) {
+                        criteria.setIndustry(industry);
+                    }
+                    if (loyaltyStr != null && !loyaltyStr.isEmpty()) {
+                        criteria.setLoyaltyScore(Double.parseDouble(loyaltyStr));
+                    }
+                    if (verificationStatus != null && !verificationStatus.isEmpty()) {
+                        criteria.setVerificationStatus(verificationStatus);
+                    }
+                    criteria.setActive(true); // Mặc định true
+                    if (isActiveStr != null && !isActiveStr.isEmpty()) {
+                        criteria.setActive(Boolean.parseBoolean(isActiveStr));
+                    }
+                    
+//                    String name = (String)request.getParameter("RecruiterName");
                     
                     RecruiterDAO dao = new RecruiterDAO();
-                    Vector<Recruiter> vec = dao.getRecruiterByName(name);
+                    Vector<Recruiter> vec = dao.searchRecruiters(criteria);
                 
                     request.setAttribute("vec", vec);
                 } else {
@@ -245,6 +441,19 @@ public class AdminController extends HttpServlet {
                 request.setAttribute("Recruiter", p);
                 
                 request.getRequestDispatcher("admin_detail_recruiter.jsp").forward(request, response);
+            } else if (service.equals("UpdateVerificationStatus")){
+                // Lấy tham số từ request
+                String idStr = request.getParameter("id");
+                String status = request.getParameter("verificationStatus");
+
+                if (idStr != null && status != null && !idStr.isEmpty() && !status.isEmpty()) {
+                    int id = Integer.parseInt(idStr);
+
+                    RecruiterDAO dao = new RecruiterDAO();
+                    dao.updateVerificationStatus(id, status);
+                }
+
+                response.sendRedirect("AdminController?target=Recruiter");
             }
         }
 

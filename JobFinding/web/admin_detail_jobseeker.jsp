@@ -1,125 +1,69 @@
-<%-- 
-    Document   : admin_detail_jobseeker
-    Created on : May 27, 2025, 10:41:56 AM
-    Author     : andin
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="java.util.Vector, models.JobSeeker" %>
+<%@page import="models.JobSeeker" %>
 <!DOCTYPE html>
 <html>
-    <% JobSeeker p = (JobSeeker) request.getAttribute("JobSeeker");%>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
-    </head>
-    <body>
-        <h1>Hello World!</h1>
-        <table>
-                <tr>              
-                    <td>id</td>
-                    <td><%= p.getId()%></td>
-                </tr>
-                <tr>              
-                    <td>username</td>
-                    <td><%= p.getUsername()%></td>
-                </tr>
-                <tr>
-                    <td>password</td>
-                    <td><%= p.getPassword()%></td>
-                </tr>
-                <tr>
-                    <td>email</td>
-                    <td><%= p.getEmail()%></td>
-                </tr>
-                <tr>
-                    <td>fullName</td>
-                    <td><%= p.getFullName()%></td>
-                </tr>
-                <tr>
-                    <td>phone</td>
-                    <td><%= p.getPhone()%></td>
-                </tr>
-                <tr>
-                    <td>dateOfBirth</td>
-                    <td><%= p.getDateOfBirth()%></td>
-                </tr>
-                <tr>
-                    <td>gender</td>
-                    <td><%= p.getGender()%></td>
-                </tr>
-                <tr>
-                    <td>address</td>
-                    <td><%= p.getAddress()%></td>
-                </tr>
-                <tr>
-                    <td>profilePicture</td>
-                    <td><%= p.getProfilePicture()%></td>
-                </tr>
-                <tr>
-                    <td>cvFile</td>
-                    <td><%= p.getCvFile()%></td>
-                </tr>
-                <tr>
-                    <td>skills</td>
-                    <td><%= p.getSkills()%></td>
-                </tr>
-                <tr>
-                    <td>experienceYears</td>
-                    <td><%= p.getExperienceYears()%></td>
-                </tr>
-                <tr>
-                    <td>education</td>
-                    <td><%= p.getEducation()%></td>
-                </tr>
-                <tr>
-                    <td>desiredJobTitle</td>
-                    <td><%= p.getDesiredJobTitle()%></td>
-                </tr>
-                <tr>
-                    <td>desiredSalary</td>
-                    <td><%= p.getDesiredSalary()%></td>
-                </tr>
-                <tr>
-                    <td>jobCategory</td>
-                    <td><%= p.getJobCategory()%></td>
-                </tr>
-                <tr>
-                    <td>preferredLocation</td>
-                    <td><%= p.getPreferredLocation()%></td>
-                </tr>
-                <tr>
-                    <td>careerLevel</td>
-                    <td><%= p.getCareerLevel()%></td>
-                </tr>
-                <tr>
-                    <td>workType</td>
-                    <td><%= p.getWorkType()%></td>
-                </tr>
-                <tr>
-                    <td>profileSummary</td>
-                    <td><%= p.getProfileSummary()%></td>
-                </tr>
-                <tr>
-                    <td>portfolioUrl</td>
-                    <td><%= p.getPortfolioUrl()%></td>
-                </tr>
-                <tr>
-                    <td>languages</td>
-                    <td><%= p.getLanguages()%></td>
-                </tr>
-                <tr>
-                    <td>createdAt</td>
-                    <td><%= p.getCreatedAt()%></td>
-                </tr>
-                <tr>
-                    <td>updatedAt</td>
-                    <td><%= p.getUpdatedAt()%></td>
-                </tr>
-                <tr>
-                    <td>isActive</td>
-                    <td><%= p.isActive() == true ? "Active" : "Banned"%></td>
-                </tr>
-            </table>
-    </body>
+<% JobSeeker p = (JobSeeker) request.getAttribute("JobSeeker"); %>
+<head>
+    <meta charset="UTF-8">
+    <title>Job Seeker Profile</title>
+    <link rel="stylesheet" href="assets/css/admin_detail_jobseeker.css">
+</head>
+<body>
+    <div class="container">
+        <a class="back-link" href="AdminController?target=JobSeeker">← Back to List JobSeekers</a>
+
+        <div class="profile-header">
+            <img class="avatar" src="<%= p.getProfilePicture() != null && !p.getProfilePicture().isEmpty() ? p.getProfilePicture() : "images/default-avatar.png" %>" alt="Avatar">
+            <div class="basic-info">
+                <h1><%= p.getFullName() %></h1>
+                <h2><%= p.getDesiredJobTitle() %></h2>
+                <p class="status <%= p.isActive() ? "active" : "banned" %>">
+                    <%= p.isActive() ? "🟢 Active" : "🔴 Banned" %>
+                </p>
+            </div>
+        </div>
+
+        <div class="profile-body">
+            <div class="left-column">
+                <h3>Thông tin liên hệ</h3>
+                <ul>
+                    <li><strong>Email:</strong> <%= p.getEmail() %></li>
+                    <li><strong>Điện thoại:</strong> <%= p.getPhone() %></li>
+                    <li><strong>Địa chỉ:</strong> <%= p.getAddress() %></li>
+                    <li><strong>Ngày sinh:</strong> <%= p.getDateOfBirth() %></li>
+                    <li><strong>Giới tính:</strong> <%= p.getGender() %></li>
+                </ul>
+
+                <h3>Tài liệu</h3>
+                <ul>
+                    <li><strong>CV:</strong> <a href="<%= p.getCvFile() %>" target="_blank">Xem CV 📄</a></li>
+                    <li><strong>Portfolio:</strong> <a href="<%= p.getPortfolioUrl() %>" target="_blank">Xem Portfolio 🌐</a></li>
+                </ul>
+            </div>
+
+            <div class="right-column">
+                <h3>Thông tin nghề nghiệp</h3>
+                <ul>
+                    <li><strong>Kinh nghiệm:</strong> <%= p.getExperienceYears() %> năm</li>
+                    <li><strong>Học vấn:</strong> <%= p.getEducation() %></li>
+                    <li><strong>Kỹ năng:</strong> <%= p.getSkills() %></li>
+                    <li><strong>Mức lương mong muốn:</strong> <%= p.getDesiredSalary() %></li>
+                    <li><strong>Ngành nghề:</strong> <%= p.getJobCategory() %></li>
+                    <li><strong>Khu vực:</strong> <%= p.getPreferredLocation() %></li>
+                    <li><strong>Cấp bậc:</strong> <%= p.getCareerLevel() %></li>
+                    <li><strong>Hình thức:</strong> <%= p.getWorkType() %></li>
+                    <li><strong>Ngôn ngữ:</strong> <%= p.getLanguages() %></li>
+                </ul>
+
+                <h3>Giới thiệu bản thân</h3>
+                <p><%= p.getProfileSummary() %></p>
+
+                <div class="meta">
+                    <small>Created at: <%= p.getCreatedAt() %></small><br>
+                    <small>Updated at: <%= p.getUpdatedAt() %></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
 </html>
