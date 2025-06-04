@@ -30,12 +30,14 @@ target/
 .sts4-cache
 
 ### NetBeans ###
+JobFinding/nbproject/
 JobFinding/nbproject/private/
 JobFinding/nbbuild/
 JobFinding/dist/
 JobFinding/nbdist/
 JobFinding/.nb-gradle/
 JobFinding/build/
+/JobFinding/nbproject/
 /JobFinding/nbproject/private/
 /JobFinding/nbbuild/
 /JobFinding/dist/
@@ -59,3 +61,4 @@ JobFinding/nbproject/project.properties
 JobFinding/nbproject/project.xml
 *.xml
 *.properties
+JobFinding/nbproject/build-impl.xml~
