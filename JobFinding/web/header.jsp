@@ -22,7 +22,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="job-listing">
+                        <a class="nav-link" href="post">
                             <i class="fas fa-briefcase"></i> Jobs
                         </a>
                     </li>

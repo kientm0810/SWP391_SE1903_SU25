@@ -1,0 +1,131 @@
+
+    /* General styles */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+        color: #333;
+    }
+    
+    .container {
+        max-width: 1200px;
+    }
+    
+    /* Job card styles */
+    .job-card {
+        margin-bottom: 20px;
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .job-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .company-logo {
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
+        border-radius: 8px;
+        border: 1px solid #eee;
+    }
+    
+    /* Job info items */
+    .job-info-item {
+        margin-right: 15px;
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+    .job-info-item i {
+        margin-right: 5px;
+        color: #6c757d;
+    }
+    
+    /* Job type badge */
+    .job-type-badge {
+        padding: 4px 8px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background-color: #e3f2fd;
+        color: #1976d2;
+    }
+    
+    /* Job description */
+    .job-description {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 0.9rem;
+        color: #495057;
+    }
+    
+    /* Salary text */
+    .salary-text {
+        color: #28a745;
+        font-weight: 500;
+    }
+    
+    /* Deadline text */
+    .deadline-text {
+        color: #dc3545;
+    }
+    
+    /* Button styles */
+    .btn-action {
+        padding: 5px 10px;
+        font-size: 0.85rem;
+
+    }
+    
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        color: #6c757d;
+        margin-bottom: 15px;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .company-logo {
+            width: 50px;
+            height: 50px;
+        }
+        
+        .job-info-item {
+            margin-right: 10px;
+            font-size: 0.8rem;
+        }
+    }
+    
+    /* Animation for job cards */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .job-card {
+        animation: fadeIn 0.5s ease forwards;
+    }
+    
+    /* Delay animations for each card */
+    .job-card:nth-child(1) { animation-delay: 0.1s; }
+    .job-card:nth-child(2) { animation-delay: 0.2s; }
+    .job-card:nth-child(3) { animation-delay: 0.3s; }
+    .job-card:nth-child(4) { animation-delay: 0.4s; }
+    .job-card:nth-child(5) { animation-delay: 0.5s; }
+    .job-card:nth-child(6) { animation-delay: 0.6s; }

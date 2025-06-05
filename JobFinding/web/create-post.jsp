@@ -11,21 +11,7 @@
         <script
             src="https://cdn.tiny.cloud/1/ainjahbwyamlr1ureczw2mbfmr73mgpn7f6ceaaxu1h8ccv8/tinymce/7/tinymce.min.js"
         referrerpolicy="origin"></script>
-        <style>
-            .form-container {
-                max-width: 800px;
-                margin: 0 auto;
-            }
-
-            .tox-tinymce {
-                min-height: 400px;
-            }
-
-            .required-field::after {
-                content: " *";
-                color: red;
-            }
-        </style>
+        <<link rel="stylesheet" href="assets/css/stylePosts.css">
     </head>
 
     <body>
@@ -198,6 +184,8 @@
             </div>
         </div>
 
+
+
         <!-- API TinyMCE-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
@@ -292,7 +280,7 @@
                                                                .then(data => {
                                                                    if (data.success) {
                                                                        alert('Bài đăng đã được tạo thành công!');
-                                                                       window.location.href = '${pageContext.request.contextPath}/';
+                                                                       window.location.href = '${pageContext.request.contextPath}/post';
                                                                    } else {
                                                                        alert(data.message || 'Có lỗi xảy ra khi tạo bài đăng. Vui lòng thử lại.');
                                                                    }
