@@ -1,57 +1,60 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<html>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html lang="vi">
 <head>
-    <title>Create CV</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>Tạo CV mới</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .form-container { background-color: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #28a745; }
-        .btn-primary { background-color: #28a745; border-color: #28a745; }
-        .btn-primary:hover { background-color: #218838; border-color: #218838; }
-        label { font-weight: bold; }
+        body { font-family: 'Arial', sans-serif; }
     </style>
 </head>
-<body>
-    <div class="container mt-4">
-        <h1>Create CV</h1>
-        <c:if test="${not empty error}">
-            <p class="text-danger">${error}</p>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-6">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6">Tạo CV mới</h1>
+        
+        <c:if test="${not empty message}">
+            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
+                ${message}
+            </div>
         </c:if>
-        <div class="form-container">
-            <form action="create_cv" method="post">
-                <div class="mb-3">
-                    <label for="fullName" class="form-label">Full Name</label>
-                    <input type="text" class="form-control" id="fullName" name="fullName" required>
-                </div>
-                <div class="mb-3">
-                    <label for="jobPosition" class="form-label">Job Position</label>
-                    <input type="text" class="form-control" id="jobPosition" name="jobPosition" required>
-                </div>
-                <h5>Personal Information</h5>
-                <div class="mb-3">
-                    <label for="phone" class="form-label">Phone</label>
-                    <input type="text" class="form-control" id="phone" name="phone">
-                </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
-                </div>
-                <div class="mb-3">
-                    <label for="address" class="form-label">Address</label>
-                    <input type="text" class="form-control" id="address" name="address">
-                </div>
-                <div class="mb-3">
-                    <label for="certificates" class="form-label">Certificates</label>
-                    <textarea class="form-control" id="certificates" name="certificates" rows="4"></textarea>
-                </div>
-                <div class="mb-3">
-                    <label for="workExperience" class="form-label">Work Experience</label>
-                    <textarea class="form-control" id="workExperience" name="workExperience" rows="4"></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Save CV</button>
-                <a href="list_cv" class="btn btn-secondary">Back</a>
-            </form>
-        </div>
+        <c:if test="${not empty error}">
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+                ${error}
+            </div>
+        </c:if>
+
+        <form action="/cv/create" method="post" class="bg-white shadow-md rounded-lg p-6">
+            <div class="mb-4">
+                <label class="block text-gray-700 font-semibold mb-2" for="title">Tiêu đề CV *</label>
+                <input type="text" id="title" name="title" required
+                       class="w-full border rounded px-4 py-2" placeholder="VD: CV Lập trình viên Java">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-semibold mb-2" for="summary">Giới thiệu bản thân</label>
+                <textarea id="summary" name="summary" rows="4"
+                          class="w-full border rounded px-4 py-2" placeholder="Mô tả ngắn về bản thân..."></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-semibold mb-2" for="education">Học vấn</label>
+                <textarea id="education" name="education" rows="4"
+                          class="w-full border rounded px-4 py-2" placeholder="VD: Cử nhân CNTT, ĐH Bách Khoa..."></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-semibold mb-2" for="experience">Kinh nghiệm làm việc</label>
+                <textarea id="experience" name="experience" rows="4"
+                          class="w-full border rounded px-4 py-2" placeholder="VD: Lập trình viên tại FPT, 2022-2024..."></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-semibold mb-2" for="skills">Kỹ năng</label>
+                <input type="text" id="skills" name="skills"
+                       class="w-full border rounded px-4 py-2" placeholder="VD: Java, Python, SQL (cách nhau bằng dấu phẩy)">
+            </div>
+            <div class="flex space-x-4">
+                <button type="submit" class="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">Lưu CV</button>
+                <a href="/cv/list" class="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600">Hủy</a>
+            </div>
+        </form>
     </div>
 </body>
 </html>

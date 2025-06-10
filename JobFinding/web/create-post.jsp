@@ -11,21 +11,7 @@
         <script
             src="https://cdn.tiny.cloud/1/ainjahbwyamlr1ureczw2mbfmr73mgpn7f6ceaaxu1h8ccv8/tinymce/7/tinymce.min.js"
         referrerpolicy="origin"></script>
-        <style>
-            .form-container {
-                max-width: 800px;
-                margin: 0 auto;
-            }
-
-            .tox-tinymce {
-                min-height: 400px;
-            }
-
-            .required-field::after {
-                content: " *";
-                color: red;
-            }
-        </style>
+        <<link rel="stylesheet" href="assets/css/stylePosts.css">
     </head>
 
     <body>
@@ -55,7 +41,7 @@
                             <input type="hidden" name="postType" value="job">
                             <input type="hidden" name="status" value="active">
                             <input type="hidden" name="parentId" value="">
-                            <!-- Thông tin cơ bản -->
+                         
                             <div class="mb-4">
                                 <h4>Thông tin cơ bản</h4>
                                 <div class="row">
@@ -198,31 +184,38 @@
             </div>
         </div>
 
+
+
         <!-- API TinyMCE-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-                                                   // Initialize TinyMCE for rich text editors
+                                                   // Khởi tạo TinyMCE 
                                                    tinymce.init({
-                                                       selector: '#jobDescription, #requirements, #benefits, #applicationMethod',
-                                                       plugins: 'lists link image table code help wordcount',
-                                                       toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | indent outdent | bullist numlist | link image | removeformat help',
-                                                       height: 300,
-                                                       menubar: false,
-                                                       content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }',
-                                                       setup: function (editor) {
+                                                   selector: '#jobDescription, #requirements, #benefits, #applicationMethod',
+                                                           // Chọn các textarea cần trình soạn thảo
+                                                           plugins: 'lists link image table code help wordcount',
+                                                           // Các plugin hỗ trợ
+                                                           toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | indent outdent | bullist numlist | link image | removeformat help',
+                                                           // Thanh công cụ của trình soạn thảo
+                                                           height: 300,
+                                                           // Chiều cao trình soạn thảo
+                                                           menubar: false,
+                                                           // Ẩn thanh menu
+                                                           content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }',
+                                                           // Định dạng font chữ và kích thước
+                                                           setup: function (editor) {
                                                            editor.on('change', function () {
-                                                               editor.save();
-                                                               validateField(editor.getElement());
+                                                           editor.save();
+                                                                   validateField(editor.getElement());
                                                            });
-                                                       }
-                                                   });
+                                                           });
 
-                                                   // Logo preview function
+                                                   // Hàm xem trước logo công ty
                                                    function previewLogo(event) {
                                                        const preview = document.getElementById('logoPreview');
                                                        const previewImage = document.getElementById('previewImage');
                                                        const file = event.target.files[0];
-
+                                                       // Lấy file ảnh vừa chọn
                                                        if (file) {
                                                            const reader = new FileReader();
                                                            reader.onload = function (e) {
@@ -230,12 +223,13 @@
                                                                preview.style.display = 'block';
                                                            }
                                                            reader.readAsDataURL(file);
+                                                           // Đọc file và hiển thị ảnh xem trước
                                                        } else {
                                                            preview.style.display = 'none';
                                                        }
                                                    }
 
-                                                   // Validate individual field
+                                                   // Hàm kiểm tra hợp lệ cho từng trường
                                                    function validateField(element) {
                                                        const value = element.value.trim();
                                                        if (!value) {
@@ -244,46 +238,41 @@
                                                        }
                                                        element.classList.remove('is-invalid');
                                                        return true;
+                                                       // Thêm/xóa lớp is-invalid nếu trường hợp lệ hay không
                                                    }
 
-                                                   // Form submission handling
+                                                   // Xử lý khi submit form
                                                    document.getElementById('createPostForm').addEventListener('submit', function (e) {
                                                        e.preventDefault();
-
-                                                       // Save TinyMCE content
+                                                       // Ngăn submit mặc định
                                                        tinymce.triggerSave();
-
-                                                       // Validate form
+                                                       // Lưu nội dung TinyMCE
                                                        const form = this;
                                                        const formData = new FormData(form);
                                                        let isValid = true;
-
-                                                       // Check required fields
                                                        const requiredFields = [
                                                            'title', 'companyName', 'salary', 'location', 'jobType',
                                                            'experience', 'deadline', 'workingTime', 'jobDescription',
                                                            'requirements', 'benefits', 'contactAddress', 'applicationMethod',
                                                            'companyLogo'
                                                        ];
-
+                                                       // Danh sách các trường bắt buộc
                                                        for (let field of requiredFields) {
                                                            const input = document.getElementById(field);
                                                            if (!validateField(input)) {
                                                                isValid = false;
-                                                               // Scroll to the first invalid field
                                                                if (isValid === false) {
                                                                    input.scrollIntoView({behavior: 'smooth', block: 'center'});
                                                                    input.focus();
                                                                }
                                                            }
                                                        }
-
+                                                       // Kiểm tra từng trường bắt buộc
                                                        if (!isValid) {
                                                            alert('Vui lòng điền đầy đủ các trường bắt buộc');
                                                            return;
                                                        }
-
-                                                       // Submit form using fetch API
+                                                       // Nếu hợp lệ, gửi form bằng fetch API
                                                        fetch(form.action, {
                                                            method: 'POST',
                                                            body: formData
@@ -292,7 +281,7 @@
                                                                .then(data => {
                                                                    if (data.success) {
                                                                        alert('Bài đăng đã được tạo thành công!');
-                                                                       window.location.href = '${pageContext.request.contextPath}/';
+                                                                       window.location.href = '${pageContext.request.contextPath}/post';
                                                                    } else {
                                                                        alert(data.message || 'Có lỗi xảy ra khi tạo bài đăng. Vui lòng thử lại.');
                                                                    }
@@ -303,13 +292,14 @@
                                                                });
                                                    });
 
-                                                   // Remove invalid class when user starts typing
+                                                   // Xóa lớp invalid khi người dùng bắt đầu nhập
                                                    document.querySelectorAll('input, textarea, select').forEach(input => {
                                                        input.addEventListener('input', function () {
                                                            validateField(this);
                                                        });
                                                    });
         </script>
+
     </body>
 
 </html>
