@@ -200,81 +200,80 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script
             src="https://cdn.tiny.cloud/1/ainjahbwyamlr1ureczw2mbfmr73mgpn7f6ceaaxu1h8ccv8/tinymce/7/tinymce.min.js"
-        referrerpolicy="origin"></script>
+            referrerpolicy="origin">      
+        </script>
         <script>
                                                    tinymce.init({
-                                                       selector: '#jobDescription, #requirements, #benefits, #applicationMethod',
-                                                       plugins: 'lists link image table code help wordcount',
-                                                       toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | indent outdent | bullist numlist | link image | removeformat help',
+                                                       selector: '#jobDescription, #requirements, #benefits, #applicationMethod', // Chọn các textarea cần soạn thảo
+                                                       plugins: 'lists link image table code help wordcount', 
+                                                       toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | indent outdent | bullist numlist | link image | removeformat help', // Thanh công cụ
                                                        height: 300,
                                                        menubar: false,
                                                        content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }',
                                                        setup: function (editor) {
                                                            editor.on('change', function () {
-                                                               editor.save();
-                                                               validateField(editor.getElement());
+                                                               editor.save(); 
+                                                               validateField(editor.getElement()); 
                                                            });
                                                        }
                                                    });
 
-                                                   // Logo preview function
+                                                   // Hàm xem trước logo khi upload
                                                    function previewLogo(event) {
                                                        const preview = document.getElementById('logoPreview');
                                                        const previewImage = document.getElementById('previewImage');
                                                        const file = event.target.files[0];
 
                                                        if (file) {
-                                                           // Check if file is an image
+                                                          
                                                            if (!file.type.match('image.*')) {
                                                                alert('Vui lòng chọn file hình ảnh (jpg, jpeg, png, gif)');
-                                                               event.target.value = ''; // Clear the file input
+                                                               event.target.value = '';
                                                                preview.style.display = 'none';
                                                                return;
                                                            }
-
-                                                           // Check file size (max 5MB)
+                                                           // Kiểm tra dung lượng file (tối đa 5MB)
                                                            if (file.size > 5 * 1024 * 1024) {
                                                                alert('Kích thước file không được vượt quá 5MB');
-                                                               event.target.value = ''; // Clear the file input
+                                                               event.target.value = '';
                                                                preview.style.display = 'none';
                                                                return;
                                                            }
-
                                                            const reader = new FileReader();
                                                            reader.onload = function (e) {
-                                                               previewImage.src = e.target.result;
+                                                               previewImage.src = e.target.result; 
                                                                preview.style.display = 'block';
-                                                           }
+                                                           };
                                                            reader.readAsDataURL(file);
                                                        } else {
                                                            preview.style.display = 'none';
                                                        }
                                                    }
 
-                                                   // Validate individual field
+                                                   // Hàm kiểm tra hợp lệ từng trường
                                                    function validateField(element) {
                                                        const value = element.value.trim();
                                                        if (!value) {
-                                                           element.classList.add('is-invalid');
+                                                           element.classList.add('is-invalid'); 
                                                            return false;
                                                        }
                                                        element.classList.remove('is-invalid');
                                                        return true;
                                                    }
 
-                                                   // Form submission handling
+                                                   // Xử lý gửi form
                                                    document.getElementById('editPostForm').addEventListener('submit', function (e) {
-                                                       e.preventDefault();
+                                                       e.preventDefault(); 
 
-                                                       // Save TinyMCE content
+                                                       // Lưu nội dung TinyMCE
                                                        tinymce.triggerSave();
 
-                                                       // Validate form
+                                                       // Kiểm tra hợp lệ form
                                                        const form = this;
                                                        const formData = new FormData(form);
                                                        let isValid = true;
 
-                                                       // Validate file upload if a new file is selected
+                                                       // Kiểm tra file upload nếu có chọn file mới
                                                        const fileInput = document.getElementById('companyLogo');
                                                        if (fileInput.files.length > 0) {
                                                            const file = fileInput.files[0];
@@ -289,7 +288,7 @@
                                                            }
                                                        }
 
-                                                       // Check required fields
+                                                       // Kiểm tra các trường bắt buộc
                                                        const requiredFields = [
                                                            'title', 'companyName', 'salary', 'location', 'jobType',
                                                            'experience', 'deadline', 'workingTime', 'jobDescription',
@@ -300,20 +299,19 @@
                                                            const input = document.getElementById(field);
                                                            if (!validateField(input)) {
                                                                isValid = false;
-                                                               // Scroll to the first invalid field
+                                                               // Cuộn đến trường đầu tiên bị lỗi
                                                                if (isValid === false) {
                                                                    input.scrollIntoView({behavior: 'smooth', block: 'center'});
                                                                    input.focus();
                                                                }
                                                            }
                                                        }
-
                                                        if (!isValid) {
                                                            alert('Vui lòng điền đầy đủ các trường bắt buộc');
                                                            return;
                                                        }
 
-                                                       // Submit form using fetch API
+                                                       // Gửi form bằng fetch API
                                                        fetch(form.action, {
                                                            method: 'POST',
                                                            body: formData
@@ -322,7 +320,7 @@
                                                                .then(data => {
                                                                    if (data.success) {
                                                                        alert('Cập nhật tin thành công!');
-                                                                       window.location.href = '${pageContext.request.contextPath}/post';
+                                                                       window.location.href = '${pageContext.request.contextPath}/post'; // Chuyển về danh sách tin
                                                                    } else {
                                                                        alert(data.message || 'Có lỗi xảy ra khi cập nhật tin. Vui lòng thử lại.');
                                                                    }
@@ -333,7 +331,7 @@
                                                                });
                                                    });
 
-                                                   // Remove invalid class when user starts typing
+                                                   // Xóa class báo lỗi khi người dùng nhập lại
                                                    document.querySelectorAll('input, textarea, select').forEach(input => {
                                                        input.addEventListener('input', function () {
                                                            validateField(this);
