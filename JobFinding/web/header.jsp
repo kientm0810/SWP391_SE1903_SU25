@@ -65,6 +65,29 @@
                 <div class="d-flex align-items-center">
                     <c:choose>
                         <c:when test="${not empty sessionScope.user}">
+                            <c:if test="${sessionScope.role == 'recruiter'}">
+                                <div class="dropdown">
+                                    <button class="btn btn-light dropdown-toggle" type="button" id="notiDropdown"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-bell"></i>
+                                    </button>
+
+                                    <ul class="dropdown-menu dropdown-menu-end notifications" aria-labelledby="notiDropdown">
+                                        <c:forEach var="noti" items="${notice}">
+                                            <li class="notification-item ${noti.is_read ? '' : 'unread'}">
+                                                <div class="notification-title">${noti.title}</div>
+                                                <div class="notification-content">${noti.content}</div>
+                                                <span class="notification-time">${noti.created_at}</span>
+                                            </li>
+                                        </c:forEach>
+
+                                        <li class="view-all">
+                                            <a href="allNotifications" class="text-primary text-decoration-none">View all</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </c:if>
+                            <div>&nbsp;</div>
                             <div class="dropdown">
                                 <button class="btn btn-light dropdown-toggle" type="button" id="userDropdown"
                                         data-bs-toggle="dropdown" aria-expanded="false">
@@ -118,91 +141,8 @@
     </nav>
 </header>
 
-<style>
-    .header-area {
-        margin-bottom: 70px;
-    }
-    .navbar {
-        padding: 0.75rem 0;
-        background-color: #fff !important;
-    }
-    .navbar-brand {
-        padding: 0;
-    }
-    .nav-link {
-        color: #2d3846 !important;
-        padding: 0.5rem 1rem !important;
-        font-weight: 500;
-    }
-    .nav-link:hover {
-        color: #00b14f !important;
-    }
-    .nav-link i {
-        margin-right: 0.5rem;
-    }
-    .dropdown-item {
-        padding: 0.5rem 1rem;
-        color: #2d3846;
-    }
-    .dropdown-item:hover {
-        background-color: #f8f9fa;
-        color: #00b14f;
-    }
-    .dropdown-item i {
-        margin-right: 0.5rem;
-        width: 1rem;
-        text-align: center;
-    }
-    .btn-primary {
-        background-color: #00b14f;
-        border-color: #00b14f;
-        padding: 0.5rem 1rem;
-        font-weight: 500;
-    }
-    .btn-primary:hover {
-        background-color: #009443;
-        border-color: #009443;
-    }
-    .btn-outline-primary {
-        color: #00b14f;
-        border-color: #00b14f;
-        padding: 0.5rem 1rem;
-        font-weight: 500;
-    }
-    .btn-outline-primary:hover {
-        background-color: #00b14f;
-        border-color: #00b14f;
-    }
-    .dropdown-toggle::after {
-        margin-left: 0.5rem;
-    }
-    .navbar-toggler {
-        border: none;
-        padding: 0.5rem;
-    }
-    .navbar-toggler:focus {
-        box-shadow: none;
-    }
-    @media (max-width: 991.98px) {
-        .navbar-collapse {
-            padding: 1rem 0;
-        }
-        .navbar-nav {
-            margin-bottom: 1rem !important;
-        }
-        .d-flex {
-            display: block !important;
-            width: 100%;
-        }
-        .btn {
-            display: block;
-            width: 100%;
-            margin: 0.5rem 0;
-        }
-    }
-</style>
-
 <!-- Bootstrap and Font Awesome -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="assets/css/header.css">

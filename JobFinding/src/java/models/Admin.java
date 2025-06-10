@@ -26,6 +26,7 @@ public class Admin {
     private Date createdAt;
     private Date updatedAt;
     private boolean isActive;
+    private String role;
 
     public Admin() {
     }
@@ -33,7 +34,7 @@ public class Admin {
     // Constructor
     public Admin(int id, String username, String password, String email, String fullName, String phone,
                  Date dateOfBirth, String gender, String address, String profilePicture, 
-                 Date createdAt, Date updatedAt, boolean isActive) {
+                 Date createdAt, Date updatedAt, boolean isActive, String role) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -47,8 +48,24 @@ public class Admin {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.isActive = isActive;
+        this.role = role;
     }
 
+    public boolean isIsActive() {
+        return isActive;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
 
     public int getId() {
         return id;

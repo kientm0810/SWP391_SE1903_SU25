@@ -19,7 +19,8 @@ CREATE TABLE Admin (
     profile_picture VARCHAR(255),
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT GETDATE(),
-    is_active BIT DEFAULT 1
+    is_active BIT DEFAULT 1,
+	role VARCHAR(20) DEFAULT 'admin' CHECK (role IN ('admin', 'manager', 'saler'))
 );
 
 
@@ -52,6 +53,21 @@ CREATE TABLE Recruiter (
     updated_at DATETIME DEFAULT GETDATE(),
     is_active BIT DEFAULT 1
 );
+
+CREATE TABLE RecruiterNotification (
+    id BIGINT PRIMARY KEY IDENTITY(1,1),
+    recruiter_id INT NOT NULL, -- Liên kết với Recruiter
+    type NVARCHAR(50), -- 'ACCOUNT_APPROVED', 'NEW_APPLICATION', etc.
+    title NVARCHAR(255),
+    content NTEXT,
+    is_read BIT DEFAULT 0,
+    created_at DATETIME DEFAULT GETDATE(),
+
+    CONSTRAINT fk_recruiter_notification FOREIGN KEY (recruiter_id)
+        REFERENCES Recruiter(id)
+        ON DELETE CASCADE
+);
+
 
 -- Job_Seekers Table
 CREATE TABLE Job_Seekers (

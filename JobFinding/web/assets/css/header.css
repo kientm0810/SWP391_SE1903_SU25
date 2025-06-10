@@ -1,0 +1,130 @@
+/* header.css */
+.dropdown-menu.notifications {
+    width: 300px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.notification-item:hover {
+    background-color: #f8f9fa;
+    cursor: pointer;
+}
+
+.notification-title {
+    font-weight: bold;
+}
+
+.notification-content {
+    font-size: 0.875rem;
+    color: #555;
+}
+
+.notification-time {
+    font-size: 0.75rem;
+    color: #999;
+    margin-top: 5px;
+    display: block;
+}
+
+.view-all {
+    text-align: center;
+    padding: 10px;
+}
+
+.header-area {
+    margin-bottom: 70px;
+}
+.navbar {
+    padding: 0.75rem 0;
+    background-color: #fff !important;
+}
+.navbar-brand {
+    padding: 0;
+}
+.nav-link {
+    color: #2d3846 !important;
+    padding: 0.5rem 1rem !important;
+    font-weight: 500;
+}
+.nav-link:hover {
+    color: #00b14f !important;
+}
+.nav-link i {
+    margin-right: 0.5rem;
+}
+.dropdown-item {
+    padding: 0.5rem 1rem;
+    color: #2d3846;
+}
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: #00b14f;
+}
+.dropdown-item i {
+    margin-right: 0.5rem;
+    width: 1rem;
+    text-align: center;
+}
+.btn-primary {
+    background-color: #00b14f;
+    border-color: #00b14f;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+}
+.btn-primary:hover {
+    background-color: #009443;
+    border-color: #009443;
+}
+.btn-outline-primary {
+    color: #00b14f;
+    border-color: #00b14f;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+}
+.btn-outline-primary:hover {
+    background-color: #00b14f;
+    border-color: #00b14f;
+}
+.dropdown-toggle::after {
+    margin-left: 0.5rem;
+}
+.navbar-toggler {
+    border: none;
+    padding: 0.5rem;
+}
+.navbar-toggler:focus {
+    box-shadow: none;
+}
+@media (max-width: 991.98px) {
+    .navbar-collapse {
+        padding: 1rem 0;
+    }
+    .navbar-nav {
+        margin-bottom: 1rem !important;
+    }
+    .d-flex {
+        display: block !important;
+        width: 100%;
+    }
+    .btn {
+        display: block;
+        width: 100%;
+        margin: 0.5rem 0;
+    }
+}
+
+.notification-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    background-color: #ffffff;
+}
+
+.notification-item.unread {
+    background-color: #f0f8ff; /* màu nền nhạt hơn để nổi bật */
+    font-weight: 600;
+}

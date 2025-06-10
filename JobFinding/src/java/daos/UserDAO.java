@@ -50,6 +50,7 @@ public class UserDAO extends DBContext {
                 admin.setCreatedAt(rs.getTimestamp("created_at"));
                 admin.setUpdatedAt(rs.getTimestamp("updated_at"));
                 admin.setActive(rs.getBoolean("is_active"));
+                admin.setRole(rs.getString("role"));
                 return admin;
             }
         } catch (SQLException e) {

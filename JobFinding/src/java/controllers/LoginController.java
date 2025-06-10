@@ -113,6 +113,9 @@ public class LoginController extends HttpServlet {
         session.setAttribute("role", role);
         session.setAttribute("userId", getUserId(user));
         session.setAttribute("userType", role);
+        if (role.equals("admin")){
+            session.setAttribute("adminRole", ((Admin)user).getRole());
+        }
         session.setMaxInactiveInterval(SESSION_TIMEOUT);
         
         redirectToHomePage(session, response);
@@ -146,9 +149,9 @@ public class LoginController extends HttpServlet {
             throws IOException {
         String role = (String) session.getAttribute("role");
         String homePage = switch (role) {
-            case "admin" -> "home.jsp";
-            case "recruiter" -> "home.jsp";
-            case "job-seeker" -> "home.jsp";
+            case "admin" -> "home";
+            case "recruiter" -> "home";
+            case "job-seeker" -> "home";
             default -> "login";
         };
         response.sendRedirect(homePage);
