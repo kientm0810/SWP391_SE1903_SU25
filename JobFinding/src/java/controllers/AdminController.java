@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import daos.RecruiterNotificationDAO;
 import models.RecruiterNotification;
+import utils.JavaMail;
 
 /**
  *
@@ -453,7 +454,8 @@ public class AdminController extends HttpServlet {
         // Lấy tham số từ request
         String idStr = request.getParameter("id");
         String status = request.getParameter("verificationStatus");
-
+        String email = request.getParameter("email");
+        
         if (idStr != null && status != null && !idStr.isEmpty() && !status.isEmpty()) {
             int id = Integer.parseInt(idStr);
 
@@ -462,12 +464,15 @@ public class AdminController extends HttpServlet {
             
             // truyền thông báo đến recruiter
             RecruiterNotificationDAO noticeDAO = new RecruiterNotificationDAO();
-            noticeDAO.insertNotice(new RecruiterNotification(id, 
+            int insert = noticeDAO.insertNotice(new RecruiterNotification(id, 
                     "ACCOUNT_APPROVED",
                     "ACCOUNT " + status.toUpperCase(), 
                     "your account have been " + status.toUpperCase(),
                     false));
             
+            if (status.equals("verified") && insert > 0){
+                JavaMail.sendNotification(email);
+            }
         }
         
         response.sendRedirect("AdminController?target=Recruiter");

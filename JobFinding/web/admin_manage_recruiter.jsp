@@ -108,6 +108,7 @@
                                 <option value="rejected" <%= "rejected".equals(i.getVerificationStatus()) ? "selected" : "" %>>Rejected</option>
                             </select>
                             <input type="submit" value="Update" class="btn-small">
+                            <input type="hidden" name="email" value="<%= i.getEmail()%>" class="btn-small">
                         </form>
                     </td>
                     <td>
