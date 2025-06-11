@@ -66,23 +66,57 @@
                     <c:choose>
                         <c:when test="${not empty sessionScope.user}">
                             <c:if test="${sessionScope.role == 'recruiter'}">
-                                <div class="dropdown">
+                                <div class="dropdown" data-bs-auto-close="outside">
                                     <button class="btn btn-light dropdown-toggle" type="button" id="notiDropdown"
                                             data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="fas fa-bell"></i>
                                     </button>
 
                                     <ul class="dropdown-menu dropdown-menu-end notifications" aria-labelledby="notiDropdown">
-                                        <c:forEach var="noti" items="${notice}">
-                                            <li class="notification-item ${noti.is_read ? '' : 'unread'}">
-                                                <div class="notification-title">${noti.title}</div>
-                                                <div class="notification-content">${noti.content}</div>
-                                                <span class="notification-time">${noti.created_at}</span>
-                                            </li>
-                                        </c:forEach>
 
-                                        <li class="view-all">
-                                            <a href="allNotifications" class="text-primary text-decoration-none">View all</a>
+                                        <!-- Notification filter tabs -->
+                                        <div class="d-flex justify-content-center px-3 pt-2">
+                                            <button type="button" class="btn btn-sm btn-outline-primary me-1 tab-btn active" 
+                                                    data-target="all">
+                                                All
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-primary me-1 tab-btn" 
+                                                    data-target="unread">
+                                                Unread
+                                            </button>
+                                        </div>
+                                        <hr class="my-2" />
+
+                                        <!-- All notifications -->
+                                        <div class="tab-content all">
+                                            <c:forEach var="noti" items="${notice}">
+                                                <a href="notification?service=detail&type=all&id=${noti.id}" class="text-decoration-none text-dark">
+                                                    <li class="notification-item ${noti.is_read ? '' : 'unread'}">
+                                                        <div class="notification-title">${noti.title}</div>
+                                                        <div class="notification-content">${noti.content}</div>
+                                                        <span class="notification-time">${noti.created_at}</span>
+                                                    </li>
+                                                </a>
+                                            </c:forEach>
+                                        </div>
+
+                                        <!-- Unread notifications only -->
+                                        <div class="tab-content unread d-none">
+                                            <c:forEach var="noti" items="${unread}">
+                                                <c:if test="${!noti.is_read}">
+                                                    <a href="notification?service=detail&type=all&id=${noti.id}" class="text-decoration-none text-dark">
+                                                        <li class="notification-item unread">
+                                                            <div class="notification-title">${noti.title}</div>
+                                                            <div class="notification-content">${noti.content}</div>
+                                                            <span class="notification-time">${noti.created_at}</span>
+                                                        </li>
+                                                    </a>
+                                                </c:if>
+                                            </c:forEach>
+                                        </div>
+
+                                        <li class="view-all text-center mt-2">
+                                            <a href="notification" class="text-primary text-decoration-none">View all</a>
                                         </li>
                                     </ul>
                                 </div>
@@ -146,3 +180,5 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <link rel="stylesheet" href="assets/css/header.css">
+
+<script src="assets/js/header.js"></script>

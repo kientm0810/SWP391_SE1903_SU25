@@ -32,6 +32,10 @@
         <servlet-name>HomeController</servlet-name>
         <servlet-class>controllers.HomeController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>NotificationController</servlet-name>
+        <servlet-class>controllers.NotificationController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>JobDetailController</servlet-name>
         <url-pattern>/job-detail</url-pattern>
@@ -63,6 +67,10 @@
     <servlet-mapping>
         <servlet-name>HomeController</servlet-name>
         <url-pattern>/home</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>NotificationController</servlet-name>
+        <url-pattern>/notification</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>

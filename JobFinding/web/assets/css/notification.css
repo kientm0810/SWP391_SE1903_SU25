@@ -1,0 +1,18 @@
+.notification-content {
+    font-size: 0.875rem;
+    color: #555;
+}
+
+.read {
+    background-color: #f8f9fa !important;
+    color: #6c757d !important;
+}
+.unread {
+    background-color: #c3e6cb !important;
+    font-weight: bold !important;
+}
+
+.noti-item:hover {
+    background-color: #c3e6cb;
+    cursor: pointer;
+}
