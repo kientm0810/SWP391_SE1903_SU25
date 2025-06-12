@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import models.Admin;
 import models.JobSeeker;
+import java.util.Vector;
 
 /**
  *
@@ -17,7 +18,7 @@ import models.JobSeeker;
  */
 public class AdminDAO extends DBContext{
     public Admin getAdminByUsernameAndPassword(String username, String password) {
-        String sql = "SELECT * FROM Admin WHERE username = ? AND password = ?";
+        String sql = "SELECT * FROM [project_SWP391].[dbo].[Admin] WHERE username = ? AND password = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, username);
             ps.setString(2, password);
@@ -38,6 +39,210 @@ public class AdminDAO extends DBContext{
         return null;
     }
     public static void main(String[] args) {
-        System.out.println(new AdminDAO().getAdminByUsernameAndPassword("admin1", "admin1").getEmail());
+        AdminDAO dao = new AdminDAO();
+        Vector<Admin> managers = dao.getAdmins("Manager");
+
+        if (managers.isEmpty()) {
+            System.out.println("No managers found.");
+        } else {
+            for (Admin admin : managers) {
+                System.out.println("ID: " + admin.getId());
+                System.out.println("Username: " + admin.getUsername());
+                System.out.println("Full Name: " + admin.getFullName());
+                System.out.println("Email: " + admin.getEmail());
+                System.out.println("Role: " + admin.getRole());
+                System.out.println("Active: " + admin.isActive());
+                System.out.println("---------------------------");
+            }
+        }
     }
+
+    
+    public String debug(String role){
+        Vector<Admin> admins = new Vector<>();
+        String sql = "SELECT * FROM [project_SWP391].[dbo].[Admin] WHERE [role] = '?'";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setString(1, role);
+            return stmt.toString();
+        } catch (SQLException ex){
+            ex.getStackTrace();
+        }
+        return "sai";
+    }
+    
+    public Vector<Admin> getAdmins(String role) {
+        Vector<Admin> admins = new Vector<>();
+        String sql = "SELECT * FROM [project_SWP391].[dbo].[Admin] WHERE [role] = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setString(1, role);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Admin admin = mapResultSetToAdmin(rs);
+                admins.add(admin);
+            }
+        } catch (SQLException ex){
+            ex.getStackTrace();
+        }
+        return admins;
+    }
+            
+    public static Admin mapResultSetToAdmin(ResultSet res) throws SQLException {
+        Admin admin = new Admin();
+        admin.setId(res.getInt("id"));
+        admin.setUsername(res.getString("username"));
+        admin.setPassword(res.getString("password"));
+        admin.setEmail(res.getString("email"));
+        admin.setFullName(res.getString("full_name"));
+        admin.setPhone(res.getString("phone"));
+        admin.setDateOfBirth(res.getDate("date_of_birth"));
+        admin.setGender(res.getString("gender"));
+        admin.setAddress(res.getString("address"));
+        admin.setProfilePicture(res.getString("profile_picture"));
+        admin.setCreatedAt(res.getDate("created_at"));
+        admin.setUpdatedAt(res.getDate("updated_at"));
+        admin.setIsActive(res.getBoolean("is_active"));
+        admin.setRole(res.getString("role"));
+        return admin;
+    }
+    
+    public Vector<Admin> searchAdmin(Admin criteria, String role) {
+        Vector<Admin> list = new Vector<>();
+        StringBuilder sql = new StringBuilder("SELECT * FROM [project_SWP391].[dbo].[Admin] WHERE [role] = '" + role + "'");
+        Vector<Object> params = new Vector<>();
+
+        if (criteria.getId() != 0) {
+            sql.append(" AND id = ?");
+            params.add(criteria.getId());
+        }
+        if (criteria.getUsername() != null && !criteria.getUsername().isEmpty()) {
+            sql.append(" AND username LIKE ?");
+            params.add("%" + criteria.getUsername() + "%");
+        }
+        if (criteria.getEmail() != null && !criteria.getEmail().isEmpty()) {
+            sql.append(" AND email LIKE ?");
+            params.add("%" + criteria.getEmail() + "%");
+        }
+        if (criteria.getFullName() != null && !criteria.getFullName().isEmpty()) {
+            sql.append(" AND full_name LIKE ?");
+            params.add("%" + criteria.getFullName() + "%");
+        }
+        if (criteria.getPhone() != null && !criteria.getPhone().isEmpty()) {
+            sql.append(" AND phone LIKE ?");
+            params.add("%" + criteria.getPhone() + "%");
+        }
+        if (criteria.getGender() != null && !criteria.getGender().isEmpty()) {
+            sql.append(" AND gender = ?");
+            params.add(criteria.getGender());
+        }
+        if (criteria.getAddress() != null && !criteria.getAddress().isEmpty()) {
+            sql.append(" AND address LIKE ?");
+            params.add("%" + criteria.getAddress() + "%");
+        }
+        
+        
+        sql.append(" AND is_active = ?");
+        params.add(criteria.isActive());
+
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            ps = connection.prepareStatement(sql.toString());
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapResultSetToAdmin(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return list;
+    }
+    
+    public void registerAdmin(Admin admin, String role) {
+    String sql = "INSERT INTO [project_SWP391].[dbo].[Admin] (username, password, email, full_name, phone, date_of_birth, gender, address, profile_picture, created_at, updated_at, is_active, role) " +
+                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE(), ?, ?)";
+        PreparedStatement ps = null;
+        try {
+            ps = connection.prepareStatement(sql);
+            ps.setString(1, admin.getUsername());
+            ps.setString(2, admin.getPassword());
+            ps.setString(3, admin.getEmail());
+            ps.setString(4, admin.getFullName());
+            ps.setString(5, admin.getPhone());
+            ps.setDate(6, admin.getDateOfBirth());
+            ps.setString(7, admin.getGender());
+            ps.setString(8, admin.getAddress());
+            ps.setString(9, admin.getProfilePicture());
+//            ps.setDate(10, admin.getCreatedAt());
+//            ps.setDate(11, admin.getUpdatedAt());
+            ps.setBoolean(10, admin.isActive());
+            ps.setString(11, role);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps != null) ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    public void changeStatus(int ID, boolean status) {
+        String sql = "UPDATE [project_SWP391].[dbo].[Admin] SET is_active = ? WHERE id = ?";
+        PreparedStatement ps = null;
+        try {
+            ps = connection.prepareStatement(sql);
+            ps.setBoolean(1, status);
+            ps.setInt(2, ID);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps != null) ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public Admin getSpecificAdmin(int ID, String role) {
+        String sql = "SELECT * FROM [project_SWP391].[dbo].[Admin] WHERE id = ? AND role = ?";
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            ps = connection.prepareStatement(sql);
+            ps.setInt(1, ID);
+            ps.setString(2, role);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return mapResultSetToAdmin(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+
 }

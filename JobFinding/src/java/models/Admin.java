@@ -10,7 +10,7 @@ package models;
  */
 // Admin.java
 
-import java.util.Date;
+import java.sql.Date;
 
 public class Admin {
     private int id;
@@ -29,6 +29,36 @@ public class Admin {
     private String role;
 
     public Admin() {
+    }
+
+    public Admin(String username, String password, String email, String fullName, String phone, Date dateOfBirth, String gender, String address, String profilePicture, boolean isActive, String role) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.fullName = fullName;
+        this.phone = phone;
+        this.dateOfBirth = dateOfBirth;
+        this.gender = gender;
+        this.address = address;
+        this.profilePicture = profilePicture;
+        this.isActive = isActive;
+        this.role = role;
+    }
+
+    public Admin(String username, String password, String email, String fullName, String phone, Date dateOfBirth, String gender, String address, String profilePicture, Date createdAt, Date updatedAt, boolean isActive, String role) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.fullName = fullName;
+        this.phone = phone;
+        this.dateOfBirth = dateOfBirth;
+        this.gender = gender;
+        this.address = address;
+        this.profilePicture = profilePicture;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.isActive = isActive;
+        this.role = role;
     }
 
     // Constructor

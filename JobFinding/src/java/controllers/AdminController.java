@@ -24,6 +24,8 @@ import java.util.List;
 import daos.RecruiterNotificationDAO;
 import models.RecruiterNotification;
 import utils.JavaMail;
+import models.Admin;
+import daos.AdminDAO;
 
 /**
  *
@@ -54,10 +56,282 @@ public class AdminController extends HttpServlet {
             processJobSeeker(request, response);
         } else if (target.equals("Recruiter")) {
             processRecruiter(request, response);
+        } else if (target.equals("Manager")){
+            processManager(request, response);
+        } else if (target.equals("Saler")){
+            processSaler(request, response);
         }
 
     }
 
+    private void processManager(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String service = request.getParameter("service");
+        if (service == null) {
+            service = "list";
+        }
+
+        if (service.equals("list")) {
+            listManager(request, response);
+        } else if (service.equals("Add")) {
+            addManager(request, response);
+        } else if (service.equals("Ban")) {
+            banManager(request, response);
+        } else if (service.equals("Detail")) {
+            detailManager(request, response);
+        }
+    }
+    
+    private void listManager(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+        String submit = request.getParameter("submit");
+        if (submit == null) {
+            submit = "";
+        }
+
+        if (submit.equals("Search")) {
+            String idStr = request.getParameter("id");
+            String username = request.getParameter("username");
+            String email = request.getParameter("email");
+            String fullName = request.getParameter("fullName");
+            String phone = request.getParameter("phone");
+            String gender = request.getParameter("gender");
+            String address = request.getParameter("address");
+            String isActiveStr = request.getParameter("isActive");
+
+            Admin criteria = new Admin();
+            if (idStr != null && !idStr.isEmpty()) {
+                criteria.setId(Integer.parseInt(idStr));
+            }
+            if (username != null && !username.isEmpty()) {
+                criteria.setUsername(username);
+            }
+            if (email != null && !email.isEmpty()) {
+                criteria.setEmail(email);
+            }
+            if (fullName != null && !fullName.isEmpty()) {
+                criteria.setFullName(fullName);
+            }
+            if (phone != null && !phone.isEmpty()) {
+                criteria.setPhone(phone);
+            }
+            if (gender != null && !gender.isEmpty()) {
+                criteria.setGender(gender);
+            }
+            if (address != null && !address.isEmpty()) {
+                criteria.setAddress(address);
+            }
+            if (isActiveStr != null && !isActiveStr.isEmpty()) {
+                criteria.setActive(Boolean.parseBoolean(isActiveStr));
+            }
+
+            AdminDAO dao = new AdminDAO();
+            Vector<Admin> vec = dao.searchAdmin(criteria, "manager");  // viết hàm này trong DAO
+            request.setAttribute("vec", vec);
+        } else {
+//            log("here");
+            AdminDAO dao = new AdminDAO();
+            Vector<Admin> vec = dao.getAdmins("manager");  // viết hàm này trong DAO
+//            log("" + vec.size());
+//            String sql = "SELECT * FROM [project_SWP391].[dbo].[Admin] WHERE [role] = 'manager'";
+//            log(sql);
+//            log(dao.debug("manager"));
+            request.setAttribute("vec", vec);
+        }
+
+        request.getRequestDispatcher("admin_manage_manager.jsp").forward(request, response);
+    }
+    
+    private void addManager(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+        AdminDAO dao = new AdminDAO();
+
+        String submit = request.getParameter("submit");
+        if (submit == null) {
+            request.getRequestDispatcher("admin_add_manager.jsp").forward(request, response);
+        } else {
+            String username = request.getParameter("username");
+            String password = request.getParameter("password");
+            String email = request.getParameter("email");
+            String fullName = request.getParameter("fullName");
+            String phone = request.getParameter("phone");
+            String dateOfBirthStr = request.getParameter("dateOfBirth");
+            String gender = request.getParameter("gender");
+            String address = request.getParameter("address");
+            String profilePicture = request.getParameter("profilePicture");
+            String isActiveStr = request.getParameter("isActive");
+
+            Date dateOfBirth = Date.valueOf(dateOfBirthStr);
+            boolean isActive = Boolean.parseBoolean(isActiveStr);
+
+            Admin manager = new Admin(username, password, email, fullName, phone,
+                    dateOfBirth, gender, address, profilePicture, isActive, "manager");
+
+            dao.registerAdmin(manager, "manager"); // bạn cần viết hàm này trong UserDAO
+
+            response.sendRedirect("AdminController?target=Manager");
+        }
+    }
+
+    private void banManager(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+        int ID = Integer.parseInt(request.getParameter("ID"));
+        boolean status = Boolean.parseBoolean(request.getParameter("status"));
+
+        AdminDAO dao = new AdminDAO();
+        status = !status;
+        dao.changeStatus(ID, status); // bạn cần viết hàm này trong AdminDAO
+
+        response.sendRedirect("AdminController?target=Manager");
+    }
+
+    private void detailManager(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+        int ID = Integer.parseInt(request.getParameter("ID"));
+
+        AdminDAO dao = new AdminDAO();
+        Admin manager = dao.getSpecificAdmin(ID, "manager"); // bạn cần viết hàm này trong AdminDAO
+
+        request.setAttribute("Manager", manager);
+
+        request.getRequestDispatcher("admin_detail_manager.jsp").forward(request, response);
+    }
+    
+    private void processSaler(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String service = request.getParameter("service");
+        if (service == null) {
+            service = "list";
+        }
+
+        if (service.equals("list")) {
+            listSaler(request, response);
+        } else if (service.equals("Add")) {
+            addSaler(request, response);
+        } else if (service.equals("Ban")) {
+            banSaler(request, response);
+        } else if (service.equals("Detail")) {
+            detailSaler(request, response);
+        }
+    }
+    
+    private void listSaler(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+        String submit = request.getParameter("submit");
+        if (submit == null) {
+            submit = "";
+        }
+
+        if (submit.equals("Search")) {
+            String idStr = request.getParameter("id");
+            String username = request.getParameter("username");
+            String email = request.getParameter("email");
+            String fullName = request.getParameter("fullName");
+            String phone = request.getParameter("phone");
+            String gender = request.getParameter("gender");
+            String address = request.getParameter("address");
+            String isActiveStr = request.getParameter("isActive");
+
+            Admin criteria = new Admin();
+            if (idStr != null && !idStr.isEmpty()) {
+                criteria.setId(Integer.parseInt(idStr));
+            }
+            if (username != null && !username.isEmpty()) {
+                criteria.setUsername(username);
+            }
+            if (email != null && !email.isEmpty()) {
+                criteria.setEmail(email);
+            }
+            if (fullName != null && !fullName.isEmpty()) {
+                criteria.setFullName(fullName);
+            }
+            if (phone != null && !phone.isEmpty()) {
+                criteria.setPhone(phone);
+            }
+            if (gender != null && !gender.isEmpty()) {
+                criteria.setGender(gender);
+            }
+            if (address != null && !address.isEmpty()) {
+                criteria.setAddress(address);
+            }
+            if (isActiveStr != null && !isActiveStr.isEmpty()) {
+                criteria.setActive(Boolean.parseBoolean(isActiveStr));
+            }
+
+            AdminDAO dao = new AdminDAO();
+            Vector<Admin> vec = dao.searchAdmin(criteria, "saler");  // viết hàm này trong DAO
+            request.setAttribute("vec", vec);
+        } else {
+            log("here u r");
+            AdminDAO dao = new AdminDAO();
+            Vector<Admin> vec = dao.getAdmins("saler");  // viết hàm này trong DAO
+//            log("" + vec.size());
+//            String sql = "SELECT * FROM [project_SWP391].[dbo].[Admin] WHERE [role] = 'manager'";
+//            log(sql);
+//            log(dao.debug("manager"));
+            log("sth went wrong");
+            request.setAttribute("vec", vec);
+        }
+
+        request.getRequestDispatcher("admin_manage_saler.jsp").forward(request, response);
+    }
+    
+    private void addSaler(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+        AdminDAO dao = new AdminDAO();
+
+        String submit = request.getParameter("submit");
+        if (submit == null) {
+            request.getRequestDispatcher("admin_add_saler.jsp").forward(request, response);
+        } else {
+            String username = request.getParameter("username");
+            String password = request.getParameter("password");
+            String email = request.getParameter("email");
+            String fullName = request.getParameter("fullName");
+            String phone = request.getParameter("phone");
+            String dateOfBirthStr = request.getParameter("dateOfBirth");
+            String gender = request.getParameter("gender");
+            String address = request.getParameter("address");
+            String profilePicture = request.getParameter("profilePicture");
+            String isActiveStr = request.getParameter("isActive");
+
+            Date dateOfBirth = Date.valueOf(dateOfBirthStr);
+            boolean isActive = Boolean.parseBoolean(isActiveStr);
+
+            Admin manager = new Admin(username, password, email, fullName, phone,
+                    dateOfBirth, gender, address, profilePicture, isActive, "saler");
+
+            dao.registerAdmin(manager, "saler"); // bạn cần viết hàm này trong UserDAO
+
+            response.sendRedirect("AdminController?target=Saler");
+        }
+    }
+
+    private void banSaler(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+        int ID = Integer.parseInt(request.getParameter("ID"));
+        boolean status = Boolean.parseBoolean(request.getParameter("status"));
+
+        AdminDAO dao = new AdminDAO();
+        status = !status;
+        dao.changeStatus(ID, status); // bạn cần viết hàm này trong AdminDAO
+
+        response.sendRedirect("AdminController?target=Saler");
+    }
+
+    private void detailSaler(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+        int ID = Integer.parseInt(request.getParameter("ID"));
+
+        AdminDAO dao = new AdminDAO();
+        Admin saler = dao.getSpecificAdmin(ID, "saler"); // bạn cần viết hàm này trong AdminDAO
+
+        request.setAttribute("Saler", saler);
+
+        request.getRequestDispatcher("admin_detail_saler.jsp").forward(request, response);
+    }
+
+    
     private void processJobSeeker(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String service = request.getParameter("service");

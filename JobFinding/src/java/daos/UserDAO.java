@@ -47,8 +47,8 @@ public class UserDAO extends DBContext {
                 admin.setGender(rs.getString("gender"));
                 admin.setAddress(rs.getString("address"));
                 admin.setProfilePicture(rs.getString("profile_picture"));
-                admin.setCreatedAt(rs.getTimestamp("created_at"));
-                admin.setUpdatedAt(rs.getTimestamp("updated_at"));
+                admin.setCreatedAt(rs.getDate("created_at"));
+                admin.setUpdatedAt(rs.getDate("updated_at"));
                 admin.setActive(rs.getBoolean("is_active"));
                 admin.setRole(rs.getString("role"));
                 return admin;
@@ -317,8 +317,8 @@ public class UserDAO extends DBContext {
                 admin.setGender(rs.getString("gender"));
                 admin.setAddress(rs.getString("address"));
                 admin.setProfilePicture(rs.getString("profile_picture"));
-                admin.setCreatedAt(rs.getTimestamp("created_at"));
-                admin.setUpdatedAt(rs.getTimestamp("updated_at"));
+                admin.setCreatedAt(rs.getDate("created_at"));
+                admin.setUpdatedAt(rs.getDate("updated_at"));
                 admin.setActive(rs.getBoolean("is_active"));
                 
                 return admin;

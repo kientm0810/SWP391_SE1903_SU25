@@ -68,7 +68,6 @@ CREATE TABLE RecruiterNotification (
         ON DELETE CASCADE
 );
 
-
 -- Job_Seekers Table
 CREATE TABLE Job_Seekers (
     id INT PRIMARY KEY IDENTITY(1,1),
@@ -97,6 +96,20 @@ CREATE TABLE Job_Seekers (
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT GETDATE(),
     is_active BIT DEFAULT 1
+);
+
+CREATE TABLE Job_SeekersNotification (
+    id BIGINT PRIMARY KEY IDENTITY(1,1),
+    jobseeker_id INT NOT NULL, -- Liên kết với Recruiter
+    type NVARCHAR(50), -- 'ACCOUNT_APPROVED', 'NEW_APPLICATION', etc.
+    title NVARCHAR(255),
+    content NTEXT,
+    is_read BIT DEFAULT 0,
+    created_at DATETIME DEFAULT GETDATE(),
+
+    CONSTRAINT fk_jobseeker_notification FOREIGN KEY (jobseeker_id)
+        REFERENCES Job_Seekers(id)
+        ON DELETE CASCADE
 );
 
 -- Email Table

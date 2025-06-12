@@ -16,6 +16,8 @@
         
         <p><a href="AdminController?target=JobSeeker">Manage JobSeeker</a></p>
         <p><a href="AdminController?target=Recruiter">Manage Recruiter</a></p>
+        <p><a href="AdminController?target=Manager">Manage Manager</a></p>
+        <p><a href="AdminController?target=Saler">Manage Saler</a></p>
         
     </body>
 </html>
