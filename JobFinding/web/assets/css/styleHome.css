@@ -1,0 +1,216 @@
+:root {
+    --primary-color: #00b14f;
+    /* Màu xanh lá cây chủ đạo của TopCV */
+    --primary-color-hover: #009a44;
+    --secondary-color: #ff8200;
+    /* Màu cam cho các điểm nhấn */
+    --text-color: #333;
+    --text-color-light: #777;
+    --border-color: #e0e0e0;
+    --background-color: #f4f5f7;
+    --white-color: #fff;
+    --font-family-main: 'Roboto', sans-serif;
+    /* Font chữ chính */
+    --box-shadow-light: 0 4px 15px rgba(0, 0, 0, 0.08);
+    --border-radius-medium: 8px;
+}
+
+/* === TỔNG QUAN & TYPOGRAPHY === */
+body {
+    font-family: var(--font-family-main);
+    color: var(--text-color);
+    background-color: var(--background-color);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 700;
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--primary-color-hover);
+}
+
+/* === THANH TÌM KIẾM (SEARCH BOX) === */
+.search-box {
+    display: flex;
+    background-color: var(--white-color);
+    padding: 10px;
+    border-radius: var(--border-radius-medium);
+    box-shadow: var(--box-shadow-light);
+    border: 1px solid var(--border-color);
+}
+
+.search-box .input-form input,
+.search-box .select-form .nice-select {
+    border: none;
+    background-color: transparent;
+    height: 48px;
+    padding: 0 15px;
+}
+
+.search-box .input-form {
+    flex-grow: 1;
+    /* Cho phép ô input chiếm nhiều không gian nhất */
+}
+
+.search-box .select-form {
+    display: flex;
+}
+
+.search-box .search-form button {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    border: none;
+    padding: 0 30px;
+    height: 48px;
+    border-radius: var(--border-radius-medium);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.search-box .search-form button:hover {
+    background-color: var(--primary-color-hover);
+}
+/* === THẺ VIỆC LÀM (JOB CARD) - ĐÃ TỐI ƯU === */
+.job-card {
+    background-color: var(--white-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-medium);
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+
+    /* SỬA ĐỔI CHÍNH: Cấu trúc Flexbox cho nội dung bên trong card */
+    display: flex;
+    flex-direction: column; /* Sắp xếp các phần tử con theo chiều dọc */
+    width: 100%; /* Đảm bảo card chiếm toàn bộ chiều rộng của cột */
+    height: 100%; /* SỬA ĐỔI QUAN TRỌNG: Buộc card lấp đầy chiều cao của cột cha */
+    overflow: hidden; /* Ngăn nội dung tràn ra ngoài */
+}
+
+.job-card:hover {
+    box-shadow: var(--box-shadow-light);
+    transform: translateY(-5px);
+    z-index: 2;
+}
+
+.job-card .job-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.job-card .company-logo {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    margin-right: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.job-card .job-info {
+    flex-grow: 1; /* Cho phép phần này chiếm không gian còn lại */
+    display: flex;
+    flex-direction: column; /* Sắp xếp tiêu đề và tên công ty theo chiều dọc */
+    min-width: 0;
+}
+
+.job-card .job-title-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+/* SỬA ĐỔI: Giới hạn tiêu đề công việc để tránh làm vỡ layout */
+.job-card .job-title a {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-color);
+    line-height: 1.4;
+
+    /* Kỹ thuật cắt văn bản sau 2 dòng */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2; /* Giới hạn ở 2 dòng */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 2.8em; /* Đảm bảo không gian cho 2 dòng, tránh giật layout */
+}
+
+.job-card .job-tag {
+    background-color: #e7f7ef;
+    color: var(--primary-color);
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    font-weight: 500;
+    white-space: nowrap;
+    margin-left: 10px; /* Thêm khoảng cách với tiêu đề */
+    flex-shrink: 0;
+}
+
+.job-card .company-name {
+    font-size: 0.9rem;
+    color: var(--text-color-light);
+    margin-bottom: 15px;
+
+    /* Kỹ thuật cắt văn bản sau 1 dòng */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.job-card .job-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    font-size: 0.9rem;
+    color: var(--text-color-light);
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+    margin-top: auto; /* SỬA ĐỔI QUAN TRỌNG: Đẩy phần này xuống đáy thẻ */
+}
+
+.job-card .job-meta-item {
+    display: flex;
+    align-items: center;
+}
+
+.job-card .job-meta-item i {
+    margin-right: 8px;
+    color: var(--primary-color);
+}
+
+/* === GRID LAYOUT - ĐÃ TỐI ƯU === */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -10px;
+    margin-right: -10px;
+    /* align-items: stretch; đã có, rất tốt! */
+}
+
+.col-xl-4,
+.col-lg-4,
+.col-md-6 {
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-bottom: 20px; /* Thêm margin-bottom để tạo khoảng cách giữa các hàng */
+    
+    /* SỬA ĐỔI QUAN TRỌNG: Đảm bảo cột là flex container */
+    display: flex; 
+}

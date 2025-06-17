@@ -152,6 +152,56 @@
             </div>
         </div>
 
+        <!-- Gợi ý việc làm phù hợp -->
+        <c:if test="${not empty suggestedPosts}">
+            <div class="container mt-5">
+                <h3 class="mb-4">Gợi ý việc làm phù hợp</h3>
+                <div class="row">
+                    <c:forEach items="${suggestedPosts}" var="post">
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <a href="${pageContext.request.contextPath}/post/view?id=${post.id}">
+                                            ${post.title}
+                                        </a>
+                                    </h5>
+                                    <p class="card-text">${post.companyName}</p>
+                                    <span class="badge bg-primary">${post.salary}</span>
+                                    <span class="badge bg-secondary">${post.location}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </c:forEach>
+                </div>
+            </div>
+        </c:if>
+
+        <!-- Việc làm liên quan -->
+        <c:if test="${not empty relatedPosts}">
+            <div class="container mt-5">
+                <h3 class="mb-4">Việc làm liên quan</h3>
+                <div class="row">
+                    <c:forEach items="${relatedPosts}" var="post">
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <a href="${pageContext.request.contextPath}/post/view?id=${post.id}">
+                                            ${post.title}
+                                        </a>
+                                    </h5>
+                                    <p class="card-text">${post.companyName}</p>
+                                    <span class="badge bg-primary">${post.salary}</span>
+                                    <span class="badge bg-secondary">${post.location}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </c:forEach>
+                </div>
+            </div>
+        </c:if>
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 

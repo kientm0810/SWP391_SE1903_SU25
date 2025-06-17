@@ -43,6 +43,7 @@ public class ResetPasswordController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String email = request.getParameter("email");
+        request.setCharacterEncoding("UTF-8");
 
         if (email == null || email.trim().isEmpty()) {
             request.setAttribute("error", "Vui lòng nhập email.");
@@ -133,6 +134,7 @@ public class ResetPasswordController extends HttpServlet {
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.host", host);
         props.put("mail.smtp.port", port);
+        
 
         Session session = Session.getInstance(props, new Authenticator() {
             @Override

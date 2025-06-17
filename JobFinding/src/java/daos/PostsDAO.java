@@ -112,6 +112,114 @@ public class PostsDAO {
         return posts;
     }
 
+    // Lấy list posts của 1 recruiter cụ thể
+    public List<Posts> getPostsByRecruiterId(int recruiterId) {
+        List<Posts> posts = new ArrayList<>();
+        String query = "SELECT * FROM Posts WHERE user_id = ? AND user_type = 'recruiter' AND deleted_at IS NULL ORDER BY created_at DESC";
+        try {
+            ps = conn.prepareStatement(query);
+            ps.setInt(1, recruiterId);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Posts post = new Posts();
+                post.setId(rs.getInt("id"));
+                post.setUserId(rs.getInt("user_id"));
+                post.setUserType(rs.getString("user_type"));
+                post.setParentId(rs.getInt("parent_id"));
+                post.setPostType(rs.getString("post_type"));
+                post.setTitle(rs.getString("title"));
+                post.setContent(rs.getString("content"));
+                post.setStatus(rs.getString("status"));
+                post.setViewCount(rs.getInt("view_count"));
+                post.setLikeCount(rs.getInt("like_count"));
+                post.setCommentCount(rs.getInt("comment_count"));
+                post.setCreatedAt(rs.getTimestamp("created_at"));
+                post.setUpdatedAt(rs.getTimestamp("updated_at"));
+                post.setDeletedAt(rs.getTimestamp("deleted_at"));
+                post.setExperience(rs.getString("experience"));
+                post.setDeadline(rs.getDate("deadline"));
+                post.setWorkingTime(rs.getString("working_time"));
+                post.setJobDescription(rs.getString("job_description"));
+                post.setRequirements(rs.getString("requirements"));
+                post.setBenefits(rs.getString("benefits"));
+                post.setContactAddress(rs.getString("contact_address"));
+                post.setApplicationMethod(rs.getString("application_method"));
+                post.setCompanyName(rs.getString("company_name"));
+                post.setCompanyLogo(rs.getString("company_logo"));
+                post.setSalary(rs.getString("salary"));
+                post.setLocation(rs.getString("location"));
+                post.setJobType(rs.getString("job_type"));
+                posts.add(post);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return posts;
+    }
+
+    // Lấy list posts của 1 recruiter cụ thể có phân trang
+    public List<Posts> getPostsByRecruiterIdWithPagination(int recruiterId, int page, int pageSize) {
+        List<Posts> posts = new ArrayList<>();
+        String query = "SELECT * FROM Posts WHERE user_id = ? AND user_type = 'recruiter' AND deleted_at IS NULL ORDER BY created_at DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        try {
+            ps = conn.prepareStatement(query);
+            ps.setInt(1, recruiterId);
+            ps.setInt(2, (page - 1) * pageSize);
+            ps.setInt(3, pageSize);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Posts post = new Posts();
+                post.setId(rs.getInt("id"));
+                post.setUserId(rs.getInt("user_id"));
+                post.setUserType(rs.getString("user_type"));
+                post.setParentId(rs.getInt("parent_id"));
+                post.setPostType(rs.getString("post_type"));
+                post.setTitle(rs.getString("title"));
+                post.setContent(rs.getString("content"));
+                post.setStatus(rs.getString("status"));
+                post.setViewCount(rs.getInt("view_count"));
+                post.setLikeCount(rs.getInt("like_count"));
+                post.setCommentCount(rs.getInt("comment_count"));
+                post.setCreatedAt(rs.getTimestamp("created_at"));
+                post.setUpdatedAt(rs.getTimestamp("updated_at"));
+                post.setDeletedAt(rs.getTimestamp("deleted_at"));
+                post.setExperience(rs.getString("experience"));
+                post.setDeadline(rs.getDate("deadline"));
+                post.setWorkingTime(rs.getString("working_time"));
+                post.setJobDescription(rs.getString("job_description"));
+                post.setRequirements(rs.getString("requirements"));
+                post.setBenefits(rs.getString("benefits"));
+                post.setContactAddress(rs.getString("contact_address"));
+                post.setApplicationMethod(rs.getString("application_method"));
+                post.setCompanyName(rs.getString("company_name"));
+                post.setCompanyLogo(rs.getString("company_logo"));
+                post.setSalary(rs.getString("salary"));
+                post.setLocation(rs.getString("location"));
+                post.setJobType(rs.getString("job_type"));
+                posts.add(post);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return posts;
+    }
+
+    // Get total number of posts for a specific recruiter
+    public int getTotalPostsByRecruiterId(int recruiterId) {
+        String query = "SELECT COUNT(*) FROM Posts WHERE user_id = ? AND user_type = 'recruiter' AND deleted_at IS NULL";
+        try {
+            ps = conn.prepareStatement(query);
+            ps.setInt(1, recruiterId);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     // Lấy details info của 1 post
     public Posts getPostById(int id) {
         String query = "SELECT * FROM Posts WHERE id = ? AND deleted_at IS NULL";
@@ -163,16 +271,16 @@ public class PostsDAO {
             return false;
         }
 
-        String query = "INSERT INTO Posts (user_id, user_type, parent_id, post_type, title, status, " +
+        String query = "INSERT INTO Posts (user_id, user_type, parent_id, post_type, title, content, status, " +
                       "view_count, like_count, comment_count, experience, deadline, working_time, " +
                       "job_description, requirements, benefits, contact_address, application_method, " +
                       "company_name, salary, location, job_type, company_logo, created_at, updated_at) " +
-                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
-      
-     try {
-            // Thiết lập giá trị mặc định cho các trường bắt buộc nếu chúng là null
+                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
+
+        try {
+            // Set default values if null
             if (post.getUserType() == null)
-                post.setUserType("user");
+                post.setUserType("recruiter");
             if (post.getPostType() == null)
                 post.setPostType("job");
             if (post.getStatus() == null)
@@ -183,124 +291,123 @@ public class PostsDAO {
                 post.setLikeCount(0);
             if (post.getCommentCount() == 0)
                 post.setCommentCount(0);
+            if (post.getContent() == null)
+                post.setContent("");
 
-            // Kiểm tra trường userId có hợp lệ không
+            // Validate required fields
             if (post.getUserId() <= 0) {
                 System.err.println("User ID is required and must be greater than 0");
                 return false;
             }
 
-            // Kiểm tra và log các trường bắt buộc
-            System.out.println("\n=== Checking Required Fields ===");
-            String[] requiredFields = {
-                    "title", "companyName", "salary", "location", "jobType",
-                    "experience", "workingTime", "jobDescription", "requirements",
-                    "benefits", "contactAddress", "applicationMethod", "deadline", "companyLogo"
-            };
-
-            String[] fieldValues = {
-                    post.getTitle(), post.getCompanyName(), post.getSalary(),
-                    post.getLocation(), post.getJobType(), post.getExperience(),
-                    post.getWorkingTime(), post.getJobDescription(), post.getRequirements(),
-                    post.getBenefits(), post.getContactAddress(), post.getApplicationMethod(),
-                    String.valueOf(post.getDeadline()), post.getCompanyLogo()
-            };
-
-            for (int i = 0; i < requiredFields.length; i++) {
-                // In ra giá trị các trường bắt buộc
-                System.out.println(requiredFields[i] + ": [" + fieldValues[i] + "]");
-                // Kiểm tra trường deadline có null không
-                if (requiredFields[i].equals("deadline")) {
-                    if (post.getDeadline() == null) {
-                        System.err.println("Error: " + requiredFields[i] + " is required and null");
-                        return false;
-                    }
-                } else if (fieldValues[i] == null || fieldValues[i].trim().isEmpty()) {
-                    // Kiểm tra các trường khác có null hoặc rỗng không
-                    System.err.println("Error: " + requiredFields[i] + " is required");
-                    return false;
-                }
+            if (post.getTitle() == null || post.getTitle().trim().isEmpty()) {
+                System.err.println("Title is required");
+                return false;
             }
 
-            // Log tất cả dữ liệu của post trước khi insert
-            System.out.println("\n=== Post Data Before Insertion ===");
-            System.out.println("User ID: " + post.getUserId());
-            System.out.println("User Type: " + post.getUserType());
-            System.out.println("Parent ID: " + post.getParentId());
-            System.out.println("Post Type: " + post.getPostType());
-            System.out.println("Title: " + post.getTitle());
-            System.out.println("Status: " + post.getStatus());
-            System.out.println("Company Name: " + post.getCompanyName());
-            System.out.println("Company Logo: " + post.getCompanyLogo());
-            System.out.println("Salary: " + post.getSalary());
-            System.out.println("Location: " + post.getLocation());
-            System.out.println("Job Type: " + post.getJobType());
-            System.out.println("Experience: " + post.getExperience());
-            System.out.println("Deadline: " + post.getDeadline());
-            System.out.println("Working Time: " + post.getWorkingTime());
-            System.out.println("Job Description: " + post.getJobDescription());
-            System.out.println("Requirements: " + post.getRequirements());
-            System.out.println("Benefits: " + post.getBenefits());
-            System.out.println("Contact Address: " + post.getContactAddress());
-            System.out.println("Application Method: " + post.getApplicationMethod());
+            if (post.getCompanyName() == null || post.getCompanyName().trim().isEmpty()) {
+                System.err.println("Company name is required");
+                return false;
+            }
 
-            // Chuẩn bị truy vấn SQL và set các tham số
+            if (post.getJobDescription() == null || post.getJobDescription().trim().isEmpty()) {
+                System.err.println("Job description is required");
+                return false;
+            }
+
+            if (post.getRequirements() == null || post.getRequirements().trim().isEmpty()) {
+                System.err.println("Requirements are required");
+                return false;
+            }
+
+            if (post.getBenefits() == null || post.getBenefits().trim().isEmpty()) {
+                System.err.println("Benefits are required");
+                return false;
+            }
+
+            if (post.getContactAddress() == null || post.getContactAddress().trim().isEmpty()) {
+                System.err.println("Contact address is required");
+                return false;
+            }
+
+            if (post.getApplicationMethod() == null || post.getApplicationMethod().trim().isEmpty()) {
+                System.err.println("Application method is required");
+                return false;
+            }
+
+            if (post.getWorkingTime() == null || post.getWorkingTime().trim().isEmpty()) {
+                System.err.println("Working time is required");
+                return false;
+            }
+
+            if (post.getExperience() == null || post.getExperience().trim().isEmpty()) {
+                System.err.println("Experience is required");
+                return false;
+            }
+
+            if (post.getDeadline() == null) {
+                System.err.println("Deadline is required");
+                return false;
+            }
+
+            if (post.getCompanyLogo() == null || post.getCompanyLogo().trim().isEmpty()) {
+                System.err.println("Company logo is required");
+                return false;
+            }
+
+            if (post.getSalary() == null || post.getSalary().trim().isEmpty()) {
+                System.err.println("Salary is required");
+                return false;
+            }
+
+            if (post.getLocation() == null || post.getLocation().trim().isEmpty()) {
+                System.err.println("Location is required");
+                return false;
+            }
+
+            if (post.getJobType() == null || post.getJobType().trim().isEmpty()) {
+                System.err.println("Job type is required");
+                return false;
+            }
+
+            // Prepare and execute query
             ps = conn.prepareStatement(query);
-            // Thiết lập các tham số theo thứ tự trong câu truy vấn SQL
             ps.setInt(1, post.getUserId());
             ps.setString(2, post.getUserType());
             ps.setObject(3, post.getParentId());
             ps.setString(4, post.getPostType());
             ps.setString(5, post.getTitle());
-            ps.setString(6, post.getStatus());
-            ps.setInt(7, post.getViewCount());
-            ps.setInt(8, post.getLikeCount());
-            ps.setInt(9, post.getCommentCount());
-            ps.setString(10, post.getExperience());
-            ps.setDate(11, new java.sql.Date(post.getDeadline().getTime()));
-            ps.setString(12, post.getWorkingTime());
-            ps.setString(13, post.getJobDescription());
-            ps.setString(14, post.getRequirements());
-            ps.setString(15, post.getBenefits());
-            ps.setString(16, post.getContactAddress());
-            ps.setString(17, post.getApplicationMethod());
-            ps.setString(18, post.getCompanyName());
-            ps.setString(19, post.getSalary());
-            ps.setString(20, post.getLocation());
-            ps.setString(21, post.getJobType());
-            ps.setString(22, post.getCompanyLogo());
+            ps.setString(6, post.getContent());
+            ps.setString(7, post.getStatus());
+            ps.setInt(8, post.getViewCount());
+            ps.setInt(9, post.getLikeCount());
+            ps.setInt(10, post.getCommentCount());
+            ps.setString(11, post.getExperience());
+            ps.setDate(12, new java.sql.Date(post.getDeadline().getTime()));
+            ps.setString(13, post.getWorkingTime());
+            ps.setString(14, post.getJobDescription());
+            ps.setString(15, post.getRequirements());
+            ps.setString(16, post.getBenefits());
+            ps.setString(17, post.getContactAddress());
+            ps.setString(18, post.getApplicationMethod());
+            ps.setString(19, post.getCompanyName());
+            ps.setString(20, post.getSalary());
+            ps.setString(21, post.getLocation());
+            ps.setString(22, post.getJobType());
+            ps.setString(23, post.getCompanyLogo());
 
-            // Log câu truy vấn SQL và các tham số
-            System.out.println("\n=== Executing SQL Query ===");
-            System.out.println("Query: " + query);
-            System.out.println("Parameters set successfully");
-
-            // Thực thi truy vấn và lấy kết quả
             int result = ps.executeUpdate();
-            System.out.println("Query execution result: " + result);
-
-            // Kiểm tra kết quả thực thi
-            if (result > 0) {
-                System.out.println("Post created successfully");
-                return true;
-            } else {
-                System.err.println("No rows were affected by the insert");
-                return false;
-            }
+            return result > 0;
         } catch (SQLException e) {
-            // Xử lý lỗi SQL
             System.err.println("\n=== SQL Error Details ===");
             System.err.println("Error Message: " + e.getMessage());
             System.err.println("SQL State: " + e.getSQLState());
             System.err.println("Error Code: " + e.getErrorCode());
-            System.err.println("Stack trace:");
             e.printStackTrace();
             return false;
         } catch (Exception e) {
-            // Xử lý lỗi không xác định
             System.err.println("\n=== Unexpected Error Details ===");
             System.err.println("Error Message: " + e.getMessage());
-            System.err.println("Stack trace:");
             e.printStackTrace();
             return false;
         }
@@ -529,6 +636,54 @@ public class PostsDAO {
         }
         return posts;
     }
+    
+    
+  public List<Posts> getRecentPosts(int limit) {
+    List<Posts> posts = new ArrayList<>();
+    String query = "SELECT TOP (?) * FROM Posts WHERE deleted_at IS NULL ORDER BY created_at DESC";
+    
+    try {
+        ps = conn.prepareStatement(query);
+        ps.setInt(1, limit);
+        rs = ps.executeQuery();
+        
+        while (rs.next()) {
+            Posts post = new Posts();
+            post.setId(rs.getInt("id"));
+            post.setUserId(rs.getInt("user_id"));
+            post.setUserType(rs.getString("user_type"));
+            post.setParentId(rs.getInt("parent_id"));
+            post.setPostType(rs.getString("post_type"));
+            post.setTitle(rs.getString("title"));
+            post.setContent(rs.getString("content"));
+            post.setStatus(rs.getString("status"));
+            post.setViewCount(rs.getInt("view_count"));
+            post.setLikeCount(rs.getInt("like_count"));
+            post.setCommentCount(rs.getInt("comment_count"));
+            post.setCreatedAt(rs.getTimestamp("created_at"));
+            post.setUpdatedAt(rs.getTimestamp("updated_at"));
+            post.setDeletedAt(rs.getTimestamp("deleted_at"));
+            post.setExperience(rs.getString("experience"));
+            post.setDeadline(rs.getDate("deadline"));
+            post.setWorkingTime(rs.getString("working_time"));
+            post.setJobDescription(rs.getString("job_description"));
+            post.setRequirements(rs.getString("requirements"));
+            post.setBenefits(rs.getString("benefits"));
+            post.setContactAddress(rs.getString("contact_address"));
+            post.setApplicationMethod(rs.getString("application_method"));
+            post.setCompanyName(rs.getString("company_name"));
+            post.setCompanyLogo(rs.getString("company_logo"));
+            post.setSalary(rs.getString("salary"));
+            post.setLocation(rs.getString("location"));
+            post.setJobType(rs.getString("job_type"));
+            posts.add(post);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    
+    return posts;
+}
 
     // Close database connection
     public void closeConnection() {
@@ -539,5 +694,68 @@ public class PostsDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }  
+
+    // Get posts by user_id with pagination
+    public List<Posts> getPostsByUserIdWithPagination(int userId, int page, int pageSize) {
+        List<Posts> posts = new ArrayList<>();
+        String query = "SELECT * FROM Posts WHERE user_id = ? AND deleted_at IS NULL ORDER BY created_at DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        try {
+            ps = conn.prepareStatement(query);
+            ps.setInt(1, userId);
+            ps.setInt(2, (page - 1) * pageSize);
+            ps.setInt(3, pageSize);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Posts post = new Posts();
+                post.setId(rs.getInt("id"));
+                post.setUserId(rs.getInt("user_id"));
+                post.setUserType(rs.getString("user_type"));
+                post.setParentId(rs.getInt("parent_id"));
+                post.setPostType(rs.getString("post_type"));
+                post.setTitle(rs.getString("title"));
+                post.setContent(rs.getString("content"));
+                post.setStatus(rs.getString("status"));
+                post.setViewCount(rs.getInt("view_count"));
+                post.setLikeCount(rs.getInt("like_count"));
+                post.setCommentCount(rs.getInt("comment_count"));
+                post.setCreatedAt(rs.getTimestamp("created_at"));
+                post.setUpdatedAt(rs.getTimestamp("updated_at"));
+                post.setDeletedAt(rs.getTimestamp("deleted_at"));
+                post.setExperience(rs.getString("experience"));
+                post.setDeadline(rs.getDate("deadline"));
+                post.setWorkingTime(rs.getString("working_time"));
+                post.setJobDescription(rs.getString("job_description"));
+                post.setRequirements(rs.getString("requirements"));
+                post.setBenefits(rs.getString("benefits"));
+                post.setContactAddress(rs.getString("contact_address"));
+                post.setApplicationMethod(rs.getString("application_method"));
+                post.setCompanyName(rs.getString("company_name"));
+                post.setCompanyLogo(rs.getString("company_logo"));
+                post.setSalary(rs.getString("salary"));
+                post.setLocation(rs.getString("location"));
+                post.setJobType(rs.getString("job_type"));
+                posts.add(post);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return posts;
+    }
+
+    // Get total posts by user_id
+    public int getTotalPostsByUserId(int userId) {
+        String query = "SELECT COUNT(*) FROM Posts WHERE user_id = ? AND deleted_at IS NULL";
+        try {
+            ps = conn.prepareStatement(query);
+            ps.setInt(1, userId);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }
