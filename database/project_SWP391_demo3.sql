@@ -24,7 +24,33 @@ CREATE TABLE Admin (
 );
 
 
+CREATE TABLE Blog (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    admin_id INT NOT NULL,
+    title NVARCHAR(255) NOT NULL,
+    description NVARCHAR(MAX) NOT NULL,
+    thumbnail NVARCHAR(255),
+    status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft', 'published')),
+    created_at DATETIME DEFAULT GETDATE(),
+    updated_at DATETIME DEFAULT GETDATE(),
+    CONSTRAINT fk_admin_blog FOREIGN KEY (admin_id)
+        REFERENCES Admin(id)
+        ON DELETE CASCADE
+);
 
+CREATE TABLE Banner (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    admin_id INT NOT NULL,
+    title NVARCHAR(255),
+    image_url NVARCHAR(255),
+    redirect_url NVARCHAR(255),
+    position INT DEFAULT 0,
+    is_active BIT DEFAULT 1,
+    created_at DATETIME DEFAULT GETDATE(),
+    CONSTRAINT fk_admin_banner FOREIGN KEY (admin_id)
+        REFERENCES Admin(id)
+        ON DELETE CASCADE
+);
 
 
 -- Recruiter Table

@@ -16,12 +16,6 @@
         
         <p><a href="AdminController?target=JobSeeker">Manage JobSeeker</a></p>
         <p><a href="AdminController?target=Recruiter">Manage Recruiter</a></p>
-        <p><a href="AdminController?target=Manager">Manage Manager</a></p>
-        <p><a href="AdminController?target=Saler">Manage Saler</a></p>
-        
-        <p><a href="AdminSalerController?target=blog">Show All Blog</a></p>
-        <!--<p><a href="AdminSalerController?target=blog&who=me">Show My Blog</a></p>-->
-        <p><a href="AdminSalerController?target=banner">Manage Banner</a></p>
         
     </body>
 </html>
