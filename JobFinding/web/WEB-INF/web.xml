@@ -36,6 +36,10 @@
         <servlet-name>NotificationController</servlet-name>
         <servlet-class>controllers.NotificationController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>UploadServlet</servlet-name>
+        <servlet-class>controllers.UploadServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>JobDetailController</servlet-name>
         <url-pattern>/job-detail</url-pattern>
@@ -71,6 +75,10 @@
     <servlet-mapping>
         <servlet-name>NotificationController</servlet-name>
         <url-pattern>/notification</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UploadServlet</servlet-name>
+        <url-pattern>/upload</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>

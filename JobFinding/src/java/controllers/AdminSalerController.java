@@ -4,6 +4,8 @@
  */
 package controllers;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import daos.BlogDAO;
 import models.Blog;
 import models.Banner;
@@ -11,17 +13,25 @@ import daos.BannerDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.util.Map;
 import java.util.Vector;
+import utils.UploadPicture;
 
 /**
  *
  * @author andin
  */
+@MultipartConfig
 @WebServlet(name = "AdminSalerController", urlPatterns = {"/AdminSalerController"})
 public class AdminSalerController extends HttpServlet {
 
@@ -47,6 +57,7 @@ public class AdminSalerController extends HttpServlet {
         if (target.equals("blog")) {
             processBlog(request, response);
         } else if (target.equals("banner")) {
+            log("qua day truoc da");
             processBanner(request, response);
         }
     }
@@ -95,7 +106,7 @@ public class AdminSalerController extends HttpServlet {
 //        log("" + blogs.size());
 
         request.setAttribute("blogs", blogs);
-        request.getRequestDispatcher("admin_manager_allpost.jsp").forward(request, response);
+        request.getRequestDispatcher("admin_saler_allblog.jsp").forward(request, response);
     }
 
     private void addBlog(HttpServletRequest request, HttpServletResponse response)
@@ -188,7 +199,157 @@ public class AdminSalerController extends HttpServlet {
     
     private void processBanner(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String service = request.getParameter("service");
 
+        if (service == null) {
+            service = "listAll";
+        }
+
+        if (service.equals("listAll")) {
+            listAllBanner(request, response);
+        } else if (service.equals("listMy")) {
+
+        } else if (service.equals("Add")) {
+            addBanner(request, response);
+        } else if (service.equals("Detail")) {
+            detailBanner(request, response);
+        } else if (service.equals("Update")){
+            updateBanner(request, response);
+        } else if (service.equals("Delete")){
+            deleteBanner(request, response);
+        }
+    }
+    
+    private void listAllBanner(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+        BannerDAO bannerDAO = new BannerDAO();
+        Vector<Banner> banners = new Vector<>();
+
+        String who = request.getParameter("who");
+        if (who == null) {
+            who = "";
+        }
+
+        if (who.equals("me")) {
+            HttpSession session = request.getSession(true);
+            int id = (int) session.getAttribute("userId");
+            banners = bannerDAO.getBannersByAdminId(id);
+        } else {
+            banners = bannerDAO.getAllBanners(); // Lấy toàn bộ banner
+        }
+        
+        log("banner " + banners.size());
+
+        request.setAttribute("banners", banners);
+        request.getRequestDispatcher("admin_saler_allbanner.jsp").forward(request, response);
+    }
+
+    private void addBanner(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+        String submit = request.getParameter("submit");
+
+        if (submit == null) {
+            submit = "";
+        }
+        
+        if (submit.equals("submit")) {
+            String title = request.getParameter("title");
+            log("da qua day ");
+            ///
+            String imageUrl = "";
+            try {
+                Part filePart = request.getPart("file");
+
+                imageUrl = UploadPicture.uploadImage(filePart, imageUrl);
+
+            } catch (Exception e) {
+                log(e.getMessage());
+            }
+            
+            ///
+            
+            String redirectUrl = request.getParameter("redirect_url");
+            int position = Integer.parseInt(request.getParameter("position"));
+            boolean isActive = request.getParameter("is_active") != null;
+            int admin_id = 1; // Lấy từ session nếu có, ví dụ: (int) session.getAttribute("userId")
+
+            Banner banner = new Banner(admin_id, title, imageUrl, redirectUrl, position, isActive);
+
+            BannerDAO dao = new BannerDAO();
+            boolean flag = dao.insertBanner(banner);
+            log("Add banner: " + flag);
+
+            response.sendRedirect("AdminSalerController?target=banner");
+        } else {
+            request.getRequestDispatcher("admin_saler_add_banner.jsp").forward(request, response);
+        }
+    }
+
+    private void updateBanner(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+        String submit = request.getParameter("submit");
+
+        if (submit == null) {
+            submit = "";
+        }
+
+        if (submit.equals("submit")) {
+            String title = request.getParameter("title");
+            int bannerId = Integer.parseInt(request.getParameter("bannerId"));
+            BannerDAO dao = new BannerDAO();
+            Banner x = dao.getBannerById(bannerId);
+            
+            //
+            String imageUrl = x.getImage_url();
+            try {
+                Part filePart = request.getPart("file");
+
+                imageUrl = UploadPicture.uploadImage(filePart, imageUrl);
+
+            } catch (Exception e) {
+                log(e.getMessage());
+            }
+            //
+            
+            String redirectUrl = request.getParameter("redirect_url");
+            int position = Integer.parseInt(request.getParameter("position"));
+            boolean isActive = request.getParameter("is_active") != null;
+            int admin_id = 1; // Lấy từ session nếu cần
+
+            Banner banner = new Banner(bannerId, admin_id, title, imageUrl, redirectUrl, position, isActive, null);
+            boolean flag = dao.updateBanner(banner);
+
+            response.sendRedirect("AdminSalerController?target=banner");
+        } else {
+            int bannerId = Integer.parseInt(request.getParameter("bannerId"));
+            BannerDAO dao = new BannerDAO();
+            Banner banner = dao.getBannerById(bannerId);
+
+            request.setAttribute("banner", banner);
+            request.getRequestDispatcher("admin_saler_update_banner.jsp").forward(request, response);
+        }
+    }
+    
+    private void detailBanner(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+        int bannerId = Integer.parseInt(request.getParameter("bannerId"));
+
+        BannerDAO dao = new BannerDAO();
+        Banner banner = dao.getBannerById(bannerId);
+
+        request.setAttribute("banner", banner);
+        request.getRequestDispatcher("admin_saler_detail_banner.jsp").forward(request, response);
+    }
+
+    private void deleteBanner(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+        int bannerId = Integer.parseInt(request.getParameter("bannerId"));
+
+        BannerDAO dao = new BannerDAO();
+        boolean flag = dao.deleteBanner(bannerId);
+
+        // log("delete banner: " + flag);
+        response.sendRedirect("AdminSalerController?target=banner");
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

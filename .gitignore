@@ -34,6 +34,7 @@ JobFinding/.nb-gradle/
 .project
 .settings/
 .DS_Store
+.env
 
 # =============================
 # Cá nhân hoặc môi trường
