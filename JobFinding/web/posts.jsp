@@ -9,17 +9,18 @@
         <title>Danh sách tin tuyển dụng</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="assets/css/Posts.css" />
+        <link href="assets/css/Posts.css" rel="stylesheet" />
     </head>
 
     <body>
         <jsp:include page="header.jsp" />
 
         <div class="container mt-4">
+
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <c:choose>
-                        <c:when test="${sessionScope.userType == 'recruiter'}">
+                        <c:when test="${isMyPosts}">
                             <h2 class="mb-1">Danh sách tin tuyển dụng của bạn</h2>
                             <p class="text-muted mb-0">Quản lý các tin tuyển dụng bạn đã đăng</p>
                         </c:when>
@@ -43,7 +44,7 @@
             </c:if>
 
             <!-- Search Form -->
-            <c:if test="${sessionScope.userType != 'recruiter'}">
+            <c:if test="${!isMyPosts}">
                 <div class="card mb-4">
                     <div class="card-body">
                         <form action="${pageContext.request.contextPath}/post" method="GET" class="row g-3">
@@ -95,7 +96,7 @@
                 <c:forEach items="${posts}" var="post">
                     <div class="col-xl-4 col-lg-4 col-md-6">
                         <div class="card job-card">
-                            <!-- Overlay for badges and save icon -->
+               
                             <div
                                 class="job-card-header-overlay d-flex justify-content-between align-items-center">
                                 <div class="job-badges-left d-flex gap-2">
@@ -113,14 +114,14 @@
                                 <div class="d-flex align-items-center mb-3">
                                     <img src="${post.companyLogo != null ? post.companyLogo : 'assets/img/icon/job-list1.png'}"
                                          alt="${post.companyName}" class="company-logo me-3">
-                                    <div>
+                                    <div class="job-details">
                                         <h5 class="card-title mb-1">
                                             <a href="${pageContext.request.contextPath}/post/view?id=${post.id}"
                                                class="text-decoration-none text-dark job-title-truncate">
                                                 ${post.title}
                                             </a>
                                         </h5>
-                                        <p class="text-muted mb-1">${post.companyName}</p>
+                                        <p class="text-muted mb-1 company-name-truncate">${post.companyName}</p>
                                     </div>
                                 </div>
 
@@ -140,12 +141,12 @@
                 </c:forEach>
             </div>
 
-            <!-- Phân trang nâng cao -->
+            <!--Khu Phân trang -->
             <c:if test="${totalPages > 1}">
                 <nav aria-label="Page navigation" class="mt-4">
                     <div class="simple-pagination d-flex justify-content-center align-items-center gap-3">
                         <!-- Nút trang trước -->
-                        <a href="${currentPage == 1 ? '#' : pageContext.request.contextPath}/post?page=${currentPage - 1}&keyword=${param.keyword}&jobType=${param.jobType}&location=${param.location}&viewAll=${param.viewAll}"
+                        <a href="${currentPage == 1 ? '#' : pageContext.request.contextPath}/post?page=${currentPage - 1}${isMyPosts ? '&view=my-post' : ''}&keyword=${param.keyword}&jobType=${param.jobType}&location=${param.location}"
                            class="pagination-arrow ${currentPage == 1 ? 'disabled' : ''}">
                             <i class="fas fa-chevron-left"></i>
                         </a>
@@ -157,19 +158,20 @@
                         </span>
 
                         <!-- Nút trang sau -->
-                        <a href="${currentPage == totalPages ? '#' : pageContext.request.contextPath}/post?page=${currentPage + 1}&keyword=${param.keyword}&jobType=${param.jobType}&location=${param.location}&viewAll=${param.viewAll}"
+                        <a href="${currentPage == totalPages ? '#' : pageContext.request.contextPath}/post?page=${currentPage + 1}${isMyPosts ? '&view=my-post' : ''}&keyword=${param.keyword}&jobType=${param.jobType}&location=${param.location}"
                            class="pagination-arrow ${currentPage == totalPages ? 'disabled' : ''}">
                             <i class="fas fa-chevron-right"></i>
                         </a>
                     </div>
                 </nav>
             </c:if>
+            <!--End-->
 
             <c:if test="${empty posts}">
                 <div class="empty-state">
                     <i class="fas fa-search"></i>
                     <c:choose>
-                        <c:when test="${sessionScope.userType == 'recruiter'}">
+                        <c:when test="${isMyPosts}">
                             <h4 class="mt-3">Bạn chưa có tin tuyển dụng nào</h4>
                             <p class="text-muted">Hãy đăng tin tuyển dụng đầu tiên của bạn</p>
                         </c:when>

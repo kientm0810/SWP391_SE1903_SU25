@@ -11,7 +11,7 @@
             <script
                 src="https://cdn.tiny.cloud/1/ainjahbwyamlr1ureczw2mbfmr73mgpn7f6ceaaxu1h8ccv8/tinymce/7/tinymce.min.js"
                 referrerpolicy="origin"></script>
-
+                <link rel="stylesheet" href="assets/css/stylePosts.css"/>
         </head>
 
         <body>
@@ -41,11 +41,6 @@
                                 <input type="hidden" name="postType" value="job">
                                 <input type="hidden" name="status" value="active">
                                 <input type="hidden" name="parentId" value="">
-                                <input type="hidden" name="userType" value="recruiter">
-                                <input type="hidden" name="viewCount" value="0">
-                                <input type="hidden" name="likeCount" value="0">
-                                <input type="hidden" name="commentCount" value="0">
-                                <input type="hidden" name="content" value="">
                                 <!-- Thông tin cơ bản -->
                                 <div class="mb-4">
                                     <h4>Thông tin cơ bản</h4>
@@ -175,6 +170,52 @@
                                     </div>
                                 </div>
 
+                                <!-- Thông tin bổ sung -->
+                                <div class="mb-4">
+                                    <h4>Thông tin bổ sung</h4>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="rank" class="form-label">Cấp bậc</label>
+                                            <input type="text" class="form-control" id="rank" name="rank"
+                                                maxlength="100">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="industry" class="form-label">Ngành nghề</label>
+                                            <input type="text" class="form-control" id="industry" name="industry"
+                                                maxlength="100">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="contactPerson" class="form-label">Người liên hệ</label>
+                                            <input type="text" class="form-control" id="contactPerson"
+                                                name="contactPerson" maxlength="100">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="companySize" class="form-label">Quy mô công ty</label>
+                                            <input type="text" class="form-control" id="companySize" name="companySize"
+                                                maxlength="100">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="companyWebsite" class="form-label">Website công ty</label>
+                                            <input type="text" class="form-control" id="companyWebsite"
+                                                name="companyWebsite" maxlength="255">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="keywords" class="form-label">Từ khóa</label>
+                                            <input type="text" class="form-control" id="keywords" name="keywords"
+                                                maxlength="255" placeholder="Nhập các từ khóa, cách nhau bởi dấu phẩy">
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="companyDescription" class="form-label">Mô tả công ty</label>
+                                        <textarea class="form-control" id="companyDescription" name="companyDescription"
+                                            rows="3" maxlength="1000"></textarea>
+                                    </div>
+                                </div>
+
                                 <div class="d-flex justify-content-between">
                                     <a href="${pageContext.request.contextPath}/post" class="btn btn-secondary">
                                         <i class="fas fa-arrow-left"></i> Quay lại
@@ -199,7 +240,7 @@
                     selector: '#jobDescription, #requirements, #benefits, #applicationMethod',
                     plugins: 'lists link image table code help wordcount',
                     toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | indent outdent | bullist numlist | link image | removeformat help',
-                    height: 300,
+                    height: 500,
                     menubar: false,
                     content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }',
                     setup: function (editor) {
@@ -235,19 +276,6 @@
                         element.classList.add('is-invalid');
                         return false;
                     }
-
-                    // Specific validation for deadline
-                    if (element.id === 'deadline') {
-                        const selectedDate = new Date(value);
-                        const today = new Date();
-                        today.setHours(0, 0, 0, 0); // Set to start of today for comparison
-                        if (selectedDate < today) {
-                            element.classList.add('is-invalid');
-                            element.nextElementSibling.textContent = 'Hạn nộp hồ sơ phải là ngày trong tương lai.';
-                            return false;
-                        }
-                    }
-
                     element.classList.remove('is-invalid');
                     return true;
                 }
@@ -263,7 +291,6 @@
                     const form = this;
                     const formData = new FormData(form);
                     let isValid = true;
-                    let firstInvalidField = null;
 
                     // Check required fields
                     const requiredFields = [
@@ -277,24 +304,18 @@
                         const input = document.getElementById(field);
                         if (!validateField(input)) {
                             isValid = false;
-                            if (!firstInvalidField) {
-                                firstInvalidField = input;
+                            // Scroll to the first invalid field
+                            if (isValid === false) {
+                                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                input.focus();
                             }
                         }
                     }
 
                     if (!isValid) {
                         alert('Vui lòng điền đầy đủ các trường bắt buộc');
-                        firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        firstInvalidField.focus();
                         return;
                     }
-
-                    // Show loading state
-                    const submitButton = form.querySelector('button[type="submit"]');
-                    const originalButtonText = submitButton.innerHTML;
-                    submitButton.disabled = true;
-                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
 
                     // Submit form using fetch API
                     fetch(form.action, {
@@ -313,11 +334,6 @@
                         .catch(error => {
                             console.error('Error:', error);
                             alert('Có lỗi xảy ra khi tạo bài đăng. Vui lòng thử lại.');
-                        })
-                        .finally(() => {
-                            // Reset button state
-                            submitButton.disabled = false;
-                            submitButton.innerHTML = originalButtonText;
                         });
                 });
 

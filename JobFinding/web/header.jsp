@@ -33,23 +33,19 @@
                                     <i class="fas fa-users"></i> Community
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="communityDropdown">
-<!--                                    <li>
-                                        <a class="dropdown-item" href="post">
-                                            <i class="fas fa-list-ul"></i> All Posts
-                                        </a>
-                                    </li>-->
+
                                     <li>
                                         <a class="dropdown-item" href="create-post.jsp">
                                             <i class="fas fa-edit"></i> Create Post
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="post">
+                                        <a class="dropdown-item" href="post?view=my-post">
                                             <i class="fas fa-user-edit"></i> My Posts
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="post?viewAll=true">
+                                        <a class="dropdown-item" href="post?view=all">
                                             <i class="fas fa-list-ul"></i> All Posts
                                         </a>
                                     </li>
@@ -86,12 +82,12 @@
                                         </li>
                                         <c:if test="${sessionScope.role == 'recruiter'}">
                                             <li>
-                                                <a class="dropdown-item" href="post">
+                                                <a class="dropdown-item" href="post?view=my">
                                                     <i class="fas fa-file-alt"></i> My Posts
                                                 </a>
                                             </li>
                                         </c:if>
-                                       
+
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
