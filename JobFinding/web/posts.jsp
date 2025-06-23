@@ -30,11 +30,25 @@
                         </c:otherwise>
                     </c:choose>
                 </div>
-                <c:if test="${sessionScope.userId != null}">
-                    <a href="${pageContext.request.contextPath}/post/create" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Đăng tin mới
-                    </a>
-                </c:if>
+                <div class="d-flex gap-2">
+                    <c:if test="${sessionScope.userType == 'recruiter'}">
+                        <c:choose>
+                            <c:when test="${isMyPosts}">
+                                <a href="${pageContext.request.contextPath}/post?view=all"
+                                   class="btn btn-outline-primary">Tất cả bài đăng</a>
+                            </c:when>
+                            <c:otherwise>
+                                <a href="${pageContext.request.contextPath}/post?view=my-post"
+                                   class="btn btn-outline-primary">Bài đăng của tôi</a>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:if>
+                    <c:if test="${sessionScope.userId != null}">
+                        <a href="${pageContext.request.contextPath}/post/create" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Đăng tin mới
+                        </a>
+                    </c:if>
+                </div>
             </div>
 
             <c:if test="${not empty error}">
@@ -96,7 +110,7 @@
                 <c:forEach items="${posts}" var="post">
                     <div class="col-xl-4 col-lg-4 col-md-6">
                         <div class="card job-card">
-               
+
                             <div
                                 class="job-card-header-overlay d-flex justify-content-between align-items-center">
                                 <div class="job-badges-left d-flex gap-2">

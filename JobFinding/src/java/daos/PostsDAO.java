@@ -16,11 +16,12 @@ public class PostsDAO {
         try {
             conn = new DBContext().getConnection();
             if (conn == null) {
-                System.err.println("Failed to establish database connection");
+                throw new SQLException("Failed to establish database connection");
             }
         } catch (Exception e) {
             System.err.println("Error initializing PostsDAO: " + e.getMessage());
             e.printStackTrace();
+            throw new RuntimeException("Failed to initialize PostsDAO: " + e.getMessage());
         }
     }
 
@@ -664,5 +665,9 @@ public class PostsDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public Connection getConnection() {
+        return conn;
     }
 }

@@ -44,11 +44,7 @@
                                             <i class="fas fa-user-edit"></i> My Posts
                                         </a>
                                     </li>
-                                    <li>
-                                        <a class="dropdown-item" href="post?view=all">
-                                            <i class="fas fa-list-ul"></i> All Posts
-                                        </a>
-                                    </li>
+                                   
                                 </ul>
                             </li>
                         </c:if>

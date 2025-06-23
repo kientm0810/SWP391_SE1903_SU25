@@ -133,7 +133,7 @@
                         fetch('save_job', {
                             method: 'POST',
                             headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'Content-Type': 'application/x-www-form-urlencoded'
                             },
                             body: `jobId=${jobId}&action=unsave`
                         })

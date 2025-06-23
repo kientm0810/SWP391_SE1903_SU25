@@ -9,18 +9,7 @@
                 <title>Chỉnh sửa tin tuyển dụng</title>
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
                 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-                <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js"
-                    referrerpolicy="origin"></script>
-                <style>
-                    .form-container {
-                        max-width: 800px;
-                        margin: 0 auto;
-                    }
-
-                    .tox-tinymce {
-                        min-height: 400px;
-                    }
-                </style>
+                <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
             </head>
 
             <body>
@@ -246,25 +235,14 @@
                     </div>
                 </div>
 
+                                            
+                <!--API CKEditor-->
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-                <script
-                    src="https://cdn.tiny.cloud/1/ainjahbwyamlr1ureczw2mbfmr73mgpn7f6ceaaxu1h8ccv8/tinymce/7/tinymce.min.js"
-                    referrerpolicy="origin"></script>
                 <script>
-                    tinymce.init({
-                        selector: '#jobDescription, #requirements, #benefits, #applicationMethod',
-                        plugins: 'lists link image table code help wordcount',
-                        toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | indent outdent | bullist numlist | link image | removeformat help',
-                        height: 300,
-                        menubar: false,
-                        content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }',
-                        setup: function (editor) {
-                            editor.on('change', function () {
-                                editor.save();
-                                validateField(editor.getElement());
-                            });
-                        }
-                    });
+                    // Khởi tạo CKEditor cho các textarea cần rich text
+                    ClassicEditor.create(document.querySelector('#jobDescription'));
+                    ClassicEditor.create(document.querySelector('#requirements'));
+                    ClassicEditor.create(document.querySelector('#benefits'));
 
                     // Logo preview function
                     function previewLogo(event) {
@@ -293,7 +271,7 @@
                             reader.onload = function (e) {
                                 previewImage.src = e.target.result;
                                 preview.style.display = 'block';
-                            }
+                            };
                             reader.readAsDataURL(file);
                         } else {
                             preview.style.display = 'none';
@@ -314,9 +292,6 @@
                     // Form submission handling
                     document.getElementById('editPostForm').addEventListener('submit', function (e) {
                         e.preventDefault();
-
-                        // Save TinyMCE content
-                        tinymce.triggerSave();
 
                         // Validate form
                         const form = this;

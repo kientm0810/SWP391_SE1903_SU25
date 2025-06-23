@@ -13,7 +13,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
-
 import models.Posts;
 
 @WebServlet(name = "PostController", urlPatterns = {"/post/*"})
@@ -60,6 +59,7 @@ public class PostController extends HttpServlet {
             String view = request.getParameter("view");
             HttpSession session = request.getSession();
             Integer userId = (Integer) session.getAttribute("userId");
+            String userType = (String) session.getAttribute("userType");
             int page = 1;
             int pageSize = 6;
             try {
@@ -74,16 +74,30 @@ public class PostController extends HttpServlet {
             String keyword = request.getParameter("keyword");
             String jobType = request.getParameter("jobType");
             String location = request.getParameter("location");
-            if (view != null && view.equals("my-post") && userId != null) {
-                
-                int totalPosts = postsDAO.getTotalPostsByUserId(userId);
-                int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
-                request.setAttribute("posts", postsDAO.getPostsByUserIdWithPaging(userId, page, pageSize));
-                request.setAttribute("currentPage", page);
-                request.setAttribute("totalPages", totalPages);
-                request.setAttribute("pageSize", pageSize);
+            boolean isMyPosts = false;
+            if (userType != null && userType.equals("recruiter")) {
+                if (view != null && view.equals("my-post") && userId != null) {
+                    int totalPosts = postsDAO.getTotalPostsByUserId(userId);
+                    int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
+                    request.setAttribute("posts", postsDAO.getPostsByUserIdWithPaging(userId, page, pageSize));
+                    request.setAttribute("currentPage", page);
+                    request.setAttribute("totalPages", totalPages);
+                    request.setAttribute("pageSize", pageSize);
+                    isMyPosts = true;
+                } else {
+                    // recruiter xem tất cả bài post
+                    int totalPosts = postsDAO.getTotalPostsWithSearch(keyword, jobType, location);
+                    int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
+                    request.setAttribute("posts", postsDAO.getPostsByPageWithSearch(page, pageSize, keyword, jobType, location));
+                    request.setAttribute("currentPage", page);
+                    request.setAttribute("totalPages", totalPages);
+                    request.setAttribute("pageSize", pageSize);
+                    request.setAttribute("keyword", keyword);
+                    request.setAttribute("jobType", jobType);
+                    request.setAttribute("location", location);
+                }
             } else {
-                // All Posts: hiện tất cả bài viết, có phân trang và tìm kiếm
+                // user thường hoặc chưa đăng nhập: chỉ xem tất cả bài post
                 int totalPosts = postsDAO.getTotalPostsWithSearch(keyword, jobType, location);
                 int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
                 request.setAttribute("posts", postsDAO.getPostsByPageWithSearch(page, pageSize, keyword, jobType, location));
@@ -94,6 +108,7 @@ public class PostController extends HttpServlet {
                 request.setAttribute("jobType", jobType);
                 request.setAttribute("location", location);
             }
+            request.setAttribute("isMyPosts", isMyPosts);
             request.getRequestDispatcher("/posts.jsp").forward(request, response);
         } else if (path.equals("/create")) {
             // Show create post form
@@ -265,11 +280,11 @@ public class PostController extends HttpServlet {
                 }
 
                 post.setWorkingTime(request.getParameter("workingTime").trim());
-                post.setJobDescription(request.getParameter("jobDescription").trim());
-                post.setRequirements(request.getParameter("requirements").trim());
-                post.setBenefits(request.getParameter("benefits").trim());
-                post.setContactAddress(request.getParameter("contactAddress").trim());
-                post.setApplicationMethod(request.getParameter("applicationMethod").trim());
+                post.setJobDescription(request.getParameter("jobDescription") != null ? request.getParameter("jobDescription").trim() : null);
+                post.setRequirements(request.getParameter("requirements") != null ? request.getParameter("requirements").trim() : null);
+                post.setBenefits(request.getParameter("benefits") != null ? request.getParameter("benefits").trim() : null);
+                post.setContactAddress(request.getParameter("contactAddress") != null ? request.getParameter("contactAddress").trim() : null);
+                post.setApplicationMethod(request.getParameter("applicationMethod") != null ? request.getParameter("applicationMethod").trim() : null);
                 post.setRank(request.getParameter("rank") != null ? request.getParameter("rank").trim() : null);
                 post.setIndustry(request.getParameter("industry") != null ? request.getParameter("industry").trim() : null);
                 post.setContactPerson(request.getParameter("contactPerson") != null ? request.getParameter("contactPerson").trim() : null);
@@ -292,6 +307,20 @@ public class PostController extends HttpServlet {
                         || post.getContactAddress() == null || post.getContactAddress().trim().isEmpty()
                         || post.getApplicationMethod() == null || post.getApplicationMethod().trim().isEmpty()) {
 
+                    System.err.println("Missing required fields:");
+                    if (post.getTitle() == null || post.getTitle().trim().isEmpty()) System.err.println("- Title is missing");
+                    if (post.getCompanyName() == null || post.getCompanyName().trim().isEmpty()) System.err.println("- Company name is missing");
+                    if (post.getSalary() == null || post.getSalary().trim().isEmpty()) System.err.println("- Salary is missing");
+                    if (post.getLocation() == null || post.getLocation().trim().isEmpty()) System.err.println("- Location is missing");
+                    if (post.getJobType() == null || post.getJobType().trim().isEmpty()) System.err.println("- Job type is missing");
+                    if (post.getExperience() == null || post.getExperience().trim().isEmpty()) System.err.println("- Experience is missing");
+                    if (post.getWorkingTime() == null || post.getWorkingTime().trim().isEmpty()) System.err.println("- Working time is missing");
+                    if (post.getJobDescription() == null || post.getJobDescription().trim().isEmpty()) System.err.println("- Job description is missing");
+                    if (post.getRequirements() == null || post.getRequirements().trim().isEmpty()) System.err.println("- Requirements is missing");
+                    if (post.getBenefits() == null || post.getBenefits().trim().isEmpty()) System.err.println("- Benefits is missing");
+                    if (post.getContactAddress() == null || post.getContactAddress().trim().isEmpty()) System.err.println("- Contact address is missing");
+                    if (post.getApplicationMethod() == null || post.getApplicationMethod().trim().isEmpty()) System.err.println("- Application method is missing");
+
                     response.setContentType("application/json");
                     response.getWriter().write("{\"success\":false,\"message\":\"Vui lòng điền đầy đủ thông tin\"}");
                     return;
@@ -300,9 +329,14 @@ public class PostController extends HttpServlet {
                 // Try to create the post
                 boolean success = postsDAO.createPost(post);
 
+                if (!success) {
+                    System.err.println("Failed to create post. Database connection status: " + (postsDAO != null && postsDAO.getConnection() != null));
+                }
+
                 response.setContentType("application/json");
                 if (success) {
-                    response.getWriter().write("{\"success\":true,\"message\":\"Đăng tin thành công\"}");
+                    // Trả về URL để redirect đến trang My Posts sau khi tạo thành công
+                    response.getWriter().write("{\"success\":true,\"message\":\"Đăng tin thành công\",\"redirectUrl\":\"" + request.getContextPath() + "/post?view=my-post\"}");
                 } else {
                     response.getWriter().write("{\"success\":false,\"message\":\"Không thể tạo tin. Vui lòng kiểm tra lại thông tin.\"}");
                 }

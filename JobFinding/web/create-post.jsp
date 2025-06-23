@@ -8,10 +8,9 @@
             <title>Create New Post</title>
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
             <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-            <script
-                src="https://cdn.tiny.cloud/1/ainjahbwyamlr1ureczw2mbfmr73mgpn7f6ceaaxu1h8ccv8/tinymce/7/tinymce.min.js"
-                referrerpolicy="origin"></script>
-                <link rel="stylesheet" href="assets/css/stylePosts.css"/>
+
+            <link rel="stylesheet" href="assets/css/stylePosts.css" />
+           
         </head>
 
         <body>
@@ -132,21 +131,19 @@
                                     <div class="mb-3">
                                         <label for="jobDescription" class="form-label required-field">Mô tả công
                                             việc</label>
-                                        <textarea class="form-control" id="jobDescription" name="jobDescription"
-                                            required></textarea>
+                                        <textarea class="form-control" id="jobDescription"
+                                            name="jobDescription"></textarea>
                                         <div class="invalid-feedback">Vui lòng nhập mô tả công việc</div>
                                     </div>
                                     <div class="mb-3">
                                         <label for="requirements" class="form-label required-field">Yêu cầu ứng
                                             viên</label>
-                                        <textarea class="form-control" id="requirements" name="requirements"
-                                            required></textarea>
+                                        <textarea class="form-control" id="requirements" name="requirements"></textarea>
                                         <div class="invalid-feedback">Vui lòng nhập yêu cầu ứng viên</div>
                                     </div>
                                     <div class="mb-3">
                                         <label for="benefits" class="form-label required-field">Quyền lợi</label>
-                                        <textarea class="form-control" id="benefits" name="benefits"
-                                            required></textarea>
+                                        <textarea class="form-control" id="benefits" name="benefits"></textarea>
                                         <div class="invalid-feedback">Vui lòng nhập quyền lợi</div>
                                     </div>
                                 </div>
@@ -230,25 +227,19 @@
                 </div>
             </div>
 
-
-
-            <!-- API TinyMCE-->
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            <!--API CKEditor 5 -->
+            <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
             <script>
-                // Initialize TinyMCE for rich text editors
-                tinymce.init({
-                    selector: '#jobDescription, #requirements, #benefits, #applicationMethod',
-                    plugins: 'lists link image table code help wordcount',
-                    toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | indent outdent | bullist numlist | link image | removeformat help',
-                    height: 500,
-                    menubar: false,
-                    content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }',
-                    setup: function (editor) {
-                        editor.on('change', function () {
-                            editor.save();
-                            validateField(editor.getElement());
-                        });
-                    }
+                // Lưu các instance CKEditor
+                window.CKEDITOR_INSTANCES = {};
+                ClassicEditor.create(document.querySelector('#jobDescription')).then(editor => {
+                    window.CKEDITOR_INSTANCES['jobDescription'] = editor;
+                });
+                ClassicEditor.create(document.querySelector('#requirements')).then(editor => {
+                    window.CKEDITOR_INSTANCES['requirements'] = editor;
+                });
+                ClassicEditor.create(document.querySelector('#benefits')).then(editor => {
+                    window.CKEDITOR_INSTANCES['benefits'] = editor;
                 });
 
                 // Logo preview function
@@ -269,79 +260,82 @@
                     }
                 }
 
-                // Validate individual field
-                function validateField(element) {
-                    const value = element.value.trim();
-                    if (!value) {
-                        element.classList.add('is-invalid');
-                        return false;
-                    }
-                    element.classList.remove('is-invalid');
-                    return true;
-                }
-
                 // Form submission handling
-                document.getElementById('createPostForm').addEventListener('submit', function (e) {
+                document.getElementById('createPostForm').addEventListener('submit', async function (e) {
                     e.preventDefault();
 
-                    // Save TinyMCE content
-                    tinymce.triggerSave();
-
-                    // Validate form
-                    const form = this;
-                    const formData = new FormData(form);
-                    let isValid = true;
-
-                    // Check required fields
-                    const requiredFields = [
-                        'title', 'companyName', 'salary', 'location', 'jobType',
-                        'experience', 'deadline', 'workingTime', 'jobDescription',
-                        'requirements', 'benefits', 'contactAddress', 'applicationMethod',
-                        'companyLogo'
-                    ];
-
-                    for (let field of requiredFields) {
-                        const input = document.getElementById(field);
-                        if (!validateField(input)) {
-                            isValid = false;
-                            // Scroll to the first invalid field
-                            if (isValid === false) {
-                                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                input.focus();
+                    try {
+                        // Đồng bộ nội dung CKEditor vào textarea
+                        for (const [id, editor] of Object.entries(window.CKEDITOR_INSTANCES)) {
+                            const textarea = document.getElementById(id);
+                            if (textarea) {
+                                const content = await editor.getData();
+                                textarea.value = content;
+                                console.log(`Updated ${id} with content:`, content);
                             }
                         }
-                    }
 
-                    if (!isValid) {
-                        alert('Vui lòng điền đầy đủ các trường bắt buộc');
-                        return;
-                    }
+                        // Validate form
+                        const form = this;
+                        const formData = new FormData(form);
+                        let isValid = true;
 
-                    // Submit form using fetch API
-                    fetch(form.action, {
-                        method: 'POST',
-                        body: formData
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                alert('Bài đăng đã được tạo thành công!');
-                                window.location.href = '${pageContext.request.contextPath}/post';
+                        // Check required fields
+                        const requiredFields = [
+                            'title', 'companyName', 'salary', 'location', 'jobType',
+                            'experience', 'deadline', 'workingTime', 'jobDescription',
+                            'requirements', 'benefits', 'contactAddress', 'applicationMethod',
+                            'companyLogo'
+                        ];
+
+                        for (let field of requiredFields) {
+                            const input = document.getElementById(field);
+                            const value = input.value.trim();
+
+                            if (!value) {
+                                isValid = false;
+                                input.classList.add('is-invalid');
+                                // Scroll to the first invalid field
+                                if (isValid === false) {
+                                    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    input.focus();
+                                }
                             } else {
-                                alert(data.message || 'Có lỗi xảy ra khi tạo bài đăng. Vui lòng thử lại.');
+                                input.classList.remove('is-invalid');
                             }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('Có lỗi xảy ra khi tạo bài đăng. Vui lòng thử lại.');
-                        });
-                });
+                        }
 
-                // Remove invalid class when user starts typing
-                document.querySelectorAll('input, textarea, select').forEach(input => {
-                    input.addEventListener('input', function () {
-                        validateField(this);
-                    });
+                        if (!isValid) {
+                            alert('Vui lòng điền đầy đủ các trường bắt buộc');
+                            return;
+                        }
+
+                        // Log form data before submission
+                        console.log('Form data before submission:');
+                        for (let [key, value] of formData.entries()) {
+                            console.log(key + ':', value);
+                        }
+
+                        // Submit form using fetch API
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        const data = await response.json();
+                        console.log('Server response:', data);
+
+                        if (data.success) {
+                            alert('Bài đăng đã được tạo thành công!');
+                            // Redirect đến trang My Posts
+                            window.location.href = data.redirectUrl || '${pageContext.request.contextPath}/post?view=my-post';
+                        } else {
+                            alert(data.message || 'Có lỗi xảy ra khi tạo bài đăng. Vui lòng thử lại.');
+                        }
+                    } catch (error) {
+                        console.error('Error during form submission:', error);
+                        alert('Có lỗi xảy ra khi tạo bài đăng: ' + error.message);
+                    }
                 });
             </script>
         </body>
