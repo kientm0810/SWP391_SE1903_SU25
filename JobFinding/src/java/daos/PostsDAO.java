@@ -7,6 +7,7 @@ import java.util.List;
 import models.Posts;
 
 public class PostsDAO {
+
     private Connection conn;
     private PreparedStatement ps;
     private ResultSet rs;
@@ -15,11 +16,12 @@ public class PostsDAO {
         try {
             conn = new DBContext().getConnection();
             if (conn == null) {
-                System.err.println("Failed to establish database connection");
+                throw new SQLException("Failed to establish database connection");
             }
         } catch (Exception e) {
             System.err.println("Error initializing PostsDAO: " + e.getMessage());
             e.printStackTrace();
+            throw new RuntimeException("Failed to initialize PostsDAO: " + e.getMessage());
         }
     }
 
@@ -38,7 +40,6 @@ public class PostsDAO {
                 post.setParentId(rs.getInt("parent_id"));
                 post.setPostType(rs.getString("post_type"));
                 post.setTitle(rs.getString("title"));
-                post.setContent(rs.getString("content"));
                 post.setStatus(rs.getString("status"));
                 post.setViewCount(rs.getInt("view_count"));
                 post.setLikeCount(rs.getInt("like_count"));
@@ -59,6 +60,13 @@ public class PostsDAO {
                 post.setSalary(rs.getString("salary"));
                 post.setLocation(rs.getString("location"));
                 post.setJobType(rs.getString("job_type"));
+                post.setRank(rs.getString("rank"));
+                post.setIndustry(rs.getString("industry"));
+                post.setContactPerson(rs.getString("contact_person"));
+                post.setCompanySize(rs.getString("company_size"));
+                post.setCompanyWebsite(rs.getString("company_website"));
+                post.setCompanyDescription(rs.getString("company_description"));
+                post.setKeywords(rs.getString("keywords"));
                 posts.add(post);
             }
         } catch (SQLException e) {
@@ -83,7 +91,6 @@ public class PostsDAO {
                 post.setParentId(rs.getInt("parent_id"));
                 post.setPostType(rs.getString("post_type"));
                 post.setTitle(rs.getString("title"));
-                post.setContent(rs.getString("content"));
                 post.setStatus(rs.getString("status"));
                 post.setViewCount(rs.getInt("view_count"));
                 post.setLikeCount(rs.getInt("like_count"));
@@ -104,6 +111,13 @@ public class PostsDAO {
                 post.setSalary(rs.getString("salary"));
                 post.setLocation(rs.getString("location"));
                 post.setJobType(rs.getString("job_type"));
+                post.setRank(rs.getString("rank"));
+                post.setIndustry(rs.getString("industry"));
+                post.setContactPerson(rs.getString("contact_person"));
+                post.setCompanySize(rs.getString("company_size"));
+                post.setCompanyWebsite(rs.getString("company_website"));
+                post.setCompanyDescription(rs.getString("company_description"));
+                post.setKeywords(rs.getString("keywords"));
                 posts.add(post);
             }
         } catch (SQLException e) {
@@ -127,7 +141,6 @@ public class PostsDAO {
                 post.setParentId(rs.getInt("parent_id"));
                 post.setPostType(rs.getString("post_type"));
                 post.setTitle(rs.getString("title"));
-                post.setContent(rs.getString("content"));
                 post.setStatus(rs.getString("status"));
                 post.setViewCount(rs.getInt("view_count"));
                 post.setLikeCount(rs.getInt("like_count"));
@@ -148,6 +161,13 @@ public class PostsDAO {
                 post.setSalary(rs.getString("salary"));
                 post.setLocation(rs.getString("location"));
                 post.setJobType(rs.getString("job_type"));
+                post.setRank(rs.getString("rank"));
+                post.setIndustry(rs.getString("industry"));
+                post.setContactPerson(rs.getString("contact_person"));
+                post.setCompanySize(rs.getString("company_size"));
+                post.setCompanyWebsite(rs.getString("company_website"));
+                post.setCompanyDescription(rs.getString("company_description"));
+                post.setKeywords(rs.getString("keywords"));
                 return post;
             }
         } catch (SQLException e) {
@@ -163,26 +183,32 @@ public class PostsDAO {
             return false;
         }
 
-        String query = "INSERT INTO Posts (user_id, user_type, parent_id, post_type, title, status, " +
-                      "view_count, like_count, comment_count, experience, deadline, working_time, " +
-                      "job_description, requirements, benefits, contact_address, application_method, " +
-                      "company_name, salary, location, job_type, company_logo, created_at, updated_at) " +
-                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
-      
-     try {
+        String query = "INSERT INTO Posts (user_id, user_type, parent_id, post_type, title, status, "
+                + "view_count, like_count, comment_count, experience, deadline, working_time, "
+                + "job_description, requirements, benefits, contact_address, application_method, "
+                + "company_name, salary, location, job_type, company_logo, created_at, updated_at, rank, industry, contact_person, company_size, company_website, company_description, keywords) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE(), ?, ?, ?, ?, ?, ?, ?)";
+
+        try {
             // Thiết lập giá trị mặc định cho các trường bắt buộc nếu chúng là null
-            if (post.getUserType() == null)
+            if (post.getUserType() == null) {
                 post.setUserType("user");
-            if (post.getPostType() == null)
+            }
+            if (post.getPostType() == null) {
                 post.setPostType("job");
-            if (post.getStatus() == null)
+            }
+            if (post.getStatus() == null) {
                 post.setStatus("active");
-            if (post.getViewCount() == 0)
+            }
+            if (post.getViewCount() == 0) {
                 post.setViewCount(0);
-            if (post.getLikeCount() == 0)
+            }
+            if (post.getLikeCount() == 0) {
                 post.setLikeCount(0);
-            if (post.getCommentCount() == 0)
+            }
+            if (post.getCommentCount() == 0) {
                 post.setCommentCount(0);
+            }
 
             // Kiểm tra trường userId có hợp lệ không
             if (post.getUserId() <= 0) {
@@ -193,17 +219,17 @@ public class PostsDAO {
             // Kiểm tra và log các trường bắt buộc
             System.out.println("\n=== Checking Required Fields ===");
             String[] requiredFields = {
-                    "title", "companyName", "salary", "location", "jobType",
-                    "experience", "workingTime", "jobDescription", "requirements",
-                    "benefits", "contactAddress", "applicationMethod", "deadline", "companyLogo"
+                "title", "companyName", "salary", "location", "jobType",
+                "experience", "workingTime", "jobDescription", "requirements",
+                "benefits", "contactAddress", "applicationMethod", "deadline", "companyLogo"
             };
 
             String[] fieldValues = {
-                    post.getTitle(), post.getCompanyName(), post.getSalary(),
-                    post.getLocation(), post.getJobType(), post.getExperience(),
-                    post.getWorkingTime(), post.getJobDescription(), post.getRequirements(),
-                    post.getBenefits(), post.getContactAddress(), post.getApplicationMethod(),
-                    String.valueOf(post.getDeadline()), post.getCompanyLogo()
+                post.getTitle(), post.getCompanyName(), post.getSalary(),
+                post.getLocation(), post.getJobType(), post.getExperience(),
+                post.getWorkingTime(), post.getJobDescription(), post.getRequirements(),
+                post.getBenefits(), post.getContactAddress(), post.getApplicationMethod(),
+                String.valueOf(post.getDeadline()), post.getCompanyLogo()
             };
 
             for (int i = 0; i < requiredFields.length; i++) {
@@ -269,6 +295,13 @@ public class PostsDAO {
             ps.setString(20, post.getLocation());
             ps.setString(21, post.getJobType());
             ps.setString(22, post.getCompanyLogo());
+            ps.setString(23, post.getRank());
+            ps.setString(24, post.getIndustry());
+            ps.setString(25, post.getContactPerson());
+            ps.setString(26, post.getCompanySize());
+            ps.setString(27, post.getCompanyWebsite());
+            ps.setString(28, post.getCompanyDescription());
+            ps.setString(29, post.getKeywords());
 
             // Log câu truy vấn SQL và các tham số
             System.out.println("\n=== Executing SQL Query ===");
@@ -308,29 +341,35 @@ public class PostsDAO {
 
     // Update post
     public boolean updatePost(Posts post) {
-        String query = "UPDATE Posts SET title = ?, content = ?, status = ?, experience = ?, deadline = ?, " +
-                      "working_time = ?, job_description = ?, requirements = ?, benefits = ?, contact_address = ?, " +
-                      "application_method = ?, company_name = ?, company_logo = ?, salary = ?, location = ?, " +
-                      "job_type = ?, updated_at = GETDATE() WHERE id = ? AND deleted_at IS NULL";
+        String query = "UPDATE Posts SET title = ?, status = ?, experience = ?, deadline = ?, "
+                + "working_time = ?, job_description = ?, requirements = ?, benefits = ?, contact_address = ?, "
+                + "application_method = ?, company_name = ?, company_logo = ?, salary = ?, location = ?, "
+                + "job_type = ?, rank = ?, industry = ?, contact_person = ?, company_size = ?, company_website = ?, company_description = ?, keywords = ?, updated_at = GETDATE() WHERE id = ? AND deleted_at IS NULL";
         try {
             ps = conn.prepareStatement(query);
             ps.setString(1, post.getTitle());
-            ps.setString(2, post.getContent()); 
-            ps.setString(3, post.getStatus());
-            ps.setString(4, post.getExperience());
-            ps.setDate(5, post.getDeadline() != null ? new java.sql.Date(post.getDeadline().getTime()) : null);
-            ps.setString(6, post.getWorkingTime());
-            ps.setString(7, post.getJobDescription());
-            ps.setString(8, post.getRequirements());
-            ps.setString(9, post.getBenefits());
-            ps.setString(10, post.getContactAddress());
-            ps.setString(11, post.getApplicationMethod());
-            ps.setString(12, post.getCompanyName());
-            ps.setString(13, post.getCompanyLogo());
-            ps.setString(14, post.getSalary());
-            ps.setString(15, post.getLocation());
-            ps.setString(16, post.getJobType());
-            ps.setInt(17, post.getId());
+            ps.setString(2, post.getStatus());
+            ps.setString(3, post.getExperience());
+            ps.setDate(4, post.getDeadline() != null ? new java.sql.Date(post.getDeadline().getTime()) : null);
+            ps.setString(5, post.getWorkingTime());
+            ps.setString(6, post.getJobDescription());
+            ps.setString(7, post.getRequirements());
+            ps.setString(8, post.getBenefits());
+            ps.setString(9, post.getContactAddress());
+            ps.setString(10, post.getApplicationMethod());
+            ps.setString(11, post.getCompanyName());
+            ps.setString(12, post.getCompanyLogo());
+            ps.setString(13, post.getSalary());
+            ps.setString(14, post.getLocation());
+            ps.setString(15, post.getJobType());
+            ps.setString(16, post.getRank());
+            ps.setString(17, post.getIndustry());
+            ps.setString(18, post.getContactPerson());
+            ps.setString(19, post.getCompanySize());
+            ps.setString(20, post.getCompanyWebsite());
+            ps.setString(21, post.getCompanyDescription());
+            ps.setString(22, post.getKeywords());
+            ps.setInt(23, post.getId());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -396,7 +435,6 @@ public class PostsDAO {
                 post.setParentId(rs.getInt("parent_id"));
                 post.setPostType(rs.getString("post_type"));
                 post.setTitle(rs.getString("title"));
-                post.setContent(rs.getString("content"));
                 post.setStatus(rs.getString("status"));
                 post.setViewCount(rs.getInt("view_count"));
                 post.setLikeCount(rs.getInt("like_count"));
@@ -417,6 +455,13 @@ public class PostsDAO {
                 post.setSalary(rs.getString("salary"));
                 post.setLocation(rs.getString("location"));
                 post.setJobType(rs.getString("job_type"));
+                post.setRank(rs.getString("rank"));
+                post.setIndustry(rs.getString("industry"));
+                post.setContactPerson(rs.getString("contact_person"));
+                post.setCompanySize(rs.getString("company_size"));
+                post.setCompanyWebsite(rs.getString("company_website"));
+                post.setCompanyDescription(rs.getString("company_description"));
+                post.setKeywords(rs.getString("keywords"));
                 posts.add(post);
             }
         } catch (SQLException e) {
@@ -501,7 +546,6 @@ public class PostsDAO {
                 post.setParentId(rs.getInt("parent_id"));
                 post.setPostType(rs.getString("post_type"));
                 post.setTitle(rs.getString("title"));
-                post.setContent(rs.getString("content"));
                 post.setStatus(rs.getString("status"));
                 post.setViewCount(rs.getInt("view_count"));
                 post.setLikeCount(rs.getInt("like_count"));
@@ -522,6 +566,82 @@ public class PostsDAO {
                 post.setSalary(rs.getString("salary"));
                 post.setLocation(rs.getString("location"));
                 post.setJobType(rs.getString("job_type"));
+                post.setRank(rs.getString("rank"));
+                post.setIndustry(rs.getString("industry"));
+                post.setContactPerson(rs.getString("contact_person"));
+                post.setCompanySize(rs.getString("company_size"));
+                post.setCompanyWebsite(rs.getString("company_website"));
+                post.setCompanyDescription(rs.getString("company_description"));
+                post.setKeywords(rs.getString("keywords"));
+                posts.add(post);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return posts;
+    }
+
+    // Lấy tổng số posts của 1 user
+    public int getTotalPostsByUserId(int userId) {
+        String query = "SELECT COUNT(*) FROM Posts WHERE user_id = ? AND deleted_at IS NULL";
+        try {
+            ps = conn.prepareStatement(query);
+            ps.setInt(1, userId);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    // Lấy danh sách posts của 1 user có phân trang
+    public List<Posts> getPostsByUserIdWithPaging(int userId, int page, int pageSize) {
+        List<Posts> posts = new ArrayList<>();
+        String query = "SELECT * FROM Posts WHERE user_id = ? AND deleted_at IS NULL ORDER BY created_at DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        try {
+            ps = conn.prepareStatement(query);
+            ps.setInt(1, userId);
+            ps.setInt(2, (page - 1) * pageSize);
+            ps.setInt(3, pageSize);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Posts post = new Posts();
+                post.setId(rs.getInt("id"));
+                post.setUserId(rs.getInt("user_id"));
+                post.setUserType(rs.getString("user_type"));
+                post.setParentId(rs.getInt("parent_id"));
+                post.setPostType(rs.getString("post_type"));
+                post.setTitle(rs.getString("title"));
+                post.setStatus(rs.getString("status"));
+                post.setViewCount(rs.getInt("view_count"));
+                post.setLikeCount(rs.getInt("like_count"));
+                post.setCommentCount(rs.getInt("comment_count"));
+                post.setCreatedAt(rs.getTimestamp("created_at"));
+                post.setUpdatedAt(rs.getTimestamp("updated_at"));
+                post.setDeletedAt(rs.getTimestamp("deleted_at"));
+                post.setExperience(rs.getString("experience"));
+                post.setDeadline(rs.getDate("deadline"));
+                post.setWorkingTime(rs.getString("working_time"));
+                post.setJobDescription(rs.getString("job_description"));
+                post.setRequirements(rs.getString("requirements"));
+                post.setBenefits(rs.getString("benefits"));
+                post.setContactAddress(rs.getString("contact_address"));
+                post.setApplicationMethod(rs.getString("application_method"));
+                post.setCompanyName(rs.getString("company_name"));
+                post.setCompanyLogo(rs.getString("company_logo"));
+                post.setSalary(rs.getString("salary"));
+                post.setLocation(rs.getString("location"));
+                post.setJobType(rs.getString("job_type"));
+                post.setRank(rs.getString("rank"));
+                post.setIndustry(rs.getString("industry"));
+                post.setContactPerson(rs.getString("contact_person"));
+                post.setCompanySize(rs.getString("company_size"));
+                post.setCompanyWebsite(rs.getString("company_website"));
+                post.setCompanyDescription(rs.getString("company_description"));
+                post.setKeywords(rs.getString("keywords"));
                 posts.add(post);
             }
         } catch (SQLException e) {
@@ -533,11 +653,21 @@ public class PostsDAO {
     // Close database connection
     public void closeConnection() {
         try {
-            if (rs != null) rs.close();
-            if (ps != null) ps.close();
-            if (conn != null) conn.close();
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public Connection getConnection() {
+        return conn;
     }
 }

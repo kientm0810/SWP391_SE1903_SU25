@@ -1,6 +1,5 @@
 package models;
 
-import java.sql.Timestamp;
 import java.util.Date;
 
 public class Posts {
@@ -11,11 +10,18 @@ public class Posts {
     private Integer parentId;
     private String postType;
     private String title;
-    private String content;
     private String status;
     private int viewCount;
     private int likeCount;
     private int commentCount;
+    private Date createdAt;
+    private Date updatedAt;
+    private Date deletedAt;
+    private String companyName;
+    private String companyLogo;
+    private String salary;
+    private String location;
+    private String jobType;
     private String experience;
     private Date deadline;
     private String workingTime;
@@ -24,33 +30,26 @@ public class Posts {
     private String benefits;
     private String contactAddress;
     private String applicationMethod;
-    private String companyName;
-    private String companyLogo;
-    private String salary;
-    private String location;
-    private String jobType;
-    private Timestamp createdAt;
-    private Timestamp updatedAt;
-    private Timestamp deletedAt;
+    private Integer quantity;
+    private String rank;
+    private String industry;
+    private String contactPerson;
+    private String companySize;
+    private String companyWebsite;
+    private String companyDescription;
+    private String keywords;
 
     public Posts() {
-        // Set default values
-        this.viewCount = 0;
-        this.likeCount = 0;
-        this.commentCount = 0;
-        this.status = "active";
-        this.postType = "job";
-        this.userType = "user";
     }
 
-    public Posts(int id, int userId, String userType, Integer parentId, String postType, String title, String content, String status, int viewCount, int likeCount, int commentCount, Timestamp createdAt, Timestamp updatedAt, Timestamp deletedAt, String experience, Date deadline, String workingTime, String jobDescription, String requirements, String benefits, String contactAddress, String applicationMethod, String companyName, String companyLogo, String salary, String location, String jobType) {
+    public Posts(int id, int userId, String userType, Integer parentId, String postType, String title, String status, int viewCount, int likeCount, int commentCount, Date createdAt, Date updatedAt, Date deletedAt, String companyName, String companyLogo, String salary, String location, String jobType, String experience, Date deadline, String workingTime, String jobDescription, String requirements, String benefits, String contactAddress, String applicationMethod, Integer quantity, String rank, String industry, String contactPerson, String companySize, String companyWebsite, String companyDescription, String keywords) {
         this.id = id;
         this.userId = userId;
+
         this.userType = userType;
         this.parentId = parentId;
         this.postType = postType;
         this.title = title;
-        this.content = content;
         this.status = status;
         this.viewCount = viewCount;
         this.likeCount = likeCount;
@@ -58,6 +57,11 @@ public class Posts {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.deletedAt = deletedAt;
+        this.companyName = companyName;
+        this.companyLogo = companyLogo;
+        this.salary = salary;
+        this.location = location;
+        this.jobType = jobType;
         this.experience = experience;
         this.deadline = deadline;
         this.workingTime = workingTime;
@@ -66,12 +70,14 @@ public class Posts {
         this.benefits = benefits;
         this.contactAddress = contactAddress;
         this.applicationMethod = applicationMethod;
-        this.companyName = companyName;
-        this.companyLogo = companyLogo;
-        this.salary = salary;
-        this.location = location;
-        this.jobType = jobType;
-
+        this.quantity = quantity;
+        this.rank = rank;
+        this.industry = industry;
+        this.contactPerson = contactPerson;
+        this.companySize = companySize;
+        this.companyWebsite = companyWebsite;
+        this.companyDescription = companyDescription;
+        this.keywords = keywords;
     }
 
     public int getId() {
@@ -95,7 +101,7 @@ public class Posts {
     }
 
     public void setUserType(String userType) {
-        this.userType = userType != null ? userType : "user";
+        this.userType = userType;
     }
 
     public Integer getParentId() {
@@ -111,7 +117,7 @@ public class Posts {
     }
 
     public void setPostType(String postType) {
-        this.postType = postType != null ? postType : "job";
+        this.postType = postType;
     }
 
     public String getTitle() {
@@ -122,20 +128,12 @@ public class Posts {
         this.title = title;
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
     public String getStatus() {
         return status;
     }
 
     public void setStatus(String status) {
-        this.status = status != null ? status : "active";
+        this.status = status;
     }
 
     public int getViewCount() {
@@ -162,16 +160,36 @@ public class Posts {
         this.commentCount = commentCount;
     }
 
-    public Timestamp getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Timestamp createdAt) {
+    public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Timestamp getUpdatedAt() {
+    public Date getUpdatedAt() {
         return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Date getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(Date deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 
     public String getCompanyLogo() {
@@ -182,16 +200,28 @@ public class Posts {
         this.companyLogo = companyLogo;
     }
 
-    public void setUpdatedAt(Timestamp updatedAt) {
-        this.updatedAt = updatedAt;
+    public String getSalary() {
+        return salary;
     }
 
-    public Timestamp getDeletedAt() {
-        return deletedAt;
+    public void setSalary(String salary) {
+        this.salary = salary;
     }
 
-    public void setDeletedAt(Timestamp deletedAt) {
-        this.deletedAt = deletedAt;
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getJobType() {
+        return jobType;
+    }
+
+    public void setJobType(String jobType) {
+        this.jobType = jobType;
     }
 
     public String getExperience() {
@@ -258,36 +288,68 @@ public class Posts {
         this.applicationMethod = applicationMethod;
     }
 
-    public String getCompanyName() {
-        return companyName;
+    public Integer getQuantity() {
+        return quantity;
     }
 
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 
-    public String getSalary() {
-        return salary;
+    public String getRank() {
+        return rank;
     }
 
-    public void setSalary(String salary) {
-        this.salary = salary;
+    public void setRank(String rank) {
+        this.rank = rank;
     }
 
-    public String getLocation() {
-        return location;
+    public String getIndustry() {
+        return industry;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setIndustry(String industry) {
+        this.industry = industry;
     }
 
-    public String getJobType() {
-        return jobType;
+    public String getContactPerson() {
+        return contactPerson;
     }
 
-    public void setJobType(String jobType) {
-        this.jobType = jobType;
+    public void setContactPerson(String contactPerson) {
+        this.contactPerson = contactPerson;
+    }
+
+    public String getCompanySize() {
+        return companySize;
+    }
+
+    public void setCompanySize(String companySize) {
+        this.companySize = companySize;
+    }
+
+    public String getCompanyWebsite() {
+        return companyWebsite;
+    }
+
+    public void setCompanyWebsite(String companyWebsite) {
+        this.companyWebsite = companyWebsite;
+    }
+
+    public String getCompanyDescription() {
+        return companyDescription;
+    }
+
+    public void setCompanyDescription(String companyDescription) {
+        this.companyDescription = companyDescription;
+    }
+
+    public String getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
     }
 
 }

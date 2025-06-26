@@ -31,124 +31,163 @@
                 </ol>
             </nav>
 
-            <div class="post-header">
-                <div class="row">
-                    <div class="col-md-8">
-                        <h1 class="mb-3">${post.title}</h1>
-                        <div class="d-flex align-items-center mb-3">
-                            <c:choose>
-                                <c:when test="${not empty post.companyLogo}">
-                                    <img src="${pageContext.request.contextPath}/${post.companyLogo}"
-                                         alt="${post.companyName}" class="company-logo me-3"
-                                         style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;">
-                                </c:when>
-
-                            </c:choose>
-                            <div>
-                                <h4 class="mb-1">${post.companyName}</h4>
-                                <div class="d-flex flex-wrap">
-                                    <div class="job-info-item">
-                                        <i class="fas fa-map-marker-alt"></i>
-                                        <span>${post.location}</span>
-                                    </div>
-                                    <div class="job-info-item">
-                                        <i class="fas fa-briefcase"></i>
-                                        <span>${post.experience}</span>
-                                    </div>
-                                    <div class="job-info-item">
-                                        <i class="fas fa-clock"></i>
-                                        <span>${post.workingTime}</span>
-                                    </div>
+            <!-- Header: Bên trái là job info, bên phải là box công ty + box thông tin chung -->
+            <div class="row mb-4 align-items-stretch">
+                <!-- Bên trái: Job header -->
+                <div class="col-lg-8">
+                    <div class="job-header-card topcv-style">
+                        <div class="job-header-content-col">
+                            <div class="job-header-title">${post.title}</div>
+                            <div class="job-header-info-row">
+                                <div class="job-header-info-box">
+                                    <div class="info-icon"><i class="fas fa-money-bill-wave"></i></div>
+                                    <div class="info-label">Mức lương</div>
+                                    <div class="info-value">${post.salary}</div>
                                 </div>
+                                <div class="job-header-info-box">
+                                    <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
+                                    <div class="info-label">Địa điểm</div>
+                                    <div class="info-value">${post.location}</div>
+                                </div>
+                                <div class="job-header-info-box">
+                                    <div class="info-icon"><i class="fas fa-user-tie"></i></div>
+                                    <div class="info-label">Kinh nghiệm</div>
+                                    <div class="info-value">${post.experience}</div>
+                                </div>
+                            </div>
+                            <div class="job-header-sub-row">
+                                <a href="#" class="btn btn-applicant-count">
+                                    <i class="fas fa-eye"></i> Xem số người đã ứng tuyển
+                                    <span class="badge-new">New</span>
+                                </a>
+                                <span class="job-header-deadline">
+                                    <i class="fas fa-calendar-alt"></i> Hạn nộp hồ sơ:
+                                    <fmt:formatDate value="${post.deadline}" pattern="dd/MM/yyyy" />
+                                </span>
+                            </div>
+                            <div class="job-header-action-row">
+                                <a href="#" class="btn btn-success btn-apply-topcv"><i
+                                        class="fas fa-paper-plane"></i>
+                                    Ứng
+                                    tuyển ngay</a>
+                                <a href="#" class="btn btn-outline-success btn-save-topcv"><i
+                                        class="far fa-heart"></i>
+                                    Lưu
+                                    tin</a>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4 text-md-end">
-                        <span class="job-type-badge mb-2 d-inline-block">${post.jobType}</span>
-                        <div class="salary-text mb-2">${post.salary}</div>
-                        <div class="deadline-text">
-                            <i class="fas fa-calendar-alt"></i>
-                            Hạn nộp:
-                            <fmt:formatDate value="${post.deadline}" pattern="dd/MM/yyyy" />
+                </div>
+                <!-- Bên phải: Box công ty + Box thông tin chung -->
+                <div class="col-lg-4">
+                    <div class="sidebar-box company-box">
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="${pageContext.request.contextPath}/${post.companyLogo}"
+                                 alt="${post.companyName}" class="company-logo me-3">
+                            <div>
+                                <div class="fw-bold mb-1">${post.companyName}</div>
+                                <div class="text-muted small"><i class="fas fa-users"></i> Quy mô:
+                                    ${post.companySize}</div>
+                                <div class="text-muted small"><i class="fas fa-briefcase"></i> Lĩnh vực: ...
+                                </div>
+                                <div class="text-muted small"><i class="fas fa-map-marker-alt"></i>
+                                    ${post.location}</div>
+                                    <c:if test="${not empty post.companyWebsite}">
+                                    <div class="mt-1"><a href="${post.companyWebsite}" target="_blank"
+                                                         class="text-success">Xem trang công ty <i
+                                                class="fas fa-external-link-alt"></i></a></div>
+                                        </c:if>
+                            </div>
                         </div>
                     </div>
+                    <div class="sidebar-box info-box">
+                        <div class="section-title">Thông tin chung</div>
+                        <div class="info-list">
+                            <div class="info-item"><i class="fas fa-user-tie"></i> Cấp bậc: Nhân viên</div>
+                            <div class="info-item"><i class="fas fa-graduation-cap"></i> Học vấn: Đại Học trở
+                                lên</div>
+                            <div class="info-item"><i class="fas fa-users"></i> Số lượng tuyển: 1 người</div>
+                            <div class="info-item"><i class="fas fa-clock"></i> Hình thức làm việc: Toàn thời
+                                gian</div>
+                        </div>
+                    </div>
+                    <c:if test="${sessionScope.userId != null && sessionScope.userId == post.userId}">
+                        <div class="sidebar-box owner-actions-box mt-4">
+                            <h3 class="section-title">Quản lý tin</h3>
+                            <div class="d-grid gap-2">
+                                <a href="${pageContext.request.contextPath}/post/edit?id=${post.id}"
+                                   class="btn btn-primary"><i class="fas fa-edit me-2"></i> Sửa tin</a>
+                                <form action="${pageContext.request.contextPath}/post/delete?id=${post.id}"
+                                      method="POST"
+                                      onsubmit="return confirm('Bạn có chắc chắn muốn xóa tin này không?');"
+                                      class="d-grid">
+                                    <button type="submit" class="btn btn-danger"><i
+                                            class="fas fa-trash me-2"></i> Xóa tin</button>
+                                </form>
+                            </div>
+                        </div>
+                    </c:if>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-md-8">
-                    <!-- Mô tả công việc -->
+                <!-- Main content -->
+                <div class="col-lg-8">
+                    <!-- Box việc làm liên quan -->
+                    <c:if test="${not empty relatedPosts}">
+                        <div class="related-jobs-box">
+                            <div class="related-jobs-title">Việc làm liên quan</div>
+                            <div class="row">
+                                <c:forEach items="${relatedPosts}" var="rel">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="related-job-card">
+                                            <img src="${pageContext.request.contextPath}/assets/img/icon/job-list1.png"
+                                                 class="related-job-logo" alt="logo">
+                                            <div class="related-job-info">
+                                                <div class="related-job-title">${rel.title}</div>
+                                                <div class="related-job-company">${rel.companyName}</div>
+                                                <div class="related-job-tags">
+                                                    <span class="related-job-tag">${rel.salary}</span>
+                                                    <span class="related-job-tag">${rel.location}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                            </div>
+                        </div>
+                    </c:if>
+                    <!-- Box chi tiết tin tuyển dụng -->
                     <div class="content-section">
+                        <div class="section-title">
+                            Chi tiết tin tuyển dụng
+                            <a href="#" class="btn btn-similar-job"><i class="fas fa-bell"></i> Gửi tôi việc làm
+                                tương tự</a>
+
+
+                        </div>
+
+                        <c:if test="${not empty post.keywords}">
+       
+                            <div class="keywords-container">
+                                <c:forEach items="${post.keywords.split(',')}" var="keyword">
+                                    <span class="keyword-tag">${keyword.trim()}</span>
+                                </c:forEach>
+                            </div>
+                        </c:if>
+
                         <h3 class="section-title">Mô tả công việc</h3>
-                        <div class="content">
-                            ${post.jobDescription}
-                        </div>
-                    </div>
-
-                    <!-- Yêu cầu ứng viên -->
-                    <div class="content-section">
+                        <div class="content">${post.jobDescription}</div>
                         <h3 class="section-title">Yêu cầu ứng viên</h3>
-                        <div class="content">
-                            ${post.requirements}
-                        </div>
-                    </div>
-
-                    <!-- Quyền lợi -->
-                    <div class="content-section">
+                        <div class="content">${post.requirements}</div>
                         <h3 class="section-title">Quyền lợi</h3>
-                        <div class="content">
-                            ${post.benefits}
-                        </div>
+                        <div class="content">${post.benefits}</div>
+
+
                     </div>
                 </div>
-
-                <div class="col-md-4">
-                    <!-- Thông tin liên hệ -->
-                    <div class="content-section">
-                        <h3 class="section-title">Thông tin liên hệ</h3>
-                        <div class="content">
-                            <div class="job-info-item mb-3">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span>${post.contactAddress}</span>
-                            </div>
-                            <div class="job-info-item">
-                                <i class="fas fa-info-circle"></i>
-                                <span>${post.applicationMethod}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Thông tin khác -->
-                    <div class="content-section">
-                        <h3 class="section-title">Thông tin khác</h3>
-                        <div class="content">
-                            <div class="job-info-item mb-2">
-                                <i class="fas fa-eye"></i>
-                                <span>${post.viewCount} lượt xem</span>
-                            </div>
-                            <div class="job-info-item mb-2">
-                                <i class="fas fa-calendar-alt"></i>
-                                <span>Đăng ngày:
-                                    <fmt:formatDate value="${post.createdAt}" pattern="dd/MM/yyyy" />
-                                </span>
-                            </div>
-                            <c:if test="${sessionScope.userId != null && sessionScope.userId == post.userId}">
-                                <div class="mt-3">
-                                    <a href="${pageContext.request.contextPath}/post/edit?id=${post.id}"
-                                       class="btn btn-outline-primary btn-action w-100 mb-2">
-                                        <i class="fas fa-edit"></i> Chỉnh sửa tin
-                                    </a>
-
-                                    <a href="${pageContext.request.contextPath}/post/delete?id=${post.id}"
-                                       class="btn btn-outline-danger btn-action w-100"
-                                       onclick="return confirm('Bạn có chắc chắn muốn xóa tin này?')">
-                                        <i class="fas fa-trash"></i> Xóa tin
-                                    </a>
-                                </div>
-                            </c:if>
-                        </div>
-                    </div>
-                </div>
+                <!-- Sidebar phải: để trống cho cân đối hoặc có thể thêm nội dung khác sau này -->
+                <div class="col-lg-4"></div>
             </div>
         </div>
 
