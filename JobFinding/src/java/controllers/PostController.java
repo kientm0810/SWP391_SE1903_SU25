@@ -75,6 +75,7 @@ public class PostController extends HttpServlet {
             String jobType = request.getParameter("jobType");
             String location = request.getParameter("location");
             boolean isMyPosts = false;
+            //recruiter xem bài đăng của mình 
             if (userType != null && userType.equals("recruiter")) {
                 if (view != null && view.equals("my-post") && userId != null) {
                     int totalPosts = postsDAO.getTotalPostsByUserId(userId);
@@ -180,7 +181,7 @@ public class PostController extends HttpServlet {
             // Check file type
             if (!isImageFile(filePart)) {
                 response.setContentType("application/json");
-                response.getWriter().write("{\"success\":false,\"message\":\"Chỉ chấp nhận file hình ảnh (jpg, jpeg, png, gif)\"}");
+                response.getWriter().write("{\"success\":false,\"message\":\"Chỉ chấp nhận file hình ảnh (jpg, jpeg, png, gif, webp)\"}");
                 return false;
             }
         }
@@ -231,7 +232,7 @@ public class PostController extends HttpServlet {
                 post.setJobType(request.getParameter("jobType").trim());
                 post.setExperience(request.getParameter("experience").trim());
 
-                // Handle company logo upload
+                // Lấy company logo upload
                 try {
                     Part filePart = request.getPart("companyLogo");
                     if (filePart != null && filePart.getSize() > 0) {
@@ -361,7 +362,7 @@ public class PostController extends HttpServlet {
                     post.setJobType(request.getParameter("jobType").trim());
                     post.setExperience(request.getParameter("experience").trim());
 
-                    // Handle company logo upload
+                    // lấy company logo upload
                     Part filePart = request.getPart("companyLogo");
                     if (filePart != null && filePart.getSize() > 0) {
                         String fileName = System.currentTimeMillis() + "_" + getSubmittedFileName(filePart);

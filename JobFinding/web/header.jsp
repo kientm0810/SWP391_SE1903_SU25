@@ -44,7 +44,7 @@
                                             <i class="fas fa-user-edit"></i> My Posts
                                         </a>
                                     </li>
-                                   
+
                                 </ul>
                             </li>
                         </c:if>
@@ -83,7 +83,12 @@
                                                 </a>
                                             </li>
                                         </c:if>
-
+                                        <li>
+                                            <a class="dropdown-item"
+                                                href="${pageContext.request.contextPath}/saved_jobs">
+                                                <i class="fas fa-heart"></i> Saved Jobs
+                                            </a>
+                                        </li>
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
