@@ -63,7 +63,7 @@ public class ajaxServlet extends HttpServlet {
 //          resp.sendRedirect("cart");
 //          return;
 //        }
-        int orderId = 1; //test
+        String orderId = "U1"; //test
 
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";

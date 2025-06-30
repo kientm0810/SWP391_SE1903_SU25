@@ -26,11 +26,11 @@ public class UploadPicture {
             "api_secret", "AP6fsHOrKHhHILISZmpUiUZCLIY"
         ));
 
-        String contentType = filePart.getContentType();
-
-        if (contentType == null || !contentType.startsWith("image/")) {
-            throw new ServletException("Chỉ cho phép upload ảnh định dạng PNG, JPG, JPEG.");
-        }
+//        String contentType = filePart.getContentType();
+//
+//        if (contentType == null || !contentType.startsWith("image/")) {
+//            throw new ServletException("Chỉ cho phép upload ảnh định dạng PNG, JPG, JPEG.");
+//        }
 
         
         try {
