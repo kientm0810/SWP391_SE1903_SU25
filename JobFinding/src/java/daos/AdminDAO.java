@@ -243,6 +243,161 @@ public class AdminDAO extends DBContext{
         }
         return null;
     }
+    
+    // Thêm vào AdminDAO.java sau các phương thức hiện có
+
+    public int getTotalAdmins(String role) {
+        String sql = "SELECT COUNT(*) FROM [project_SWP391].[dbo].[Admin] WHERE [role] = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, role);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    public int getTotalSearchResults(Admin criteria, String role) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM [project_SWP391].[dbo].[Admin] WHERE [role] = '" + role + "'");
+        Vector<Object> params = new Vector<>();
+
+        if (criteria.getId() != 0) {
+            sql.append(" AND id = ?");
+            params.add(criteria.getId());
+        }
+        if (criteria.getUsername() != null && !criteria.getUsername().isEmpty()) {
+            sql.append(" AND username LIKE ?");
+            params.add("%" + criteria.getUsername() + "%");
+        }
+        if (criteria.getEmail() != null && !criteria.getEmail().isEmpty()) {
+            sql.append(" AND email LIKE ?");
+            params.add("%" + criteria.getEmail() + "%");
+        }
+        if (criteria.getFullName() != null && !criteria.getFullName().isEmpty()) {
+            sql.append(" AND full_name LIKE ?");
+            params.add("%" + criteria.getFullName() + "%");
+        }
+        if (criteria.getPhone() != null && !criteria.getPhone().isEmpty()) {
+            sql.append(" AND phone LIKE ?");
+            params.add("%" + criteria.getPhone() + "%");
+        }
+        if (criteria.getGender() != null && !criteria.getGender().isEmpty()) {
+            sql.append(" AND gender = ?");
+            params.add(criteria.getGender());
+        }
+        if (criteria.getAddress() != null && !criteria.getAddress().isEmpty()) {
+            sql.append(" AND address LIKE ?");
+            params.add("%" + criteria.getAddress() + "%");
+        }
+        sql.append(" AND is_active = ?");
+        params.add(criteria.isActive());
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql.toString());
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    public Vector<Admin> getAdminsWithPagingAndSorting(String role, int page, int recordsPerPage, String sortField, String sortOrder) {
+        int start = (page - 1) * recordsPerPage;
+        Vector<Admin> admins = new Vector<>();
+        String sql = "SELECT * FROM [project_SWP391].[dbo].[Admin] WHERE [role] = ? ORDER BY " + sortField + " " + sortOrder + 
+                     " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setString(1, role);
+            stmt.setInt(2, start);
+            stmt.setInt(3, recordsPerPage);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Admin admin = mapResultSetToAdmin(rs);
+                admins.add(admin);
+            }
+        } catch (SQLException ex){
+            ex.getStackTrace();
+        }
+        return admins;
+    }
+    
+    public Vector<Admin> searchAdminWithPagingAndSorting(Admin criteria, String role, int page, int recordsPerPage, String sortField, String sortOrder) {
+        int start = (page - 1) * recordsPerPage;
+        Vector<Admin> list = new Vector<>();
+        StringBuilder sql = new StringBuilder("SELECT * FROM [project_SWP391].[dbo].[Admin] WHERE [role] = '" + role + "'");
+        Vector<Object> params = new Vector<>();
+
+        if (criteria.getId() != 0) {
+            sql.append(" AND id = ?");
+            params.add(criteria.getId());
+        }
+        if (criteria.getUsername() != null && !criteria.getUsername().isEmpty()) {
+            sql.append(" AND username LIKE ?");
+            params.add("%" + criteria.getUsername() + "%");
+        }
+        if (criteria.getEmail() != null && !criteria.getEmail().isEmpty()) {
+            sql.append(" AND email LIKE ?");
+            params.add("%" + criteria.getEmail() + "%");
+        }
+        if (criteria.getFullName() != null && !criteria.getFullName().isEmpty()) {
+            sql.append(" AND full_name LIKE ?");
+            params.add("%" + criteria.getFullName() + "%");
+        }
+        if (criteria.getPhone() != null && !criteria.getPhone().isEmpty()) {
+            sql.append(" AND phone LIKE ?");
+            params.add("%" + criteria.getPhone() + "%");
+        }
+        if (criteria.getGender() != null && !criteria.getGender().isEmpty()) {
+            sql.append(" AND gender = ?");
+            params.add(criteria.getGender());
+        }
+        if (criteria.getAddress() != null && !criteria.getAddress().isEmpty()) {
+            sql.append(" AND address LIKE ?");
+            params.add("%" + criteria.getAddress() + "%");
+        }
+//        sql.append(" AND is_active = ?");
+//        params.add(criteria.isActive());
+        
+        sql.append(" ORDER BY ").append(sortField).append(" ").append(sortOrder);
+        sql.append(" OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            ps = connection.prepareStatement(sql.toString());
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            ps.setInt(params.size() + 1, start);
+            ps.setInt(params.size() + 2, recordsPerPage);
+            
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapResultSetToAdmin(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return list;
+    }
 
 
 }

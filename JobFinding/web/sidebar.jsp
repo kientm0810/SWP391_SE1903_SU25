@@ -1,9 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!-- Sidebar Component -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <div class="sidebar">
-    <div class="sidebar-header">
-        <h2>Admin Panel</h2>
-        <p>Recruitment System</p>
+    <div class="d-flex align-items-center gap-2 sidebar-header">
+        <img src="assets/img/logo/logoweb.png" alt="JobFinding Logo" height="50" class="me-2 anh"/>
+        <div>
+            <h2 class="mb-0">Admin Panel</h2>
+            <p class="mb-0">Recruitment System</p>
+        </div>
     </div>
 
     <nav class="sidebar-menu">
@@ -49,6 +53,11 @@
 
         <hr style="margin: 20px 25px; opacity: 0.2;">
 
+        <a class="menu-item" href="home">
+            <i class="fas fa-home"></i> 
+            <span>Home</span>
+        </a>
+        
         <a href="profile.jsp" class="menu-item">
             <i class="fas fa-user-circle"></i>
             <span>My Profile</span>
@@ -154,5 +163,9 @@
         margin: 0;
         font-size: 20px;
     }
+}
+
+.anh{
+    border-radius: 20px;
 }
 </style>

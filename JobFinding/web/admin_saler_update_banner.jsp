@@ -28,7 +28,7 @@
         
         <div class="main-content">
             <div class="container mt-5">
-                <a href="AdminSalerController?target=banner&service=List" class="btn btn-outline-success mb-3">← Back to List Banners</a>
+                <a href="AdminSalerController?target=banner" class="btn btn-outline-success mb-3">← Back to List Banners</a>
                 <div class="card shadow">
                     <div class="card-header bg-success text-white">
                         <h4 class="mb-0">✏️ Update Banner</h4>
@@ -41,8 +41,11 @@
                                        value="<%= banner.getTitle() %>">
                             </div>
                             <div class="mb-3">
-                                <label for="image_url" class="form-label">Image URL</label> <br/>
+                                <label for="image_url" class="form-label">Image</label> <br/>
                                 <input type="file" name="file" accept="image/*" />
+                                <c:if test="${not empty mustbeImg}">
+                                    ${mustbeImg}
+                                </c:if>
                             </div>
                             <div class="mb-3">
                                 <label for="redirect_url" class="form-label">Redirect URL</label>

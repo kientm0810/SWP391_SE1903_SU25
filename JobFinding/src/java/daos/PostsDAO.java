@@ -510,7 +510,7 @@ public class PostsDAO {
         return 0;
     }
 
-    // Get posts by page with search
+    // Lấy posts theo tìm kiếm 
     public List<Posts> getPostsByPageWithSearch(int page, int pageSize, String keyword, String jobType, String location) {
         List<Posts> posts = new ArrayList<>();
         StringBuilder query = new StringBuilder("SELECT * FROM Posts WHERE deleted_at IS NULL");
@@ -601,7 +601,7 @@ public class PostsDAO {
         return 0;
     }
 
-    // Lấy danh sách posts của 1 user có phân trang
+    // Lấy danh sách posts của 1 recruiter
     public List<Posts> getPostsByUserIdWithPaging(int userId, int page, int pageSize) {
         List<Posts> posts = new ArrayList<>();
         String query = "SELECT * FROM Posts WHERE user_id = ? AND deleted_at IS NULL ORDER BY created_at DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";

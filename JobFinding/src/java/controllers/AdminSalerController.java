@@ -71,7 +71,7 @@ public class AdminSalerController extends HttpServlet {
         }
 
         if (service.equals("listAll")) {
-            listAll(request, response);
+            listAlls(request, response);
         } else if (service.equals("listMy")) {
 
         } else if (service.equals("Add")) {
@@ -85,6 +85,119 @@ public class AdminSalerController extends HttpServlet {
         }
     }
 
+    // Thay thế phương thức listAll bằng:
+
+    private void listAlls(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        BlogDAO blogDAO = new BlogDAO();
+        Vector<Blog> blogs = new Vector<>();
+        
+        // Pagination parameters
+        String pageStr = request.getParameter("page");
+        String recordsPerPageStr = request.getParameter("recordsPerPage");
+        String sortField = request.getParameter("sortField");
+        String sortOrder = request.getParameter("sortOrder");
+        String searchTitle = request.getParameter("title");
+        
+        int page = 1;
+        int recordsPerPage = 10;
+        
+        if (pageStr != null && !pageStr.isEmpty()) {
+            page = Integer.parseInt(pageStr);
+        }
+        if (recordsPerPageStr != null && !recordsPerPageStr.isEmpty()) {
+            recordsPerPage = Integer.parseInt(recordsPerPageStr);
+        }
+        if (sortField == null || sortField.isEmpty()) {
+            sortField = "id";
+        }
+        if (sortOrder == null || sortOrder.isEmpty()) {
+            sortOrder = "DESC";
+        }
+        
+        int totalRecords;
+        
+        String who = request.getParameter("who");
+        if (who == null) {
+            who = "";
+        }
+
+        if (searchTitle != null && !searchTitle.isEmpty()) {
+            blogs = blogDAO.searchBlogsByTitleWithPaging(searchTitle, page, recordsPerPage, sortField, sortOrder);
+            totalRecords = blogDAO.getTotalBlogsByTitle(searchTitle);
+        } else {
+            blogs = blogDAO.getAllBlogsWithPagingAndSorting(page, recordsPerPage, sortField, sortOrder);
+            totalRecords = blogDAO.getTotalBlogs();
+        }
+        
+        int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+        
+        request.setAttribute("blogs", blogs);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("recordsPerPage", recordsPerPage);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("totalRecords", totalRecords);
+        request.setAttribute("sortField", sortField);
+        request.setAttribute("sortOrder", sortOrder);
+        request.setAttribute("searchTitle", searchTitle);
+        
+        request.getRequestDispatcher("admin_saler_allblog.jsp").forward(request, response);
+    }
+
+// Thay thế phương thức listAllBanner bằng:
+
+    private void listAllBanners(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+        BannerDAO bannerDAO = new BannerDAO();
+        Vector<Banner> banners = new Vector<>();
+        
+        // Pagination parameters
+        String pageStr = request.getParameter("page");
+        String recordsPerPageStr = request.getParameter("recordsPerPage");
+        String sortField = request.getParameter("sortField");
+        String sortOrder = request.getParameter("sortOrder");
+        String searchTitle = request.getParameter("title");
+        
+        int page = 1;
+        int recordsPerPage = 10;
+        
+        if (pageStr != null && !pageStr.isEmpty()) {
+            page = Integer.parseInt(pageStr);
+        }
+        if (recordsPerPageStr != null && !recordsPerPageStr.isEmpty()) {
+            recordsPerPage = Integer.parseInt(recordsPerPageStr);
+        }
+        if (sortField == null || sortField.isEmpty()) {
+            sortField = "position";
+        }
+        if (sortOrder == null || sortOrder.isEmpty()) {
+            sortOrder = "ASC";
+        }
+        
+        int totalRecords;
+        
+        if (searchTitle != null && !searchTitle.isEmpty()) {
+            banners = bannerDAO.searchBannersByTitleWithPaging(searchTitle, page, recordsPerPage, sortField, sortOrder);
+            totalRecords = bannerDAO.getTotalBannersByTitle(searchTitle);
+        } else {
+            banners = bannerDAO.getAllBannersWithPagingAndSorting(page, recordsPerPage, sortField, sortOrder);
+            totalRecords = bannerDAO.getTotalBanners();
+        }
+        
+        int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+        
+        request.setAttribute("banners", banners);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("recordsPerPage", recordsPerPage);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("totalRecords", totalRecords);
+        request.setAttribute("sortField", sortField);
+        request.setAttribute("sortOrder", sortOrder);
+        request.setAttribute("searchTitle", searchTitle);
+
+        request.getRequestDispatcher("admin_saler_allbanner.jsp").forward(request, response);
+    }
+    
     private void listAll(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         BlogDAO blogDAO = new BlogDAO();
@@ -123,7 +236,29 @@ public class AdminSalerController extends HttpServlet {
         
         if (submit.equals("submit")) {
             String title = request.getParameter("title");
-            String thumbnail = request.getParameter("thumbnail");
+            
+            ///
+            String thumbnail = "";
+            try {
+                Part filePart = request.getPart("thumbnail");
+
+                String contentType = filePart.getContentType();
+
+                if (contentType != null && contentType.startsWith("image/")) {
+                } else {
+                    // Không phải ảnh
+                    request.setAttribute("mustbeImg", "Chỉ cho phép upload file ảnh!");
+                    request.getRequestDispatcher("admin_saler_add_blog.jsp").forward(request, response);
+                    return;
+                }
+
+                thumbnail = UploadPicture.uploadImage(filePart, thumbnail);
+
+            } catch (Exception e) {
+                log(e.getMessage());
+            }
+            ///
+            
             String description = request.getParameter("description");
             String status = "draft";
             int admin_id = 1;//Integer.parseInt(1); // can fix
@@ -135,7 +270,7 @@ public class AdminSalerController extends HttpServlet {
             boolean flag = dao.insertBlog(blog);
             log("add " + flag);
 
-            response.sendRedirect("AdminSalerController");
+            response.sendRedirect("AdminSalerController?target=blog");
 
         } else {
             request.getRequestDispatcher("admin_saler_add_blog.jsp").forward(request, response);
@@ -163,7 +298,40 @@ public class AdminSalerController extends HttpServlet {
 
         if (submit.equals("submit")) {
             String title = request.getParameter("title");
-            String thumbnail = request.getParameter("thumbnail");
+            
+            int blogId = Integer.parseInt(request.getParameter("blogId"));
+            BlogDAO dao = new BlogDAO();
+            
+            Blog x = dao.getBlogById(blogId);
+            
+            //
+            String thumbnail = x.getThumbnail();
+            
+            try {
+                Part filePart = request.getPart("thumbnail");
+                
+                if (filePart != null && filePart.getSize() > 0){
+                    String contentType = filePart.getContentType();
+
+                    if (contentType != null && contentType.startsWith("image/")) {
+                    } else {
+                        // Không phải ảnh
+                        request.setAttribute("mustbeImg", "Chỉ cho phép upload file ảnh!");
+                        request.setAttribute("blog", x);
+                        request.getRequestDispatcher("admin_saler_add_blog.jsp").forward(request, response);
+                        return;
+                    }
+                } else {
+                }
+
+                thumbnail = UploadPicture.uploadImage(filePart, thumbnail);
+
+            } catch (Exception e) {
+                log(e.getMessage());
+            }
+            
+            //
+            
             String description = request.getParameter("description");
             String status = "draft";
             int admin_id = 1;//Integer.parseInt(1); // can fix
@@ -171,12 +339,10 @@ public class AdminSalerController extends HttpServlet {
            
             Blog blog = new Blog(blogID, admin_id, title, description, thumbnail, status);
 
-            BlogDAO dao = new BlogDAO();
-
             boolean flag = dao.updateBlogFields(blog);
 //            log("update " + flag);
 
-            response.sendRedirect("AdminSalerController");
+            response.sendRedirect("AdminSalerController?target=blog");
 
         } else {
             int blogId = Integer.parseInt(request.getParameter("blogId"));
@@ -184,7 +350,7 @@ public class AdminSalerController extends HttpServlet {
             Blog blog = dao.getBlogById(blogId);
             
             request.setAttribute("blog", blog);
-            request.getRequestDispatcher("admin_saler_update_blog.jsp").forward(request, response);
+            request.getRequestDispatcher("admin_saler_add_blog.jsp").forward(request, response);
         }
     }
     
@@ -196,7 +362,7 @@ public class AdminSalerController extends HttpServlet {
         boolean flag = dao.deleteBlog(blogID);
         
 //        log("delete " + flag);
-        response.sendRedirect("AdminSalerController");
+        response.sendRedirect("AdminSalerController?target=blog");
     }
     
     private void processBanner(HttpServletRequest request, HttpServletResponse response)
@@ -208,7 +374,7 @@ public class AdminSalerController extends HttpServlet {
         }
 
         if (service.equals("listAll")) {
-            listAllBanner(request, response);
+            listAllBanners(request, response);
         } else if (service.equals("listMy")) {
 
         } else if (service.equals("Add")) {
@@ -257,17 +423,28 @@ public class AdminSalerController extends HttpServlet {
         if (submit.equals("submit")) {
             String title = request.getParameter("title");
             log("da qua day ");
-            ///
+            
+            /// xu li check xem co phai la file anh hay khong
+            
             String imageUrl = "";
             try {
                 Part filePart = request.getPart("file");
+
+                String contentType = filePart.getContentType();
+
+                if (contentType != null && contentType.startsWith("image/")) {
+                } else {
+                    // Không phải ảnh
+                    request.setAttribute("mustbeImg", "Chỉ cho phép upload file ảnh!");
+                    request.getRequestDispatcher("admin_saler_add_banner.jsp").forward(request, response);
+                    return;
+                }
 
                 imageUrl = UploadPicture.uploadImage(filePart, imageUrl);
 
             } catch (Exception e) {
                 log(e.getMessage());
             }
-            
             ///
             
             String redirectUrl = request.getParameter("redirect_url");
@@ -306,6 +483,19 @@ public class AdminSalerController extends HttpServlet {
             try {
                 Part filePart = request.getPart("file");
 
+                if (filePart != null && filePart.getSize() > 0){
+                    String contentType = filePart.getContentType();
+
+                    if (contentType != null && contentType.startsWith("image/")) {
+                    } else {
+                        // Không phải ảnh
+                        request.setAttribute("mustbeImg", "Chỉ cho phép upload file ảnh!");
+                        request.setAttribute("banner", x);
+                        request.getRequestDispatcher("admin_saler_add_banner.jsp").forward(request, response);
+                        return;
+                    }
+                }
+
                 imageUrl = UploadPicture.uploadImage(filePart, imageUrl);
 
             } catch (Exception e) {
@@ -328,7 +518,7 @@ public class AdminSalerController extends HttpServlet {
             Banner banner = dao.getBannerById(bannerId);
 
             request.setAttribute("banner", banner);
-            request.getRequestDispatcher("admin_saler_update_banner.jsp").forward(request, response);
+            request.getRequestDispatcher("admin_saler_add_banner.jsp").forward(request, response);
         }
     }
     

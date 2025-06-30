@@ -32,14 +32,14 @@
                         <h4 class="mb-0">Update Blog</h4>
                     </div>
                     <div class="card-body">
-                        <form action="AdminSalerController" method="post">
+                        <form action="AdminSalerController" method="post" enctype="multipart/form-data">
                             <div class="mb-3">
                                 <label class="form-label">Title</label>
                                 <input name="title" type="text" class="form-control" value="${blog.title}" required>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Thumbnail URL</label>
-                                <input name="thumbnail" type="text" class="form-control" value="${blog.thumbnail}" required>
+                                <label class="form-label">Thumbnail</label>
+                                <input type="file" name="thumbnail" accept="image/*" class="form-control" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Description</label>
