@@ -1,9 +1,10 @@
-﻿DROP DATABASE IF EXISTS project_SWP391;
+DROP DATABASE IF EXISTS project_SWP391;
 CREATE DATABASE project_SWP391;
-
 USE project_SWP391;
 
-
+-- =============================================
+-- 1. CREATE MAIN TABLES (NO FOREIGN KEYS)
+-- =============================================
 
 -- Admin Table
 CREATE TABLE Admin (
@@ -11,47 +12,16 @@ CREATE TABLE Admin (
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
-    full_name NVARCHAR(100) NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
     phone VARCHAR(20), 
     date_of_birth DATE,
     gender VARCHAR(10),
-    address NVARCHAR(255),
+    address VARCHAR(255),
     profile_picture VARCHAR(255),
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT GETDATE(),
-    is_active BIT DEFAULT 1,
-	role VARCHAR(20) DEFAULT 'admin' CHECK (role IN ('admin', 'manager', 'saler'))
+    is_active BIT DEFAULT 1
 );
-
-
-CREATE TABLE Blog (
-    id INT PRIMARY KEY IDENTITY(1,1),
-    admin_id INT NOT NULL,
-    title NVARCHAR(255) NOT NULL,
-    description NVARCHAR(MAX) NOT NULL,
-    thumbnail NVARCHAR(MAX),
-    status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft', 'published')),
-    created_at DATETIME DEFAULT GETDATE(),
-    updated_at DATETIME DEFAULT GETDATE(),
-    CONSTRAINT fk_admin_blog FOREIGN KEY (admin_id)
-        REFERENCES Admin(id)
-        ON DELETE CASCADE
-);
-
-CREATE TABLE Banner (
-    id INT PRIMARY KEY IDENTITY(1,1),
-    admin_id INT NOT NULL,
-    title NVARCHAR(255),
-    image_url NVARCHAR(MAX),
-    redirect_url NVARCHAR(MAX),
-    position INT DEFAULT 0,
-    is_active BIT DEFAULT 1,
-    created_at DATETIME DEFAULT GETDATE(),
-    CONSTRAINT fk_admin_banner FOREIGN KEY (admin_id)
-        REFERENCES Admin(id)
-        ON DELETE CASCADE
-);
-
 
 -- Recruiter Table
 CREATE TABLE Recruiter (
@@ -59,19 +29,19 @@ CREATE TABLE Recruiter (
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
-    full_name NVARCHAR(100) NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
     phone VARCHAR(20), 
     date_of_birth DATE,
     gender VARCHAR(10),
-    address NVARCHAR(255),
+    address VARCHAR(255),
     profile_picture VARCHAR(255),
-    company_name NVARCHAR(100) NOT NULL,
-    company_description NTEXT,
+    company_name VARCHAR(100) NOT NULL,
+    company_description TEXT,
     logo VARCHAR(255),
     website VARCHAR(255),
-    company_address NVARCHAR(255),
+    company_address VARCHAR(255),
     company_size VARCHAR(50), 
-    industry NVARCHAR(100), 
+    industry VARCHAR(100), 
     tax_code VARCHAR(50), 
     loyalty_score DECIMAL(10, 2) DEFAULT 0.0,
     verification_status VARCHAR(20) DEFAULT 'pending' CHECK (verification_status IN ('pending', 'verified', 'rejected')),
@@ -80,63 +50,51 @@ CREATE TABLE Recruiter (
     is_active BIT DEFAULT 1
 );
 
-CREATE TABLE RecruiterNotification (
-    id BIGINT PRIMARY KEY IDENTITY(1,1),
-    recruiter_id INT NOT NULL, -- Liên kết với Recruiter
-    type NVARCHAR(50), -- 'ACCOUNT_APPROVED', 'NEW_APPLICATION', etc.
-    title NVARCHAR(255),
-    content NTEXT,
-    is_read BIT DEFAULT 0,
-    created_at DATETIME DEFAULT GETDATE(),
-
-    CONSTRAINT fk_recruiter_notification FOREIGN KEY (recruiter_id)
-        REFERENCES Recruiter(id)
-        ON DELETE CASCADE
-);
-
 -- Job_Seekers Table
 CREATE TABLE Job_Seekers (
     id INT PRIMARY KEY IDENTITY(1,1),
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
-    full_name NVARCHAR(100) NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
     phone VARCHAR(20),
     date_of_birth DATE,
     gender VARCHAR(10),
-    address NVARCHAR(255),
+    address VARCHAR(255),
     profile_picture VARCHAR(255),
     cv_file VARCHAR(255),
     skills TEXT,
     experience_years INT,
     education TEXT,
-    desired_job_title NVARCHAR(100),
+    desired_job_title VARCHAR(100),
     desired_salary DECIMAL(15,2),
-    job_category NVARCHAR(100),
-    preferred_location NVARCHAR(100),
+    job_category VARCHAR(100),
+    preferred_location VARCHAR(100),
     career_level VARCHAR(50), 
-    work_type NVARCHAR(50), 
-    profile_summary NTEXT,
+    work_type VARCHAR(50), 
+    profile_summary TEXT,
     portfolio_url VARCHAR(255),
-    languages NTEXT, 
+    languages TEXT, 
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT GETDATE(),
     is_active BIT DEFAULT 1
 );
 
-CREATE TABLE Job_SeekersNotification (
-    id BIGINT PRIMARY KEY IDENTITY(1,1),
-    jobseeker_id INT NOT NULL, -- Liên kết với Recruiter
-    type NVARCHAR(50), -- 'ACCOUNT_APPROVED', 'NEW_APPLICATION', etc.
-    title NVARCHAR(255),
-    content NTEXT,
-    is_read BIT DEFAULT 0,
+-- Promotion_Programs Table
+CREATE TABLE Promotion_Programs (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    name VARCHAR(100) NOT NULL,
+    cost DECIMAL(12, 2) NOT NULL,
+    duration_days INT NOT NULL,
+    description TEXT,
+    is_active BIT DEFAULT 1,
     created_at DATETIME DEFAULT GETDATE(),
-
-    CONSTRAINT fk_jobseeker_notification FOREIGN KEY (jobseeker_id)
-        REFERENCES Job_Seekers(id)
-        ON DELETE CASCADE
+    updated_at DATETIME DEFAULT GETDATE()
 );
+
+-- =============================================
+-- 2. CREATE TABLES WITH FOREIGN KEYS
+-- =============================================
 
 -- Email Table
 CREATE TABLE Email (
@@ -145,8 +103,8 @@ CREATE TABLE Email (
     sender_type VARCHAR(20) NOT NULL CHECK (sender_type IN ('admin', 'recruiter', 'job_seeker')),
     recipient_id INT NOT NULL,
     recipient_type VARCHAR(20) NOT NULL CHECK (recipient_type IN ('admin', 'recruiter', 'job_seeker')),
-    subject NVARCHAR(255) NOT NULL,
-    body NTEXT NOT NULL,
+    subject NVARCHAR(MAX) NOT NULL,
+    body TEXT NOT NULL,
     is_read BIT DEFAULT 0,
     sent_at DATETIME DEFAULT GETDATE(),
     attachments VARCHAR(255)
@@ -158,24 +116,12 @@ CREATE TABLE Notifications (
     user_id INT NOT NULL,
     user_type VARCHAR(20) NOT NULL CHECK (user_type IN ('admin', 'recruiter', 'job_seeker')),
     type VARCHAR(50) NOT NULL,
-    content NTEXT NOT NULL,
+    content TEXT NOT NULL,
     is_read BIT DEFAULT 0,
     created_at DATETIME DEFAULT GETDATE()
 );
 
--- Promotion_Programs Table
-CREATE TABLE Promotion_Programs (
-    id INT PRIMARY KEY IDENTITY(1,1),
-    name NVARCHAR(100) NOT NULL,
-    cost DECIMAL(12, 2) NOT NULL,
-    duration_days INT NOT NULL,
-    description NTEXT,
-    is_active BIT DEFAULT 1,
-    created_at DATETIME DEFAULT GETDATE(),
-    updated_at DATETIME DEFAULT GETDATE()
-);
-
--- Bảng Financial_Transactions đã gộp Checkout vào
+-- Financial_Transactions Table
 CREATE TABLE Financial_Transactions (
     id INT PRIMARY KEY IDENTITY(1,1),
     recruiter_id INT NOT NULL,
@@ -183,11 +129,11 @@ CREATE TABLE Financial_Transactions (
     type VARCHAR(10) NOT NULL CHECK (type IN ('income', 'expense')),
     transaction_type VARCHAR(20) NOT NULL CHECK (transaction_type IN ('featured_job', 'advertising', 'subscription', 'cv_service', 'checkout', 'other')),
     amount DECIMAL(12, 2) NOT NULL,
-    description NTEXT,
+    description TEXT,
     status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'failed')),
     transaction_date DATETIME DEFAULT GETDATE(),
-    payment_method NVARCHAR(50),
-    transaction_code VARCHAR(100), -- tương đương transaction_id trong Checkout
+    payment_method VARCHAR(50),
+    transaction_code VARCHAR(100),
     FOREIGN KEY (recruiter_id) REFERENCES Recruiter(id),
     FOREIGN KEY (promotion_id) REFERENCES Promotion_Programs(id)
 );
@@ -196,10 +142,10 @@ CREATE TABLE Financial_Transactions (
 CREATE TABLE Job_Listings (
     id INT PRIMARY KEY IDENTITY(1,1),
     recruiter_id INT NOT NULL,
-    title NVARCHAR(100) NOT NULL,
-    description NTEXT NOT NULL,
-    requirements NTEXT,
-    location NVARCHAR(100),
+    title VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    requirements TEXT,
+    location VARCHAR(100),
     salary_min DECIMAL(12, 2),
     salary_max DECIMAL(12, 2),
     job_type VARCHAR(20) NOT NULL CHECK (job_type IN ('full_time', 'part_time', 'freelance', 'internship', 'contract')),
@@ -219,7 +165,7 @@ CREATE TABLE Applications (
     job_listing_id INT NOT NULL,
     job_seeker_id INT NOT NULL,
     cv_file VARCHAR(255),
-    cover_letter NTEXT,
+    cover_letter TEXT,
     status VARCHAR(20) DEFAULT 'new' CHECK (status IN ('new', 'reviewed', 'interviewed', 'offered', 'rejected')),
     applied_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT GETDATE(),
@@ -233,7 +179,7 @@ CREATE TABLE Recruitment_Stages (
     job_listing_id INT NOT NULL,
     stage_name VARCHAR(50) NOT NULL,
     order_num INT NOT NULL,
-    description NTEXT,
+    description TEXT,
     expected_duration INT,
     FOREIGN KEY (job_listing_id) REFERENCES Job_Listings(id)
 );
@@ -265,8 +211,8 @@ CREATE TABLE Featured_Jobs (
 CREATE TABLE Search_History (
     id INT PRIMARY KEY IDENTITY(1,1),
     job_seeker_id INT NOT NULL,
-    search_query NVARCHAR(255),
-    search_filters NTEXT,
+    search_query VARCHAR(255),
+    search_filters TEXT,
     search_date DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (job_seeker_id) REFERENCES Job_Seekers(id)
 );
@@ -275,25 +221,23 @@ CREATE TABLE Search_History (
 CREATE TABLE CV_Skills (
     id INT PRIMARY KEY IDENTITY(1,1),
     job_seeker_id INT NOT NULL,
-    skill_name NVARCHAR(100) NOT NULL,
-    proficiency_level NVARCHAR(20),
+    skill_name VARCHAR(100) NOT NULL,
+    proficiency_level VARCHAR(20),
     FOREIGN KEY (job_seeker_id) REFERENCES Job_Seekers(id)
 );
-
-CREATE INDEX idx_skill_name ON CV_Skills(skill_name);
 
 -- CV_Templates Table
 CREATE TABLE cv_templates (
     id INT PRIMARY KEY IDENTITY(1,1),
     job_seeker_id INT NOT NULL,
-    full_name NVARCHAR(100) NOT NULL,
-    job_position NVARCHAR(100) NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    job_position VARCHAR(100) NOT NULL,
     phone VARCHAR(20),
     email VARCHAR(100) NOT NULL,
-    address NVARCHAR(255),
+    address VARCHAR(255),
     certificates TEXT,
-    work_experience NTEXT,
-	image_path VARCHAR(255),
+    work_experience TEXT,
+    image_path VARCHAR(255),
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (job_seeker_id) REFERENCES Job_Seekers(id)
@@ -304,8 +248,8 @@ CREATE TABLE Job_Seeker_CVs (
     id INT PRIMARY KEY IDENTITY(1,1),
     job_seeker_id INT NOT NULL,
     cv_template_id INT,
-    cv_content NTEXT,
-    title NVARCHAR(100) NOT NULL,
+    cv_content TEXT,
+    title VARCHAR(100) NOT NULL,
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT GETDATE(),
     is_default BIT DEFAULT 0,
@@ -320,24 +264,20 @@ CREATE TABLE Reports (
     generated_by INT NOT NULL,
     start_date DATETIME,
     end_date DATETIME,
-    data NTEXT,
+    data TEXT,
     created_at DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (generated_by) REFERENCES Admin(id)
 );
 
-
-
-
--- Tạo bảng Posts với đầy đủ thông tin
--- Tạo bảng Posts với khóa ngoại tham chiếu đến Recruiter
+-- Posts Table
 CREATE TABLE Posts (
     id INT PRIMARY KEY IDENTITY(1,1),
     user_id INT NOT NULL,
+    content NVARCHAR(MAX),
     user_type VARCHAR(20) NOT NULL CHECK (user_type IN ('admin', 'recruiter', 'job_seeker')),
-    parent_id INT NULL,  -- Dùng để liên kết comments với post gốc
-    post_type VARCHAR(20) NOT NULL CHECK (post_type IN ('post', 'comment', 'like')), -- Phân biệt loại
-    title NVARCHAR(255) NULL,  -- NULL cho comments và likes
-    content NVARCHAR(MAX),        -- NULL cho likes
+    parent_id INT NULL,
+    post_type VARCHAR(20) NOT NULL CHECK (post_type IN ('post', 'comment', 'like')),
+    title NVARCHAR(MAX) NULL,
     status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'deleted')),
     view_count INT DEFAULT 0,
     like_count INT DEFAULT 0,
@@ -345,15 +285,8 @@ CREATE TABLE Posts (
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT GETDATE(),
     deleted_at DATETIME NULL,
-  
-    FOREIGN KEY (user_id) REFERENCES Recruiter(id)
-);
-
-ALTER TABLE posts
-ADD 
-
     company_name NVARCHAR(255),
-	company_logo VARCHAR(500),
+    company_logo VARCHAR(500),
     salary NVARCHAR(100),
     location NVARCHAR(255),
     job_type NVARCHAR(50),
@@ -364,32 +297,90 @@ ADD
     requirements TEXT,
     benefits TEXT,
     contact_address NVARCHAR(500),
-    application_method TEXT;
-	
--- Bước 1: Đổi từ TEXT sang VARCHAR(MAX)
-ALTER TABLE Posts
-ALTER COLUMN content VARCHAR(MAX);
+    application_method TEXT,
+    quantity INT NULL,
+    rank NVARCHAR(100) NULL,
+    industry NVARCHAR(255) NULL,
+    contact_person NVARCHAR(255) NULL,
+    company_size NVARCHAR(100) NULL,
+    company_website VARCHAR(500) NULL,
+    company_description NVARCHAR(MAX) NULL,
+    keywords NVARCHAR(500) NULL,
+    FOREIGN KEY (user_id) REFERENCES Recruiter(id)
+);
 
--- Bước 2: Đổi từ VARCHAR(MAX) sang NVARCHAR(MAX)
-ALTER TABLE Posts
-ALTER COLUMN title NVARCHAR(MAX);
+-- Interviews Table
+CREATE TABLE Interviews (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    application_id INT NOT NULL,
+    interview_time DATETIME NOT NULL,
+    location NVARCHAR(255),
+    interviewer NVARCHAR(100),
+    result NVARCHAR(50),
+    notes NVARCHAR(MAX),
+    created_at DATETIME DEFAULT GETDATE(),
+    updated_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (application_id) REFERENCES Applications(id)
+);
 
+-- Application_Status_History Table
+CREATE TABLE Application_Status_History (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    application_id INT NOT NULL,
+    old_status VARCHAR(20),
+    new_status VARCHAR(20),
+    changed_by INT,
+    changed_at DATETIME DEFAULT GETDATE(),
+    notes NVARCHAR(MAX),
+    FOREIGN KEY (application_id) REFERENCES Applications(id)
+);
 
+-- Candidate_Evaluations Table
+CREATE TABLE Candidate_Evaluations (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    application_id INT NOT NULL,
+    stage_id INT NOT NULL,
+    evaluator_id INT NOT NULL,
+    score INT,
+    comments NVARCHAR(MAX),
+    created_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (application_id) REFERENCES Applications(id),
+    FOREIGN KEY (stage_id) REFERENCES Recruitment_Stages(id)
+);
 
+-- Saved_Jobs Table
+CREATE TABLE Saved_Jobs (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    job_seeker_id INT NULL,
+    recruiter_id INT NULL,
+    post_id INT NOT NULL,
+    saved_at DATETIME DEFAULT GETDATE(),
+    UNIQUE (job_seeker_id, recruiter_id, post_id),
+    CHECK (
+        (job_seeker_id IS NOT NULL AND recruiter_id IS NULL)
+        OR
+        (job_seeker_id IS NULL AND recruiter_id IS NOT NULL)
+    ),
+    FOREIGN KEY (job_seeker_id) REFERENCES Job_Seekers(id),
+    FOREIGN KEY (recruiter_id) REFERENCES Recruiter(id),
+    FOREIGN KEY (post_id) REFERENCES Posts(id)
+);
 
+-- =============================================
+-- 3. CREATE INDEXES FOR PERFORMANCE
+-- =============================================
 
--- Indexes for performance
 CREATE INDEX idx_job_listings_recruiter_id ON Job_Listings(recruiter_id);
 CREATE INDEX idx_applications_job_listing_id ON Applications(job_listing_id);
 CREATE INDEX idx_applications_job_seeker_id ON Applications(job_seeker_id);
-
--- Tạo các chỉ mục để tối ưu truy vấn
+CREATE INDEX idx_skill_name ON CV_Skills(skill_name);
 CREATE INDEX idx_posts_user ON Posts(user_id, user_type);
 CREATE INDEX idx_posts_parent ON Posts(parent_id);
 CREATE INDEX idx_posts_type ON Posts(post_type);
 CREATE INDEX idx_posts_status ON Posts(status);
 CREATE INDEX idx_posts_created_at ON Posts(created_at DESC);
-
+CREATE INDEX idx_saved_jobs_job_seeker_post ON Saved_Jobs(job_seeker_id, post_id);
+CREATE INDEX idx_saved_jobs_recruiter_post ON Saved_Jobs(recruiter_id, post_id);
 
 -- Insert data into Admin table
 INSERT INTO Admin (username, password, email, full_name, phone, date_of_birth, gender, address, profile_picture)
@@ -415,46 +406,6 @@ VALUES
  'https://th.bing.com/th/id/OIP.o47x8GzYi-Aes0zNIsw4hAHaES?w=295&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7',
  'Tiki Corporation', 'Vietnams leading e-commerce platform', 'https://th.bing.com/th/id/OIP.o47x8GzYi-Aes0zNIsw4hAHaES?w=295&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7', 
  'https://tiki.vn', 'Tiki Office, District 7, HCMC', '1000+', 'E-commerce', '0312862646', 'verified');
-
- INSERT INTO Recruiter (
-    username, password, email, full_name, phone, date_of_birth, gender, address, profile_picture, 
-    company_name, company_description, logo, website, company_address, company_size, industry, tax_code, verification_status
-)
-VALUES
--- Viettel
-('viettel_hr', 'password4', 'hr@viettel.com.vn', 'Pham Van D', '0912345681', '1980-01-05', 'male', 'Viettel Building, Hanoi',
- 'https://th.bing.com/th/id/OIP.XHsoZ1a3mpgskB_WFkLAXAHaE7?w=274&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7',
- 'Viettel Group', 'Leading telecom and technology corporation in Vietnam', 
- 'https://th.bing.com/th/id/OIP.XHsoZ1a3mpgskB_WFkLAXAHaE7?w=274&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7', 
- 'https://viettel.com.vn', '1 Tran Huu Duc, Hanoi', '30,000+', 'Telecommunications', '0100109101', 'verified'),
-
--- Shopee
-('shopee_recruit', 'password5', 'hr@shopee.vn', 'Nguyen Thi E', '0912345682', '1990-06-10', 'female', 'Shopee Office, HCMC',
- 'https://th.bing.com/th/id/OIP.3Tt7B7fg3GiGktmU2ADxewHaE8?w=254&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7',
- 'Shopee Vietnam', 'Top e-commerce platform in Southeast Asia', 
- 'https://th.bing.com/th/id/OIP.3Tt7B7fg3GiGktmU2ADxewHaE8?w=254&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7', 
- 'https://shopee.vn', 'Saigon Centre, District 1, HCMC', '2000+', 'E-commerce', '0312323210', 'verified'),
-
--- VNPT
-('vnpt_recruit', 'password6', 'hr@vnpt.vn', 'Do Van F', '0912345683', '1978-08-08', 'male', 'VNPT Tower, Hanoi',
- 'https://th.bing.com/th/id/OIP.RQYAz2jEoVxRTUHHv3md9AHaEK?w=306&h=172&c=7&r=0&o=5&dpr=1.3&pid=1.7',
- 'VNPT Group', 'National telecommunications and IT service provider', 
- 'https://th.bing.com/th/id/OIP.RQYAz2jEoVxRTUHHv3md9AHaEK?w=306&h=172&c=7&r=0&o=5&dpr=1.3&pid=1.7',
- 'https://vnpt.com.vn', '57 Huynh Thuc Khang, Hanoi', '25,000+', 'Telecommunications', '0100109102', 'verified'),
-
--- Vingroup
-('vingroup_hr', 'password7', 'recruit@vingroup.net', 'Le Thi G', '0912345684', '1983-09-12', 'female', 'Vinhomes Central Park, HCMC',
- 'https://th.bing.com/th/id/OIP.GRQUPBXv4DN3vwKn6ofODwHaE8?w=262&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7',
- 'Vingroup', 'Vietnam’s largest private enterprise with diverse sectors', 
- 'https://th.bing.com/th/id/OIP.GRQUPBXv4DN3vwKn6ofODwHaE8?w=262&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7',
- 'https://vingroup.net', '72A Nguyen Trai, Hanoi', '50,000+', 'Conglomerate', '0100109103', 'verified'),
-
--- MoMo
-('momo_recruiter', 'password8', 'hr@momo.vn', 'Tran Van H', '0912345685', '1986-04-25', 'male', 'MoMo Office, HCMC',
- 'https://th.bing.com/th/id/OIP.U6kRJS7dO74YjQpShvuxcAHaEK?w=324&h=182&c=7&r=0&o=5&dpr=1.3&pid=1.7',
- 'MoMo E-Wallet', 'Vietnam’s top fintech and e-wallet platform', 
- 'https://th.bing.com/th/id/OIP.U6kRJS7dO74YjQpShvuxcAHaEK?w=324&h=182&c=7&r=0&o=5&dpr=1.3&pid=1.7',
- 'https://momo.vn', 'TNR Tower, District 1, HCMC', '1000+', 'Fintech', '0312345678', 'verified');
 
 -- Insert data into Job_Seekers table
 INSERT INTO Job_Seekers (username, password, email, full_name, phone, date_of_birth, gender, address, profile_picture,
@@ -613,9 +564,9 @@ VALUES
 -- Insert data into Email table
 INSERT INTO Email (sender_id, sender_type, recipient_id, recipient_type, subject, body, is_read, attachments)
 VALUES
-(1, 'recruiter', 1, 'job_seeker', 'Interview Invitation', 'Dear Nguyen, We would like to invite you for an interview...', 1, NULL),
-(1, 'job_seeker', 1, 'recruiter', 'Follow-up on Application', 'Dear Mr. Nguyen, I would like to follow up on my application...', 0, 'follow_up.pdf'),
-(1, 'admin', 1, 'recruiter', 'Account Verification', 'Your account has been successfully verified', 1, NULL);
+(1, 'recruiter', 1, 'job_seeker', 'Interview Invitation', N'Dear Nguyen, We would like to invite you for an interview...', 1, NULL),
+(1, 'job_seeker', 1, 'recruiter', 'Follow-up on Application', N'Dear Mr. Nguyen, I would like to follow up on my application...', 0, 'follow_up.pdf'),
+(1, 'admin', 1, 'recruiter', 'Account Verification', N'Your account has been successfully verified', 1, NULL);
 
 
 
@@ -648,5 +599,3 @@ VALUES
 }', 
 'Nguyen Van D - Java Developer CV', 
 1);
-
-
