@@ -40,6 +40,22 @@
         <servlet-name>UploadServlet</servlet-name>
         <servlet-class>controllers.UploadServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ajaxServlet</servlet-name>
+        <servlet-class>com.vnpay.common.ajaxServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>VnpayReturn</servlet-name>
+        <servlet-class>com.vnpay.common.VnpayReturn</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ajaxServlet</servlet-name>
+        <url-pattern>/payment</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>VnpayReturn</servlet-name>
+        <url-pattern>/vnpayReturn</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>JobDetailController</servlet-name>
         <url-pattern>/job-detail</url-pattern>

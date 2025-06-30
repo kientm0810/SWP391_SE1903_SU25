@@ -5,7 +5,7 @@
  */
 package com.vnpay.common;
 
-import dao.OrderDao;
+//import dao.OrderDao;
 import java.io.IOException;import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -22,7 +22,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import model.Order;
+//import model.Order;
 
 /**
  *
@@ -30,38 +30,48 @@ import model.Order;
  */
 public class ajaxServlet extends HttpServlet {
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) 
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String bankCode = req.getParameter("bankCode");
-        if(req.getParameter("totalBill") == null) {
-         resp.sendRedirect("cart");//create cart servlet
+        String bankCode = request.getParameter("bankCode");
+        if(request.getParameter("totalBill") == null) {
+         response.sendRedirect("home");//quay lai trang chu
          return;
         }
-        double amountDouble = Double.parseDouble(req.getParameter("totalBill"));
+        double amountDouble = Double.parseDouble(request.getParameter("totalBill"));
         
-        OrderDao orderDao = new OrderDao();
-        //Gia su user login co id = 1
-        //phan id user se lay tu sesson (user dang login)
-        int userId = 1;
-        
-        Order order = new Order();
-        order.setUserID(userId);
-        order.setTotalAmount(amountDouble);
-        
-        int orderId = orderDao.insertOrder(order);
-        
-        if(orderId < 1) {
-          resp.sendRedirect("cart");
-          return;
-        }
+//        OrderDao orderDao = new OrderDao();
+//        //Gia su user login co id = 1
+//        //phan id user se lay tu sesson (user dang login)
+//        int userId = 1;
+//        
+//        Order order = new Order();
+//        order.setUserID(userId);
+//        order.setTotalAmount(amountDouble);
+//        
+//        int orderId = orderDao.insertOrder(order);
+//        
+//        if(orderId < 1) {
+//          resp.sendRedirect("cart");
+//          return;
+//        }
+        int orderId = 1; //test
+
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String orderType = "other";
         
         long amount = (long) (amountDouble * 100);
         String vnp_TxnRef = orderId+"";//dky ma rieng
-        String vnp_IpAddr = Config.getIpAddress(req);
+        String vnp_IpAddr = Config.getIpAddress(request);
 
         String vnp_TmnCode = Config.vnp_TmnCode;
         
@@ -79,7 +89,7 @@ public class ajaxServlet extends HttpServlet {
         vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + vnp_TxnRef);
         vnp_Params.put("vnp_OrderType", orderType);
 
-        String locate = req.getParameter("language");
+        String locate = request.getParameter("language");
         if (locate != null && !locate.isEmpty()) {
             vnp_Params.put("vnp_Locale", locate);
         } else {
@@ -124,6 +134,12 @@ public class ajaxServlet extends HttpServlet {
         String vnp_SecureHash = Config.hmacSHA512(Config.secretKey, hashData.toString());
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
         String paymentUrl = Config.vnp_PayUrl + "?" + queryUrl;
-        resp.sendRedirect(paymentUrl);
+        response.sendRedirect(paymentUrl);
+    }
+    
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) 
+            throws ServletException, IOException {
+        processRequest(req, resp);
     }
 }
