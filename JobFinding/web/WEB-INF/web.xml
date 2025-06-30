@@ -29,6 +29,18 @@
         <servlet-class>controllers.CVCreateController</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>SaveJobController</servlet-name>
+        <servlet-class>controllers.SaveJobController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SavedJobsController</servlet-name>
+        <servlet-class>controllers.SavedJobsController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>TestController</servlet-name>
+        <servlet-class>controllers.TestController</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>HomeController</servlet-name>
         <servlet-class>controllers.HomeController</servlet-class>
     </servlet>
@@ -64,6 +76,19 @@
         <servlet-name>JobListingController</servlet-name>
         <url-pattern>/job-listing</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SaveJobController</servlet-name>
+        <url-pattern>/save_job</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SavedJobsController</servlet-name>
+        <url-pattern>/saved_jobs</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TestController</servlet-name>
+        <url-pattern>/test</url-pattern>
+    </servlet-mapping>
+
     <servlet-mapping>
         <servlet-name>LogoutController</servlet-name>
         <url-pattern>/logout</url-pattern>
@@ -110,7 +135,7 @@
         <error-code>500</error-code>
         <location>/error.jsp</location>
     </error-page>
-    
+
     <welcome-file-list>
         <welcome-file>home</welcome-file>
     </welcome-file-list>

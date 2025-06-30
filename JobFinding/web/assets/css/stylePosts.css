@@ -339,6 +339,85 @@
     color: #007bff !important;
 }
 
+
+
+    /* Container form */
+    #createPostForm {
+        max-width: 800px;
+        margin: 0 auto; /* căn giữa */
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Khoảng cách giữa các trường */
+    #createPostForm .form-group {
+        margin-bottom: 20px;
+    }
+
+    /* Label */
+    #createPostForm label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    /* Input, Textarea, Select */
+    #createPostForm input[type="text"],
+    #createPostForm input[type="file"],
+    #createPostForm input[type="number"],
+    #createPostForm input[type="date"],
+    #createPostForm select,
+    #createPostForm textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 16px;
+    }
+
+    /* CKEditor wrapper */
+    .ck-editor__editable {
+        min-height: 200px;
+    }
+
+    /* Invalid field */
+    .is-invalid {
+        border-color: red;
+        background-color: #fff0f0;
+    }
+
+    /* Logo preview */
+    #logoPreview {
+        display: none;
+        margin-top: 10px;
+    }
+
+    #logoPreview img {
+        max-width: 200px;
+        height: auto;
+        border-radius: 6px;
+        box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+    }
+
+    /* Submit button */
+    #createPostForm button[type="submit"] {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    #createPostForm button[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+
+
+
 /* Loading Animation */
 .job-card {
     animation: slideUp 0.6s ease-out;

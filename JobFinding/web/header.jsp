@@ -44,7 +44,7 @@
                                             <i class="fas fa-user-edit"></i> My Posts
                                         </a>
                                     </li>
-                                   
+
                                 </ul>
                             </li>
                     </c:if>
