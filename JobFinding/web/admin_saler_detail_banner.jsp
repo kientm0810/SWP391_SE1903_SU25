@@ -4,72 +4,97 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Banner Detail</title>
+    <title>Banner Detail - Admin Panel</title>
     <meta charset="UTF-8">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <jsp:include page="admin-common-styles.jsp" />
     <style>
-        .btn-green {
-            background-color: #28a745;
-            color: white;
+        .detail-section {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .btn-green:hover {
-            background-color: #218838;
+        
+        .banner-image {
+            max-width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .detail-info {
+            margin-top: 30px;
+        }
+        
+        .detail-row {
+            display: flex;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #666;
+            width: 150px;
+        }
+        
+        .detail-value {
+            color: #333;
+            flex: 1;
         }
     </style>
 </head>
-<body class="bg-light">
-
-<div class="container mt-5">
-    <a href="AdminSalerController?target=banner" class="btn btn-outline-success mb-3">← Back to List Banners</a>
-
-    <div class="card shadow">
-        <div class="card-header bg-success text-white">
-            <h4 class="mb-0">${banner.title}</h4>
-        </div>
-        <div class="card-body">
-            <div class="mb-3">
-                <h6 class="text-muted">Redirect URL:</h6>
-                <p><a href="${banner.redirect_url}" target="_blank">${banner.redirect_url}</a></p>
+<body>
+    <div class="dashboard-container">
+        <jsp:include page="sidebar.jsp" />
+        
+        <div class="main-content">
+            <div class="page-header">
+                <h1>Banner Details</h1>
+                <div class="header-actions">
+                    <a href="AdminSalerController?target=banner" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to List
+                    </a>
+                    <a href="AdminSalerController?target=banner&service=Update&bannerId=${banner.id}" class="btn btn-primary">
+                        <i class="fas fa-edit"></i>
+                        Edit Banner
+                    </a>
+                </div>
             </div>
-
-            <div class="mb-3">
-                <h6 class="text-muted">Image Preview:</h6>
-                <img src="${banner.image_url}" alt="Banner Image" class="img-fluid rounded shadow-sm" style="max-height: 250px;">
-            </div>
-
-            <div class="mb-3">
-                <h6 class="text-muted">Position:</h6>
-                <p>${banner.position}</p>
-            </div>
-
-            <div class="mb-3">
-                <h6 class="text-muted">Active:</h6>
-                <p>${banner.is_active ? "Yes" : "No"}</p>
-            </div>
-
-            <div class="mb-3">
-                <h6 class="text-muted">Created At:</h6>
-                <p>${banner.created_at}</p>
-            </div>
-
-            <div class="d-flex gap-3">
-                <form action="AdminSalerController" method="post">
-                    <input type="hidden" name="target" value="banner" />
-                    <input type="hidden" name="service" value="Update" />
-                    <input type="hidden" name="bannerId" value="${banner.id}" />
-                    <button type="submit" class="btn btn-green">✏️ Update Banner</button>
-                </form>
-
-                <form action="AdminSalerController" method="post" onsubmit="return confirm('Are you sure you want to delete this banner?');">
-                    <input type="hidden" name="target" value="banner" />
-                    <input type="hidden" name="service" value="Delete" />
-                    <input type="hidden" name="bannerId" value="${banner.id}" />
-                    <button type="submit" class="btn btn-danger">🗑️ Delete Banner</button>
-                </form>
+            
+            <div class="detail-section">
+                <h2 class="mb-3" style="color: #2e7d32;">${banner.title}</h2>
+                
+                <div class="text-center mb-4">
+                    <img src="${banner.image_url}" alt="Banner Image" class="banner-image">
+                </div>
+                
+                <div class="detail-info">
+                    <div class="detail-row">
+                        <span class="detail-label">Redirect URL:</span>
+                        <span class="detail-value">
+                            <a href="${banner.redirect_url}" target="_blank" style="color: #4caf50;">
+                                ${banner.redirect_url}
+                            </a>
+                        </span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Position:</span>
+                        <span class="detail-value">${banner.position}</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Status:</span>
+                        <span class="detail-value">${banner.is_active}</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
-
 </body>
 </html>

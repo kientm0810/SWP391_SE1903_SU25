@@ -1,59 +1,74 @@
+<!-- admin_saler_add_blog.jsp -->
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Create Blog</title>
+    <title>Create Blog - Admin Panel</title>
     <meta charset="UTF-8">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .btn-green {
-            background-color: #28a745;
-            color: white;
-        }
-        .btn-green:hover {
-            background-color: #218838;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <jsp:include page="admin-common-styles.jsp" />
 </head>
-<body class="bg-light">
-
-<div class="container mt-5">
-    <a href="AdminSalerController?target=blog" class="btn btn-outline-success mb-3">← Back to List Blogs</a>
-
-    <div class="card shadow">
-        <div class="card-header bg-success text-white">
-            <h4 class="mb-0">📝 Create New Blog</h4>
-        </div>
-        <div class="card-body">
-            <form action="AdminSalerController" method="post">
-                <div class="mb-3">
-                    <label for="title" class="form-label">Title</label>
-                    <input name="title" type="text" class="form-control" id="title" required>
+<body>
+    <div class="dashboard-container">
+        <jsp:include page="sidebar.jsp" />
+        
+        <div class="main-content">
+            <div class="page-header">
+                <h1>Create New Blog Post</h1>
+                <div class="header-actions">
+                    <a href="AdminSalerController?target=blog" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to List
+                    </a>
                 </div>
+            </div>
+            
+            <div class="form-container">
+                <form action="AdminSalerController" method="post">
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input name="title" type="text" class="form-control" required>
+                    </div>
 
-                <div class="mb-3">
-                    <label for="thumbnail" class="form-label">Thumbnail URL</label>
-                    <textarea name="thumbnail" class="form-control" id="thumbnail"></textarea>
-                </div>
+                    <div class="form-group">
+                        <label>Thumbnail URL</label>
+                        <textarea name="thumbnail" class="form-control" rows="2"></textarea>
+                    </div>
 
-                <div class="mb-3">
-                    <label for="description" class="form-label">Description</label>
-                    <textarea name="description" id="default" class="form-control" rows="6"></textarea>
-                </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea name="description" id="default" class="form-control" rows="6"></textarea>
+                    </div>
 
-                <input type="hidden" name="target" value="blog">
-                <input type="hidden" name="service" value="Add">
+                    <input type="hidden" name="target" value="blog">
+                    <input type="hidden" name="service" value="Add">
 
-                <button type="submit" name="submit" value="submit" class="btn btn-green">Submit</button>
-            </form>
+                    <div class="form-actions">
+                        <button type="submit" name="submit" value="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Create Blog
+                        </button>
+                        <a href="AdminSalerController?target=blog" class="btn btn-secondary">
+                            <i class="fas fa-times"></i>
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- TinyMCE -->
-<script src="./tinymce/tinymce.min.js"></script>
-<script src="./assets/js/tinymceConfig.js"></script>
-<script src="./assets/js/tinymceConfigThumbnailBlog.js"></script>
-
+    <!-- TinyMCE -->
+    <script src="./tinymce/tinymce.min.js"></script>
+    <script src="./assets/js/tinymceConfig.js"></script>
+    <script src="./assets/js/tinymceConfigThumbnailBlog.js"></script>
+    
+    <style>
+        .form-actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+        }
+    </style>
 </body>
 </html>

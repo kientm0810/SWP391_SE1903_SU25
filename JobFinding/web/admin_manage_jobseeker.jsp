@@ -1,125 +1,141 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="java.util.Vector, models.JobSeeker" %>
-<%
-    Vector<JobSeeker> vec = (Vector<JobSeeker>)request.getAttribute("vec");
-%>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Manage JobSeekers</title>
-    <link rel="stylesheet" href="assets/css/admin_manage_jobseeker.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Job Seekers - Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <jsp:include page="admin-common-styles.jsp" />
 </head>
 <body>
-    <div class="container">
-        <div class="top-bar">
-            <a href="admin_dashboard.jsp" class="btn back-btn">← Back to Dashboard</a>
-        </div>
-
-        <h1>Quản lý JobSeekers</h1>
-
-        <form action="AdminController" method="post" class="search-form">
-            <div class="form-group">
-                <label>ID:</label>
-                <input type="number" name="id" value="<%=request.getParameter("id") != null ? request.getParameter("id") : ""%>">
+    <div class="dashboard-container">
+        <!-- Include Sidebar -->
+        <jsp:include page="sidebar.jsp" />
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1>Manage Job Seekers</h1>
+                <div class="header-actions">
+                    <a href="AdminController?target=JobSeeker&service=Add" class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Add New Job Seeker
+                    </a>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Username:</label>
-                <input type="text" name="username" value="<%=request.getParameter("username") != null ? request.getParameter("username") : ""%>">
+            
+            <!-- Search and Filter -->
+            <div class="search-filter-section">
+                <form action="AdminController" method="get">
+                    <input type="hidden" name="target" value="JobSeeker">
+                    <input type="hidden" name="service" value="list">
+                    
+                    <div class="search-filter-row">
+                        <div class="search-box">
+                            <input type="text" name="fullName" placeholder="Search by name..." 
+                                   value="${param.fullName}">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        
+                        <input type="text" name="email" class="form-control" 
+                               placeholder="Email" value="${param.email}" style="width: 200px;">
+                        
+                        <input type="text" name="phone" class="form-control" 
+                               placeholder="Phone" value="${param.phone}" style="width: 150px;">
+                        
+                        <select name="gender" class="form-control" style="width: 120px;">
+                            <option value="">All Gender</option>
+                            <option value="Male" ${param.gender == 'Male' ? 'selected' : ''}>Male</option>
+                            <option value="Female" ${param.gender == 'Female' ? 'selected' : ''}>Female</option>
+                            <option value="Other" ${param.gender == 'Other' ? 'selected' : ''}>Other</option>
+                        </select>
+                        
+                        <select name="isActive" class="form-control" style="width: 120px;">
+                            <option value="">All Status</option>
+                            <option value="true" ${param.isActive == 'true' ? 'selected' : ''}>Active</option>
+                            <option value="false" ${param.isActive == 'false' ? 'selected' : ''}>Inactive</option>
+                        </select>
+                        
+                        <button type="submit" name="submit" value="Search" class="btn btn-primary">
+                            <i class="fas fa-filter"></i>
+                            Search
+                        </button>
+                        
+                        <a href="AdminController?target=JobSeeker" class="btn btn-secondary">
+                            <i class="fas fa-redo"></i>
+                            Reset
+                        </a>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-                <label>Email:</label>
-                <input type="text" name="email" value="<%=request.getParameter("email") != null ? request.getParameter("email") : ""%>">
+            
+            <!-- Data Table -->
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Gender</th>
+                            <th>Experience</th>
+                            <th>Education</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach var="jobSeeker" items="${vec}">
+                            <tr>
+                                <td>#${jobSeeker.id}</td>
+                                <td>${jobSeeker.fullName}</td>
+                                <td>${jobSeeker.email}</td>
+                                <td>${jobSeeker.phone}</td>
+                                <td>${jobSeeker.gender}</td>
+                                <td>${jobSeeker.experienceYears} years</td>
+                                <td>${jobSeeker.education}</td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${jobSeeker.active}">
+                                            <span class="status-badge status-active">Active</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="status-badge status-inactive">Inactive</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="AdminController?target=JobSeeker&service=Detail&ID=${jobSeeker.id}" 
+                                           class="action-btn view-btn">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="AdminController?target=JobSeeker&service=Update&ID=${jobSeeker.id}" 
+                                           class="action-btn edit-btn">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="AdminController?target=JobSeeker&service=Ban&ID=${jobSeeker.id}&status=${jobSeeker.active}" 
+                                           class="action-btn delete-btn"
+                                           onclick="return confirm('Are you sure you want to change the status?')">
+                                            <i class="fas fa-ban"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        
+                        <c:if test="${empty vec}">
+                            <tr>
+                                <td colspan="9" class="text-center">No job seekers found.</td>
+                            </tr>
+                        </c:if>
+                    </tbody>
+                </table>
             </div>
-            <div class="form-group">
-                <label>Full Name:</label>
-                <input type="text" name="fullName" value="<%=request.getParameter("fullName") != null ? request.getParameter("fullName") : ""%>">
-            </div>
-            <div class="form-group">
-                <label>Phone:</label>
-                <input type="text" name="phone" value="<%=request.getParameter("phone") != null ? request.getParameter("phone") : ""%>">
-            </div>
-            <div class="form-group">
-                <label>Gender:</label>
-                <select name="gender">
-                    <option value="">--Select--</option>
-                    <option value="male" <%= "male".equals(request.getParameter("gender")) ? "selected" : "" %>>Male</option>
-                    <option value="female" <%= "female".equals(request.getParameter("gender")) ? "selected" : "" %>>Female</option>
-                    <option value="other" <%= "other".equals(request.getParameter("gender")) ? "selected" : "" %>>Other</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Address:</label>
-                <input type="text" name="address" value="<%=request.getParameter("address") != null ? request.getParameter("address") : ""%>">
-            </div>
-            <div class="form-group">
-                <label>Experience Years:</label>
-                <input type="number" name="experienceYears" value="<%=request.getParameter("experienceYears") != null ? request.getParameter("experienceYears") : ""%>">
-            </div>
-            <div class="form-group">
-                <label>Education:</label>
-                <input type="text" name="education" value="<%=request.getParameter("education") != null ? request.getParameter("education") : ""%>">
-            </div>
-            <div class="form-group">
-                <label>Desired Salary:</label>
-                <input type="number" name="desiredSalary" value="<%=request.getParameter("desiredSalary") != null ? request.getParameter("desiredSalary") : ""%>">
-            </div>
-            <div class="form-group">
-                <label>Job Category:</label>
-                <input type="text" name="jobCategory" value="<%=request.getParameter("jobCategory") != null ? request.getParameter("jobCategory") : ""%>">
-            </div>
-            <div class="form-group">
-                <label>Languages:</label>
-                <input type="text" name="languages" value="<%=request.getParameter("languages") != null ? request.getParameter("languages") : ""%>">
-            </div>
-            <div class="form-group">
-                <label>Active:</label>
-                <select name="isActive">
-                    <option value="">--Select--</option>
-                    <option value="true" <%= "true".equals(request.getParameter("isActive")) ? "selected" : "" %>>Active</option>
-                    <option value="false" <%= "false".equals(request.getParameter("isActive")) ? "selected" : "" %>>Banned</option>
-                </select>
-            </div>
-
-            <div class="form-actions">
-                <input type="submit" name="submit" value="Search">
-                <input type="reset" value="Reset">
-                <input type="hidden" name="service" value="list">
-                <input type="hidden" name="target" value="JobSeeker">
-            </div>
-        </form>
-
-        <table class="jobseeker-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Profile Picture</th>
-                    <th>Full Name</th>
-                    <th>View</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% for (JobSeeker i : vec) { %>
-                    <tr>
-                        <td><%= i.getId() %></td>
-                        <td><img src="<%= i.getProfilePicture() %>" alt="Profile" class="profile-pic"></td>
-                        <td><%= i.getFullName() %></td>
-                        <td>
-                            <a class="btn view" href="AdminController?target=JobSeeker&service=Detail&ID=<%= i.getId() %>">View</a>
-                        </td>
-                        <td>
-                            <a class="btn <%= i.isActive() ? "ban" : "reassign" %>" href="AdminController?target=JobSeeker&service=Ban&ID=<%= i.getId() %>&status=<%= i.isActive() %>">
-                                <%= i.isActive() ? "Ban" : "Reassign" %>
-                            </a>
-                        </td>
-                    </tr>
-                <% } %>
-            </tbody>
-        </table>
-
-        <div class="add-link">
-            <a href="AdminController?target=JobSeeker&service=Add">+ Add New JobSeeker</a>
         </div>
     </div>
 </body>

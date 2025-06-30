@@ -105,6 +105,8 @@ public class AdminSalerController extends HttpServlet {
         }
 //        log("" + blogs.size());
 
+        log("di qua day ma");
+
         request.setAttribute("blogs", blogs);
         request.getRequestDispatcher("admin_saler_allblog.jsp").forward(request, response);
     }

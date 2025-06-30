@@ -5,8 +5,11 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update Blog</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <jsp:include page="admin-common-styles.jsp" />
     <style>
         .btn-green {
             background-color: #28a745;
@@ -18,46 +21,45 @@
     </style>
 </head>
 <body class="bg-light">
-
-<div class="container mt-5">
-    <a href="AdminSalerController?target=blog" class="btn btn-outline-success mb-4">← Back to Blog List</a>
-
-    <div class="card shadow">
-        <div class="card-header bg-success text-white">
-            <h4 class="mb-0">Update Blog</h4>
-        </div>
-        <div class="card-body">
-            <form action="AdminSalerController" method="post">
-                <div class="mb-3">
-                    <label class="form-label">Title</label>
-                    <input name="title" type="text" class="form-control" value="${blog.title}" required>
+    <div class="dashboard-container">
+        <jsp:include page="sidebar.jsp" />
+        
+        <div class="main-content">
+            <div class="container mt-5">
+                <a href="AdminSalerController?target=blog" class="btn btn-outline-success mb-4">← Back to Blog List</a>
+                <div class="card shadow">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="mb-0">Update Blog</h4>
+                    </div>
+                    <div class="card-body">
+                        <form action="AdminSalerController" method="post">
+                            <div class="mb-3">
+                                <label class="form-label">Title</label>
+                                <input name="title" type="text" class="form-control" value="${blog.title}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Thumbnail URL</label>
+                                <input name="thumbnail" type="text" class="form-control" value="${blog.thumbnail}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea id="default" name="description" class="form-control" rows="6" required>${blog.description}</textarea>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <input type="hidden" name="target" value="blog">
+                                <input type="hidden" name="service" value="Update">
+                                <input type="hidden" name="blogId" value="${blog.id}">
+                                <button type="submit" name="submit" value="submit" class="btn btn-green">✅ Update Blog</button>
+                                <a href="AdminSalerController?target=blog" class="btn btn-secondary">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Thumbnail URL</label>
-                    <input name="thumbnail" type="text" class="form-control" value="${blog.thumbnail}" required>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Description</label>
-                    <textarea id="default" name="description" class="form-control" rows="6" required>${blog.description}</textarea>
-                </div>
-
-                <div class="d-flex justify-content-between">
-                    <input type="hidden" name="target" value="blog">
-                    <input type="hidden" name="service" value="Update">
-                    <input type="hidden" name="blogId" value="${blog.id}">
-
-                    <button type="submit" name="submit" value="submit" class="btn btn-green">✅ Update Blog</button>
-                    <a href="AdminSalerController?target=blog" class="btn btn-secondary">Cancel</a>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
-</div>
-
-<!-- TinyMCE + Bootstrap JS (if needed) -->
-<script src="./tinymce/tinymce.min.js"></script>
-<script src="./assets/js/tinymceConfig.js"></script>
+    <!-- TinyMCE + Bootstrap JS (if needed) -->
+    <script src="./tinymce/tinymce.min.js"></script>
+    <script src="./assets/js/tinymceConfig.js"></script>
 </body>
 </html>
