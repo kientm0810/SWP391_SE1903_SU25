@@ -143,9 +143,9 @@
                                             <span class="job-info-tag salary-tag">${post.salary}</span>
                                             <span class="job-info-tag location-tag">${post.location}</span>
 
-                                            <form action="${pageContext.request.contextPath}/save_job" method="post"
+                                            <form action="${pageContext.request.contextPath}/saved-jobs" method="post"
                                                 style="display:inline;">
-                                                <input type="hidden" name="jobId" value="${post.id}" />
+                                                <input type="hidden" name="postId" value="${post.id}" />
                                                 <input type="hidden" name="action" value="save" />
                                                 <button type="submit" class="btn btn-outline-primary save-job ms-auto">
                                                     <i class="far fa-heart"></i> Lưu tin
@@ -209,46 +209,19 @@
                 </div>
 
                 <div class="toast-container position-fixed bottom-0 end-0 p-3">
-                    <div id="saveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-                        <div class="toast-header">
-                            <i class="fas fa-check-circle text-success me-2"></i>
-                            <strong class="me-auto">Thông báo</strong>
-                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    <c:if test="${not empty sessionScope.notification}">
+                        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="toast-header">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                <strong class="me-auto">Thông báo</strong>
+                                <button type="button" class="btn-close" data-bs-dismiss="toast"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body">${sessionScope.notification}</div>
                         </div>
-                        <div class="toast-body">Đã lưu tin!</div>
-                    </div>
+                        <c:remove var="notification" scope="session" />
+                    </c:if>
                 </div>
-                <script>
-                    document.querySelectorAll('.save-job').forEach(button => {
-                        button.addEventListener('click', function (e) {
-                            e.preventDefault();
-                            const jobId = this.dataset.jobId;
-                            fetch('save_job', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                                body: `postId=${jobId}&action=save`
-                            })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        showSaveToast('Đã lưu tin thành công!');
-                                        this.querySelector('i').classList.remove('far');
-                                        this.querySelector('i').classList.add('fas', 'text-danger');
-                                        this.setAttribute('title', 'Đã lưu - Click để bỏ lưu');
-                                        this.disabled = true;
-                                    } else {
-                                        showSaveToast(data.message || 'Lưu tin thất bại!');
-                                    }
-                                });
-                        });
-                    });
-                    function showSaveToast(message) {
-                        const toastEl = document.getElementById('saveToast');
-                        toastEl.querySelector('.toast-body').textContent = message;
-                        const toast = new bootstrap.Toast(toastEl);
-                        toast.show();
-                    }
-                </script>
 
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
             </body>

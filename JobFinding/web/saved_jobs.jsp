@@ -139,19 +139,18 @@
                 </head>
 
                 <body>
-                    <c:if test="${not empty sessionScope.saveSuccess}">
+                    <c:if test="${not empty sessionScope.notification}">
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <i class="fas fa-check-circle me-2"></i>${sessionScope.saveSuccess}
+                            <i class="fas fa-check-circle me-2"></i>${sessionScope.notification}
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
-                        <c:remove var="saveSuccess" scope="session" />
+                        <c:remove var="notification" scope="session" />
                     </c:if>
                     <div class="container py-4">
                         <!-- Header -->
                         <div class="saved-header mb-4">
                             <h2>Việc làm đã lưu</h2>
-                            <div class="desc">Xem lại danh sách những việc làm bạn đã lưu trước đó. Ứng tuyển ngay để
-                                không bỏ lỡ cơ hội nghề nghiệp dành cho bạn.</div>
+                            <div class="desc">Xem lại danh sách những việc làm bạn đã quan tâm và lưu trước đó.</div>
                             <div class="count mt-2">Danh sách <b>${fn:length(savedJobs)}</b> việc làm đã lưu</div>
                         </div>
 
@@ -182,14 +181,22 @@
                                         <div class="saved-job-actions ms-3">
                                             <a href="${pageContext.request.contextPath}/post/view?id=${job.id}"
                                                 class="btn btn-success btn-sm">
-                                                Ứng tuyển
+                                                <c:choose>
+                                                    <c:when test="${sessionScope.role == 'jobseeker'}">
+                                                        <i class="fas fa-paper-plane"></i> Ứng tuyển
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <i class="fas fa-eye"></i> Xem chi tiết
+                                                    </c:otherwise>
+                                                </c:choose>
                                             </a>
-                                            <form action="${pageContext.request.contextPath}/save_job" method="post"
+                                            <form action="${pageContext.request.contextPath}/saved-jobs" method="post"
                                                 style="display:inline;">
-                                                <input type="hidden" name="jobId" value="${job.id}" />
+                                                <input type="hidden" name="postId" value="${job.id}" />
                                                 <input type="hidden" name="action" value="unsave" />
-                                                <button type="submit" class="btn btn-outline-danger btn-sm">Bỏ
-                                                    lưu</button>
+                                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                    <i class="fas fa-heart-broken"></i> Bỏ lưu
+                                                </button>
                                             </form>
                                         </div>
                                     </div>
@@ -197,10 +204,9 @@
                             </c:when>
                             <c:otherwise>
                                 <div class="text-center py-5">
-
                                     <h5>Chưa có việc làm nào được lưu</h5>
                                     <p class="text-muted">Hãy lưu những việc làm bạn quan tâm để xem lại sau!</p>
-                                    <a href="${pageContext.request.contextPath}/home" class="btn btn-primary mt-3">
+                                    <a href="${pageContext.request.contextPath}/posts" class="btn btn-primary mt-3">
                                         <i class="fas fa-search me-2"></i>Tìm việc ngay
                                     </a>
                                 </div>

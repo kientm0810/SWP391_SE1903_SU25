@@ -85,7 +85,7 @@
                                         </c:if>
                                         <li>
                                             <a class="dropdown-item"
-                                                href="${pageContext.request.contextPath}/saved_jobs">
+                                                href="${pageContext.request.contextPath}/saved-jobs">
                                                 <i class="fas fa-heart"></i> Saved Jobs
                                             </a>
                                         </li>
