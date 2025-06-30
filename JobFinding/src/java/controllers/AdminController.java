@@ -72,7 +72,7 @@ public class AdminController extends HttpServlet {
         }
 
         if (service.equals("list")) {
-            listManager(request, response);
+            listManagers(request, response);
         } else if (service.equals("Add")) {
             addManager(request, response);
         } else if (service.equals("Ban")) {
@@ -80,6 +80,280 @@ public class AdminController extends HttpServlet {
         } else if (service.equals("Detail")) {
             detailManager(request, response);
         }
+    }
+    
+    // Thêm các phương thức xử lý phân trang vào AdminController.java
+
+    private void listRecruiters(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String submit = request.getParameter("submit");
+        String pageStr = request.getParameter("page");
+        String recordsPerPageStr = request.getParameter("recordsPerPage");
+        String sortField = request.getParameter("sortField");
+        String sortOrder = request.getParameter("sortOrder");
+        
+        int page = 1;
+        int recordsPerPage = 10;
+        
+        if (pageStr != null && !pageStr.isEmpty()) {
+            page = Integer.parseInt(pageStr);
+        }
+        if (recordsPerPageStr != null && !recordsPerPageStr.isEmpty()) {
+            recordsPerPage = Integer.parseInt(recordsPerPageStr);
+        }
+        if (sortField == null || sortField.isEmpty()) {
+            sortField = "id";
+        }
+        if (sortOrder == null || sortOrder.isEmpty()) {
+            sortOrder = "ASC";
+        }
+        
+        RecruiterDAO dao = new RecruiterDAO();
+        Vector<Recruiter> vec;
+        int totalRecords;
+        
+        if (submit != null && submit.equals("Search")) {
+            String idStr = request.getParameter("id");
+            String username = request.getParameter("username");
+            String email = request.getParameter("email");
+            String phone = request.getParameter("phone");
+            String companyName = request.getParameter("companyName");
+            String companyAddress = request.getParameter("companyAddress");
+            String companySize = request.getParameter("companySize");
+            String industry = request.getParameter("industry");
+            String loyaltyStr = request.getParameter("loyaltyScore");
+            String verificationStatus = request.getParameter("verificationStatus");
+            String isActiveStr = request.getParameter("isActive");
+
+            Recruiter criteria = new Recruiter();
+
+            if (idStr != null && !idStr.isEmpty()) {
+                criteria.setId(Integer.parseInt(idStr));
+            }
+            if (username != null && !username.isEmpty()) {
+                criteria.setUsername(username);
+            }
+            if (email != null && !email.isEmpty()) {
+                criteria.setEmail(email);
+            }
+            if (phone != null && !phone.isEmpty()) {
+                criteria.setPhone(phone);
+            }
+            if (companyName != null && !companyName.isEmpty()) {
+                criteria.setCompanyName(companyName);
+            }
+            if (companyAddress != null && !companyAddress.isEmpty()) {
+                criteria.setCompanyAddress(companyAddress);
+            }
+            if (companySize != null && !companySize.isEmpty()) {
+                criteria.setCompanySize(companySize);
+            }
+            if (industry != null && !industry.isEmpty()) {
+                criteria.setIndustry(industry);
+            }
+            if (loyaltyStr != null && !loyaltyStr.isEmpty()) {
+                criteria.setLoyaltyScore(Double.parseDouble(loyaltyStr));
+            }
+            if (verificationStatus != null && !verificationStatus.isEmpty()) {
+                criteria.setVerificationStatus(verificationStatus);
+            }
+            criteria.setActive(true);
+            if (isActiveStr != null && !isActiveStr.isEmpty()) {
+                criteria.setActive(Boolean.parseBoolean(isActiveStr));
+            }
+
+            vec = dao.searchRecruitersWithPagingAndSorting(criteria, page, recordsPerPage, sortField, sortOrder);
+            totalRecords = dao.getTotalSearchResults(criteria);
+            request.setAttribute("param", criteria);
+        } else {
+            vec = dao.getAllRecruiterWithPagingAndSorting(page, recordsPerPage, sortField, sortOrder);
+            totalRecords = dao.getTotalRecruiters();
+        }
+
+        int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+       
+        request.setAttribute("vec", vec);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("recordsPerPage", recordsPerPage);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("totalRecords", totalRecords);
+        request.setAttribute("sortField", sortField);
+        request.setAttribute("sortOrder", sortOrder);
+
+        request.getRequestDispatcher("admin_manage_recruiter.jsp").forward(request, response);
+    }
+
+    private void listManagers(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String submit = request.getParameter("submit");
+        String pageStr = request.getParameter("page");
+        String recordsPerPageStr = request.getParameter("recordsPerPage");
+        String sortField = request.getParameter("sortField");
+        String sortOrder = request.getParameter("sortOrder");
+        
+        int page = 1;
+        int recordsPerPage = 10;
+        
+        if (pageStr != null && !pageStr.isEmpty()) {
+            page = Integer.parseInt(pageStr);
+        }
+        if (recordsPerPageStr != null && !recordsPerPageStr.isEmpty()) {
+            recordsPerPage = Integer.parseInt(recordsPerPageStr);
+        }
+        if (sortField == null || sortField.isEmpty()) {
+            sortField = "id";
+        }
+        if (sortOrder == null || sortOrder.isEmpty()) {
+            sortOrder = "ASC";
+        }
+        
+        AdminDAO dao = new AdminDAO();
+        Vector<Admin> vec;
+        int totalRecords;
+        
+        if (submit != null && submit.equals("Search")) {
+            String idStr = request.getParameter("id");
+            String username = request.getParameter("username");
+            String email = request.getParameter("email");
+            String fullName = request.getParameter("fullName");
+            String phone = request.getParameter("phone");
+            String gender = request.getParameter("gender");
+            String address = request.getParameter("address");
+            String isActiveStr = request.getParameter("isActive");
+
+            Admin criteria = new Admin();
+            if (idStr != null && !idStr.isEmpty()) {
+                criteria.setId(Integer.parseInt(idStr));
+            }
+            if (username != null && !username.isEmpty()) {
+                criteria.setUsername(username);
+            }
+            if (email != null && !email.isEmpty()) {
+                criteria.setEmail(email);
+            }
+            if (fullName != null && !fullName.isEmpty()) {
+                criteria.setFullName(fullName);
+            }
+            if (phone != null && !phone.isEmpty()) {
+                criteria.setPhone(phone);
+            }
+            if (gender != null && !gender.isEmpty()) {
+                criteria.setGender(gender);
+            }
+            if (address != null && !address.isEmpty()) {
+                criteria.setAddress(address);
+            }
+            if (isActiveStr != null && !isActiveStr.isEmpty()) {
+                criteria.setActive(Boolean.parseBoolean(isActiveStr));
+            }
+            criteria.setActive(true);
+            
+
+            vec = dao.searchAdminWithPagingAndSorting(criteria, "manager", page, recordsPerPage, sortField, sortOrder);
+            totalRecords = dao.getTotalSearchResults(criteria, "manager");
+            request.setAttribute("param", criteria);
+        } else {
+            vec = dao.getAdminsWithPagingAndSorting("manager", page, recordsPerPage, sortField, sortOrder);
+            totalRecords = dao.getTotalAdmins("manager");
+        }
+
+        int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+        
+        request.setAttribute("vec", vec);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("recordsPerPage", recordsPerPage);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("totalRecords", totalRecords);
+        request.setAttribute("sortField", sortField);
+        request.setAttribute("sortOrder", sortOrder);
+
+        request.getRequestDispatcher("admin_manage_manager.jsp").forward(request, response);
+    }
+
+    private void listSalers(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String submit = request.getParameter("submit");
+        String pageStr = request.getParameter("page");
+        String recordsPerPageStr = request.getParameter("recordsPerPage");
+        String sortField = request.getParameter("sortField");
+        String sortOrder = request.getParameter("sortOrder");
+        
+        int page = 1;
+        int recordsPerPage = 10;
+        
+        if (pageStr != null && !pageStr.isEmpty()) {
+            page = Integer.parseInt(pageStr);
+        }
+        if (recordsPerPageStr != null && !recordsPerPageStr.isEmpty()) {
+            recordsPerPage = Integer.parseInt(recordsPerPageStr);
+        }
+        if (sortField == null || sortField.isEmpty()) {
+            sortField = "id";
+        }
+        if (sortOrder == null || sortOrder.isEmpty()) {
+            sortOrder = "ASC";
+        }
+        
+        AdminDAO dao = new AdminDAO();
+        Vector<Admin> vec;
+        int totalRecords;
+        
+        if (submit != null && submit.equals("Search")) {
+            String idStr = request.getParameter("id");
+            String username = request.getParameter("username");
+            String email = request.getParameter("email");
+            String fullName = request.getParameter("fullName");
+            String phone = request.getParameter("phone");
+            String gender = request.getParameter("gender");
+            String address = request.getParameter("address");
+            String isActiveStr = request.getParameter("isActive");
+
+            Admin criteria = new Admin();
+            if (idStr != null && !idStr.isEmpty()) {
+                criteria.setId(Integer.parseInt(idStr));
+            }
+            if (username != null && !username.isEmpty()) {
+                criteria.setUsername(username);
+            }
+            if (email != null && !email.isEmpty()) {
+                criteria.setEmail(email);
+            }
+            if (fullName != null && !fullName.isEmpty()) {
+                criteria.setFullName(fullName);
+            }
+            if (phone != null && !phone.isEmpty()) {
+                criteria.setPhone(phone);
+            }
+            if (gender != null && !gender.isEmpty()) {
+                criteria.setGender(gender);
+            }
+            if (address != null && !address.isEmpty()) {
+                criteria.setAddress(address);
+            }
+            if (isActiveStr != null && !isActiveStr.isEmpty()) {
+                criteria.setActive(Boolean.parseBoolean(isActiveStr));
+            }
+            criteria.setActive(true);
+
+            vec = dao.searchAdminWithPagingAndSorting(criteria, "saler", page, recordsPerPage, sortField, sortOrder);
+            totalRecords = dao.getTotalSearchResults(criteria, "saler");
+            request.setAttribute("param", criteria);
+        } else {
+            vec = dao.getAdminsWithPagingAndSorting("saler", page, recordsPerPage, sortField, sortOrder);
+            totalRecords = dao.getTotalAdmins("saler");
+        }
+
+        int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+        
+        request.setAttribute("vec", vec);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("recordsPerPage", recordsPerPage);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("totalRecords", totalRecords);
+        request.setAttribute("sortField", sortField);
+        request.setAttribute("sortOrder", sortOrder);
+
+        request.getRequestDispatcher("admin_manage_saler.jsp").forward(request, response);
     }
     
     private void listManager(HttpServletRequest request, HttpServletResponse response)
@@ -205,7 +479,7 @@ public class AdminController extends HttpServlet {
         }
 
         if (service.equals("list")) {
-            listSaler(request, response);
+            listSalers(request, response);
         } else if (service.equals("Add")) {
             addSaler(request, response);
         } else if (service.equals("Ban")) {
@@ -567,7 +841,7 @@ public class AdminController extends HttpServlet {
         }
 
         if (service.equals("list")) {
-            listRecruiter(request, response);
+            listRecruiters(request, response);
         } else if (service.equals("Add")) {
             addRecruiter(request, response);
         } else if (service.equals("Ban")) {

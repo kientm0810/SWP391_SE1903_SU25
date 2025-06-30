@@ -375,20 +375,188 @@ public class RecruiterDAO extends DBContext {
     }   
     
     public void updateVerificationStatus(int id, String status){
-    String sql = "UPDATE [project_SWP391].[dbo].[Recruiter] SET verification_status = ? WHERE id = ?";
-    
-    try {
-        PreparedStatement ps = connection.prepareStatement(sql);
-        
-        ps.setString(1, status);
-        ps.setInt(2, id);
-        
-        ps.executeUpdate();
-    } catch (SQLException e) {
-        e.getStackTrace();
-    }
-}
+        String sql = "UPDATE [project_SWP391].[dbo].[Recruiter] SET verification_status = ? WHERE id = ?";
 
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+
+            ps.setString(1, status);
+            ps.setInt(2, id);
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.getStackTrace();
+        }
+    }
+    
+    // Thêm vào RecruiterDAO.java sau các phương thức hiện có
+
+    public int getTotalRecruiters() {
+        String sql = "SELECT COUNT(*) FROM [project_SWP391].[dbo].[Recruiter]";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    public int getTotalSearchResults(Recruiter criteria) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM [project_SWP391].[dbo].[Recruiter] WHERE 1=1");
+        Vector<Object> params = new Vector<>();
+
+        if (criteria.getId() != 0) {
+            sql.append(" AND id = ?");
+            params.add(criteria.getId());
+        }
+        if (criteria.getUsername() != null && !criteria.getUsername().isEmpty()) {
+            sql.append(" AND username LIKE ?");
+            params.add("%" + criteria.getUsername() + "%");
+        }
+        if (criteria.getEmail() != null && !criteria.getEmail().isEmpty()) {
+            sql.append(" AND email LIKE ?");
+            params.add("%" + criteria.getEmail() + "%");
+        }
+        if (criteria.getPhone() != null && !criteria.getPhone().isEmpty()) {
+            sql.append(" AND phone LIKE ?");
+            params.add("%" + criteria.getPhone() + "%");
+        }
+        if (criteria.getCompanyName() != null && !criteria.getCompanyName().isEmpty()) {
+            sql.append(" AND company_name LIKE ?");
+            params.add("%" + criteria.getCompanyName() + "%");
+        }
+        if (criteria.getCompanyAddress() != null && !criteria.getCompanyAddress().isEmpty()) {
+            sql.append(" AND company_address LIKE ?");
+            params.add("%" + criteria.getCompanyAddress() + "%");
+        }
+        if (criteria.getCompanySize() != null && !criteria.getCompanySize().isEmpty()) {
+            sql.append(" AND company_size = ?");
+            params.add(criteria.getCompanySize());
+        }
+        if (criteria.getIndustry() != null && !criteria.getIndustry().isEmpty()) {
+            sql.append(" AND industry = ?");
+            params.add(criteria.getIndustry());
+        }
+        if (criteria.getLoyaltyScore() > 0) {
+            sql.append(" AND loyalty_score >= ?");
+            params.add(criteria.getLoyaltyScore());
+        }
+        if (criteria.getVerificationStatus() != null && !criteria.getVerificationStatus().isEmpty()) {
+            sql.append(" AND verification_status = ?");
+            params.add(criteria.getVerificationStatus());
+        }
+        sql.append(" AND is_active = ?");
+        params.add(criteria.isActive());
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql.toString());
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    public Vector<Recruiter> getAllRecruiterWithPagingAndSorting(int page, int recordsPerPage, String sortField, String sortOrder) {
+        int start = (page - 1) * recordsPerPage;
+        String sql = "SELECT * FROM [project_SWP391].[dbo].[Recruiter] ORDER BY " + sortField + " " + sortOrder + 
+                     " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        
+        Vector<Recruiter> listRecruiters = new Vector<>();
+        try {
+            PreparedStatement ptm = connection.prepareStatement(sql);
+            ptm.setInt(1, start);
+            ptm.setInt(2, recordsPerPage);
+            ResultSet res = ptm.executeQuery();
+            while (res.next()) {
+                Recruiter p = mapResultSetToRecruiter(res);
+                listRecruiters.add(p);
+            }
+        } catch (SQLException ex) {
+            ex.getStackTrace();
+        }
+        return listRecruiters;
+    }
+    
+    public Vector<Recruiter> searchRecruitersWithPagingAndSorting(Recruiter criteria, int page, int recordsPerPage, String sortField, String sortOrder) {
+        int start = (page - 1) * recordsPerPage;
+        StringBuilder sql = new StringBuilder("SELECT * FROM [project_SWP391].[dbo].[Recruiter] WHERE 1=1");
+        Vector<Object> params = new Vector<>();
+
+        if (criteria.getId() != 0) {
+            sql.append(" AND id = ?");
+            params.add(criteria.getId());
+        }
+        if (criteria.getUsername() != null && !criteria.getUsername().isEmpty()) {
+            sql.append(" AND username LIKE ?");
+            params.add("%" + criteria.getUsername() + "%");
+        }
+        if (criteria.getEmail() != null && !criteria.getEmail().isEmpty()) {
+            sql.append(" AND email LIKE ?");
+            params.add("%" + criteria.getEmail() + "%");
+        }
+        if (criteria.getPhone() != null && !criteria.getPhone().isEmpty()) {
+            sql.append(" AND phone LIKE ?");
+            params.add("%" + criteria.getPhone() + "%");
+        }
+        if (criteria.getCompanyName() != null && !criteria.getCompanyName().isEmpty()) {
+            sql.append(" AND company_name LIKE ?");
+            params.add("%" + criteria.getCompanyName() + "%");
+        }
+        if (criteria.getCompanyAddress() != null && !criteria.getCompanyAddress().isEmpty()) {
+            sql.append(" AND company_address LIKE ?");
+            params.add("%" + criteria.getCompanyAddress() + "%");
+        }
+        if (criteria.getCompanySize() != null && !criteria.getCompanySize().isEmpty()) {
+            sql.append(" AND company_size = ?");
+            params.add(criteria.getCompanySize());
+        }
+        if (criteria.getIndustry() != null && !criteria.getIndustry().isEmpty()) {
+            sql.append(" AND industry = ?");
+            params.add(criteria.getIndustry());
+        }
+        if (criteria.getLoyaltyScore() > 0) {
+            sql.append(" AND loyalty_score >= ?");
+            params.add(criteria.getLoyaltyScore());
+        }
+        if (criteria.getVerificationStatus() != null && !criteria.getVerificationStatus().isEmpty()) {
+            sql.append(" AND verification_status = ?");
+            params.add(criteria.getVerificationStatus());
+        }
+        sql.append(" AND is_active = ?");
+        params.add(criteria.isActive());
+        
+        sql.append(" ORDER BY ").append(sortField).append(" ").append(sortOrder);
+        sql.append(" OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+
+        Vector<Recruiter> result = new Vector<>();
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql.toString());
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            ps.setInt(params.size() + 1, start);
+            ps.setInt(params.size() + 2, recordsPerPage);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                result.add(mapResultSetToRecruiter(rs));
+            }
+        } catch (SQLException ex) {
+            ex.getStackTrace();
+        }
+        return result;
+    }
 
 
 }

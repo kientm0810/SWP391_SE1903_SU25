@@ -71,7 +71,7 @@ public class AdminSalerController extends HttpServlet {
         }
 
         if (service.equals("listAll")) {
-            listAll(request, response);
+            listAlls(request, response);
         } else if (service.equals("listMy")) {
 
         } else if (service.equals("Add")) {
@@ -85,6 +85,119 @@ public class AdminSalerController extends HttpServlet {
         }
     }
 
+    // Thay thế phương thức listAll bằng:
+
+    private void listAlls(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        BlogDAO blogDAO = new BlogDAO();
+        Vector<Blog> blogs = new Vector<>();
+        
+        // Pagination parameters
+        String pageStr = request.getParameter("page");
+        String recordsPerPageStr = request.getParameter("recordsPerPage");
+        String sortField = request.getParameter("sortField");
+        String sortOrder = request.getParameter("sortOrder");
+        String searchTitle = request.getParameter("title");
+        
+        int page = 1;
+        int recordsPerPage = 10;
+        
+        if (pageStr != null && !pageStr.isEmpty()) {
+            page = Integer.parseInt(pageStr);
+        }
+        if (recordsPerPageStr != null && !recordsPerPageStr.isEmpty()) {
+            recordsPerPage = Integer.parseInt(recordsPerPageStr);
+        }
+        if (sortField == null || sortField.isEmpty()) {
+            sortField = "id";
+        }
+        if (sortOrder == null || sortOrder.isEmpty()) {
+            sortOrder = "DESC";
+        }
+        
+        int totalRecords;
+        
+        String who = request.getParameter("who");
+        if (who == null) {
+            who = "";
+        }
+
+        if (searchTitle != null && !searchTitle.isEmpty()) {
+            blogs = blogDAO.searchBlogsByTitleWithPaging(searchTitle, page, recordsPerPage, sortField, sortOrder);
+            totalRecords = blogDAO.getTotalBlogsByTitle(searchTitle);
+        } else {
+            blogs = blogDAO.getAllBlogsWithPagingAndSorting(page, recordsPerPage, sortField, sortOrder);
+            totalRecords = blogDAO.getTotalBlogs();
+        }
+        
+        int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+        
+        request.setAttribute("blogs", blogs);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("recordsPerPage", recordsPerPage);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("totalRecords", totalRecords);
+        request.setAttribute("sortField", sortField);
+        request.setAttribute("sortOrder", sortOrder);
+        request.setAttribute("searchTitle", searchTitle);
+        
+        request.getRequestDispatcher("admin_saler_allblog.jsp").forward(request, response);
+    }
+
+// Thay thế phương thức listAllBanner bằng:
+
+    private void listAllBanners(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+        BannerDAO bannerDAO = new BannerDAO();
+        Vector<Banner> banners = new Vector<>();
+        
+        // Pagination parameters
+        String pageStr = request.getParameter("page");
+        String recordsPerPageStr = request.getParameter("recordsPerPage");
+        String sortField = request.getParameter("sortField");
+        String sortOrder = request.getParameter("sortOrder");
+        String searchTitle = request.getParameter("title");
+        
+        int page = 1;
+        int recordsPerPage = 10;
+        
+        if (pageStr != null && !pageStr.isEmpty()) {
+            page = Integer.parseInt(pageStr);
+        }
+        if (recordsPerPageStr != null && !recordsPerPageStr.isEmpty()) {
+            recordsPerPage = Integer.parseInt(recordsPerPageStr);
+        }
+        if (sortField == null || sortField.isEmpty()) {
+            sortField = "position";
+        }
+        if (sortOrder == null || sortOrder.isEmpty()) {
+            sortOrder = "ASC";
+        }
+        
+        int totalRecords;
+        
+        if (searchTitle != null && !searchTitle.isEmpty()) {
+            banners = bannerDAO.searchBannersByTitleWithPaging(searchTitle, page, recordsPerPage, sortField, sortOrder);
+            totalRecords = bannerDAO.getTotalBannersByTitle(searchTitle);
+        } else {
+            banners = bannerDAO.getAllBannersWithPagingAndSorting(page, recordsPerPage, sortField, sortOrder);
+            totalRecords = bannerDAO.getTotalBanners();
+        }
+        
+        int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+        
+        request.setAttribute("banners", banners);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("recordsPerPage", recordsPerPage);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("totalRecords", totalRecords);
+        request.setAttribute("sortField", sortField);
+        request.setAttribute("sortOrder", sortOrder);
+        request.setAttribute("searchTitle", searchTitle);
+
+        request.getRequestDispatcher("admin_saler_allbanner.jsp").forward(request, response);
+    }
+    
     private void listAll(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         BlogDAO blogDAO = new BlogDAO();
@@ -261,7 +374,7 @@ public class AdminSalerController extends HttpServlet {
         }
 
         if (service.equals("listAll")) {
-            listAllBanner(request, response);
+            listAllBanners(request, response);
         } else if (service.equals("listMy")) {
 
         } else if (service.equals("Add")) {

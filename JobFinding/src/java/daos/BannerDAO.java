@@ -118,4 +118,73 @@ public class BannerDAO extends DBContext {
                 rs.getDate("created_at")
         );
     }
+    
+    // Thêm các phương thức sau vào BannerDAO.java
+    public int getTotalBanners() {
+        String sql = "SELECT COUNT(*) FROM [project_SWP391].[dbo].[Banner]";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    public int getTotalBannersByTitle(String title) {
+        String sql = "SELECT COUNT(*) FROM [project_SWP391].[dbo].[Banner] WHERE title LIKE ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, "%" + title + "%");
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    public Vector<Banner> getAllBannersWithPagingAndSorting(int page, int recordsPerPage, String sortField, String sortOrder) {
+        int start = (page - 1) * recordsPerPage;
+        Vector<Banner> banners = new Vector<>();
+        String sql = "SELECT * FROM [project_SWP391].[dbo].[Banner] ORDER BY " + sortField + " " + sortOrder + 
+                     " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, start);
+            ps.setInt(2, recordsPerPage);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                banners.add(mapResultSetToBanner(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return banners;
+    }
+    
+    public Vector<Banner> searchBannersByTitleWithPaging(String title, int page, int recordsPerPage, String sortField, String sortOrder) {
+        int start = (page - 1) * recordsPerPage;
+        Vector<Banner> banners = new Vector<>();
+        String sql = "SELECT * FROM [project_SWP391].[dbo].[Banner] WHERE title LIKE ? ORDER BY " + sortField + " " + sortOrder + 
+                     " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, "%" + title + "%");
+            ps.setInt(2, start);
+            ps.setInt(3, recordsPerPage);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                banners.add(mapResultSetToBanner(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return banners;
+    }
 }

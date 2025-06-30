@@ -127,5 +127,74 @@ public class BlogDAO extends DBContext{
         blog.setUpdated_at(rs.getDate("updated_at"));
         return blog;
     }
+    
+    // Thêm các phương thức sau vào BlogDAO.java
+    public int getTotalBlogs() {
+        String sql = "SELECT COUNT(*) FROM [project_SWP391].[dbo].[Blog]";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    public int getTotalBlogsByTitle(String title) {
+        String sql = "SELECT COUNT(*) FROM [project_SWP391].[dbo].[Blog] WHERE title LIKE ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, "%" + title + "%");
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    public Vector<Blog> getAllBlogsWithPagingAndSorting(int page, int recordsPerPage, String sortField, String sortOrder) {
+        int start = (page - 1) * recordsPerPage;
+        Vector<Blog> blogs = new Vector<>();
+        String sql = "SELECT * FROM [project_SWP391].[dbo].[Blog] ORDER BY " + sortField + " " + sortOrder + 
+                     " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, start);
+            ps.setInt(2, recordsPerPage);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                blogs.add(mapResultSetToBlog(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return blogs;
+    }
+    
+    public Vector<Blog> searchBlogsByTitleWithPaging(String title, int page, int recordsPerPage, String sortField, String sortOrder) {
+        int start = (page - 1) * recordsPerPage;
+        Vector<Blog> blogs = new Vector<>();
+        String sql = "SELECT * FROM [project_SWP391].[dbo].[Blog] WHERE title LIKE ? ORDER BY " + sortField + " " + sortOrder + 
+                     " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, "%" + title + "%");
+            ps.setInt(2, start);
+            ps.setInt(3, recordsPerPage);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                blogs.add(mapResultSetToBlog(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return blogs;
+    }
 
 }
