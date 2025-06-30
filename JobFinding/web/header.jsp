@@ -26,6 +26,11 @@
                             <i class="fas fa-briefcase"></i> Jobs
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="blog.jsp">
+                            <i class="fas fa-blog"></i> Blog
+                        </a>
+                    </li>
                     <c:if test="${sessionScope.role == 'recruiter'}">
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="communityDropdown" role="button"

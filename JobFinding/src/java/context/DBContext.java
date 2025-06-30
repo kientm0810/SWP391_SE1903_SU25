@@ -20,7 +20,7 @@ public class DBContext {
             String user = "sa";
             String pass = "123";
             //String url = "jdbc:sqlserver://NHOTUNG\\SQLEXPRESS:1433;databaseName=project_SWP391";
-            String url = "jdbc:sqlserver://MSI:1433;databaseName=project_SWP391";
+            String url = "jdbc:sqlserver://localhost:1433;databaseName=project_SWP391";
         
             
             // Đăng ký driver

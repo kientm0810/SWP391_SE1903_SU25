@@ -18,16 +18,34 @@
 
             <body>
                 <div class="container py-5">
+                    <!-- Success/Error Messages -->
+                    <c:if test="${not empty sessionScope.successMessage}">
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            ${sessionScope.successMessage}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        <c:remove var="successMessage" scope="session" />
+                    </c:if>
+
+                    <c:if test="${not empty sessionScope.errorMessage}">
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            ${sessionScope.errorMessage}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        <c:remove var="errorMessage" scope="session" />
+                    </c:if>
                     <div class="row">
                         <!-- Profile Information -->
                         <div class="col-lg-4">
                             <div class="card mb-4">
                                 <div class="card-body text-center">
-                                    <img src="${user.profilePicture}" alt="Avatar" class="rounded-circle img-fluid"
-                                        style="width: 150px;">
-                                    <h5 class="my-3">${user.fullName}</h5>
-                                    <p class="text-muted mb-1">${user.desiredJobTitle}</p>
-                                    <p class="text-muted mb-4">${user.location}</p>
+                                                        <img src="${sessionScope.user.profilePicture != null ? sessionScope.user.profilePicture : 'assets/img/elements/user.png'}" alt="Avatar" class="rounded-circle img-fluid"
+                        style="width: 150px;">
+                    <h5 class="my-3">${sessionScope.user.fullName}</h5>
+                    <p class="text-muted mb-1">${sessionScope.user.desiredJobTitle != null ? sessionScope.user.desiredJobTitle : 'Tìm việc làm'}</p>
+                    <p class="text-muted mb-4">${sessionScope.user.address != null ? sessionScope.user.address : 'Việt Nam'}</p>
                                     <div class="d-flex justify-content-center mb-2">
                                         <a href="edit_profile.jsp" class="btn btn-primary me-2">
                                             <i class="fas fa-edit me-2"></i>Chỉnh sửa
@@ -45,22 +63,24 @@
                                     <h5 class="mb-3">Thông tin liên hệ</h5>
                                     <div class="mb-3">
                                         <i class="fas fa-envelope me-2 text-primary"></i>
-                                        <span>${user.email}</span>
+                                        <span>${sessionScope.user.email}</span>
                                     </div>
                                     <div class="mb-3">
                                         <i class="fas fa-phone me-2 text-primary"></i>
-                                        <span>${user.phone}</span>
+                                        <span>${sessionScope.user.phone != null ? sessionScope.user.phone : 'Chưa cập nhật'}</span>
                                     </div>
                                     <div class="mb-3">
                                         <i class="fas fa-map-marker-alt me-2 text-primary"></i>
-                                        <span>${user.address}</span>
+                                        <span>${sessionScope.user.address != null ? sessionScope.user.address : 'Chưa cập nhật'}</span>
                                     </div>
-                                    <div class="mb-3">
-                                        <i class="fab fa-linkedin me-2 text-primary"></i>
-                                        <a href="${user.linkedinUrl}" target="_blank" class="text-decoration-none">
-                                            LinkedIn Profile
-                                        </a>
-                                    </div>
+                                    <c:if test="${not empty sessionScope.user.portfolioUrl}">
+                                        <div class="mb-3">
+                                            <i class="fab fa-linkedin me-2 text-primary"></i>
+                                            <a href="${sessionScope.user.portfolioUrl}" target="_blank" class="text-decoration-none">
+                                                Portfolio/LinkedIn
+                                            </a>
+                                        </div>
+                                    </c:if>
                                 </div>
                             </div>
 
@@ -69,9 +89,16 @@
                                 <div class="card-body">
                                     <h5 class="mb-3">Kỹ năng</h5>
                                     <div class="d-flex flex-wrap gap-2">
-                                        <c:forEach items="${user.skills}" var="skill">
-                                            <span class="badge bg-primary">${skill}</span>
-                                        </c:forEach>
+                                        <c:choose>
+                                            <c:when test="${not empty sessionScope.user.skills}">
+                                                <c:forEach items="${sessionScope.user.skills}" var="skill">
+                                                    <span class="badge bg-primary">${skill}</span>
+                                                </c:forEach>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span class="text-muted">Chưa có kỹ năng nào</span>
+                                            </c:otherwise>
+                                        </c:choose>
                                     </div>
                                 </div>
                             </div>
@@ -83,77 +110,258 @@
                             <div class="card mb-4">
                                 <div class="card-body">
                                     <h5 class="mb-3">Giới thiệu</h5>
-                                    <p>${user.about}</p>
+                                    <p>${sessionScope.user.profileSummary != null ? sessionScope.user.profileSummary : 'Chưa có thông tin giới thiệu'}</p>
                                 </div>
                             </div>
 
-                            <!-- Experience -->
+                            <!-- Experience & Education -->
                             <div class="card mb-4">
                                 <div class="card-body">
-                                    <h5 class="mb-3">Kinh nghiệm làm việc</h5>
-                                    <c:forEach items="${user.experiences}" var="exp">
-                                        <div class="mb-4">
-                                            <div class="d-flex justify-content-between mb-2">
-                                                <h6 class="mb-0">${exp.position}</h6>
-                                                <span class="text-muted">
-                                                    <fmt:formatDate value="${exp.startDate}" pattern="MM/yyyy" /> -
-                                                    <c:choose>
-                                                        <c:when test="${exp.current}">Hiện tại</c:when>
-                                                        <c:otherwise>
-                                                            <fmt:formatDate value="${exp.endDate}" pattern="MM/yyyy" />
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </span>
-                                            </div>
-                                            <p class="text-muted mb-2">${exp.company}</p>
-                                            <p>${exp.description}</p>
+                                    <h5 class="mb-3">Thông tin nghề nghiệp</h5>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6 class="text-primary">Vị trí mong muốn</h6>
+                                            <p>${sessionScope.user.desiredJobTitle != null ? sessionScope.user.desiredJobTitle : 'Chưa xác định'}</p>
                                         </div>
-                                    </c:forEach>
+                                        <div class="col-md-6">
+                                            <h6 class="text-primary">Mức lương mong muốn</h6>
+                                            <p>
+                                                <c:choose>
+                                                    <c:when test="${not empty sessionScope.user.desiredSalary}">
+                                                        <fmt:formatNumber value="${sessionScope.user.desiredSalary}" type="currency" currencySymbol="" />₫
+                                                    </c:when>
+                                                    <c:otherwise>Thỏa thuận</c:otherwise>
+                                                </c:choose>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6 class="text-primary">Kinh nghiệm</h6>
+                                            <p>${sessionScope.user.experienceYears != null ? sessionScope.user.experienceYears : 0} năm</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6 class="text-primary">Nơi làm việc</h6>
+                                            <p>${sessionScope.user.preferredLocation != null ? sessionScope.user.preferredLocation : 'Toàn quốc'}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <c:if test="${not empty sessionScope.user.jobCategory}">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <h6 class="text-primary">Lĩnh vực</h6>
+                                                <p>${sessionScope.user.jobCategory}</p>
+                                            </div>
+                                        </div>
+                                    </c:if>
                                 </div>
                             </div>
 
-                            <!-- Education -->
+                            <!-- CV Management -->
                             <div class="card mb-4">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-file-alt text-primary me-2"></i>
+                                        Quản lý CV 
+                                        <span class="badge bg-primary ms-2">${totalCVs != null ? totalCVs : 0}</span>
+                                    </h5>
+                                    <a href="cv-upload" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-plus me-2"></i>Tạo CV mới
+                                    </a>
+                                </div>
                                 <div class="card-body">
-                                    <h5 class="mb-3">Học vấn</h5>
-                                    <c:forEach items="${user.education}" var="edu">
-                                        <div class="mb-4">
-                                            <div class="d-flex justify-content-between mb-2">
-                                                <h6 class="mb-0">${edu.degree}</h6>
-                                                <span class="text-muted">
-                                                    <fmt:formatDate value="${edu.startDate}" pattern="yyyy" /> -
-                                                    <fmt:formatDate value="${edu.endDate}" pattern="yyyy" />
-                                                </span>
+                                    <!-- Search Box -->
+                                    <div class="mb-3">
+                                        <form method="get" action="profile" class="position-relative">
+                                            <input type="text" 
+                                                   class="form-control" 
+                                                   name="search" 
+                                                   placeholder="Tìm kiếm CV theo tên hoặc vị trí..." 
+                                                   value="${searchTerm}">
+                                            <input type="hidden" name="page" value="1">
+                                        </form>
+                                    </div>
+
+                                    <!-- CV List -->
+                                    <c:choose>
+                                        <c:when test="${empty cvList}">
+                                            <div class="text-center py-4">
+                                                <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                                                <h6 class="text-muted">Chưa có CV nào</h6>
+                                                <p class="text-muted">Hãy tạo CV đầu tiên để bắt đầu tìm việc làm</p>
+                                                <a href="cv-upload" class="btn btn-primary">
+                                                    <i class="fas fa-plus me-2"></i>Tạo CV ngay
+                                                </a>
                                             </div>
-                                            <p class="text-muted mb-2">${edu.school}</p>
-                                            <p>${edu.description}</p>
-                                        </div>
-                                    </c:forEach>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <div class="row">
+                                                <c:forEach items="${cvList}" var="cv">
+                                                    <div class="col-md-6 mb-3">
+                                                        <div class="card border">
+                                                            <div class="card-body">
+                                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                                    <h6 class="card-title mb-0">${cv.jobPosition}</h6>
+                                                                    <div class="dropdown">
+                                                                        <button class="btn btn-sm btn-outline-secondary" 
+                                                                                type="button" 
+                                                                                data-bs-toggle="dropdown">
+                                                                            <i class="fas fa-ellipsis-v"></i>
+                                                                        </button>
+                                                                        <ul class="dropdown-menu">
+                                                                            <li>
+                                                                                <a class="dropdown-item" href="cv-edit?id=${cv.id}">
+                                                                                    <i class="fas fa-edit me-2"></i>Chỉnh sửa
+                                                                                </a>
+                                                                            </li>
+                                                                            <c:if test="${not empty cv.pdfFilePath}">
+                                                                                <li>
+                                                                                    <a class="dropdown-item" href="${cv.pdfFilePath}" target="_blank">
+                                                                                        <i class="fas fa-download me-2"></i>Tải xuống
+                                                                                    </a>
+                                                                                </li>
+                                                                            </c:if>
+                                                                            <li><hr class="dropdown-divider"></li>
+                                                                            <li>
+                                                                                <button class="dropdown-item text-danger" 
+                                                                                        onclick="confirmDelete(${cv.id}, '${cv.jobPosition}')">
+                                                                                    <i class="fas fa-trash me-2"></i>Xóa
+                                                                                </button>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                                <p class="text-muted mb-1">
+                                                                    <i class="fas fa-user me-1"></i>${cv.fullName}
+                                                                </p>
+                                                                <p class="text-muted small mb-2">
+                                                                    <i class="fas fa-envelope me-1"></i>${cv.email}
+                                                                </p>
+                                                                <div class="d-flex justify-content-between text-muted small">
+                                                                    <span>
+                                                                        <i class="fas fa-calendar me-1"></i>
+                                                                        <fmt:formatDate value="${cv.createdAt}" pattern="dd/MM/yyyy" />
+                                                                    </span>
+                                                                    <c:if test="${not empty cv.pdfFilePath}">
+                                                                        <span class="text-success">
+                                                                            <i class="fas fa-file-pdf me-1"></i>PDF
+                                                                        </span>
+                                                                    </c:if>
+                                                                </div>
+                                                            </div>
+                                                            <div class="card-footer bg-light p-2">
+                                                                <div class="d-flex gap-1">
+                                                                    <a href="cv-edit?id=${cv.id}" class="btn btn-sm btn-outline-primary flex-fill">
+                                                                        <i class="fas fa-edit me-1"></i>Sửa
+                                                                    </a>
+                                                                    <c:if test="${not empty cv.pdfFilePath}">
+                                                                        <a href="${cv.pdfFilePath}" target="_blank" class="btn btn-sm btn-outline-success">
+                                                                            <i class="fas fa-download"></i>
+                                                                        </a>
+                                                                    </c:if>
+                                                                    <button class="btn btn-sm btn-outline-danger" 
+                                                                            onclick="confirmDelete(${cv.id}, '${cv.jobPosition}')">
+                                                                        <i class="fas fa-trash"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </c:forEach>
+                                            </div>
+
+                                            <!-- Pagination -->
+                                            <c:if test="${totalPages > 1}">
+                                                <nav class="d-flex justify-content-center mt-3">
+                                                    <ul class="pagination">
+                                                        <c:if test="${currentPage > 1}">
+                                                            <li class="page-item">
+                                                                <a class="page-link" href="profile?page=${currentPage - 1}&search=${searchTerm}">
+                                                                    <i class="fas fa-chevron-left"></i>
+                                                                </a>
+                                                            </li>
+                                                        </c:if>
+                                                        
+                                                        <c:forEach begin="1" end="${totalPages}" var="pageNum">
+                                                            <c:choose>
+                                                                <c:when test="${pageNum == currentPage}">
+                                                                    <li class="page-item active">
+                                                                        <span class="page-link">${pageNum}</span>
+                                                                    </li>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <li class="page-item">
+                                                                        <a class="page-link" href="profile?page=${pageNum}&search=${searchTerm}">
+                                                                            ${pageNum}
+                                                                        </a>
+                                                                    </li>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </c:forEach>
+                                                        
+                                                        <c:if test="${currentPage < totalPages}">
+                                                            <li class="page-item">
+                                                                <a class="page-link" href="profile?page=${currentPage + 1}&search=${searchTerm}">
+                                                                    <i class="fas fa-chevron-right"></i>
+                                                                </a>
+                                                            </li>
+                                                        </c:if>
+                                                    </ul>
+                                                </nav>
+                                            </c:if>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
                             </div>
 
                             <!-- Certifications -->
                             <div class="card">
                                 <div class="card-body">
-                                    <h5 class="mb-3">Chứng chỉ</h5>
-                                    <div class="row">
-                                        <c:forEach items="${user.certifications}" var="cert">
-                                            <div class="col-md-6 mb-3">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-certificate text-primary me-3 fa-2x"></i>
-                                                    <div>
-                                                        <h6 class="mb-1">${cert.name}</h6>
-                                                        <p class="text-muted mb-0">
-                                                            ${cert.issuer} -
-                                                            <fmt:formatDate value="${cert.issueDate}"
-                                                                pattern="MM/yyyy" />
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </c:forEach>
-                                    </div>
+                                    <h5 class="mb-3">Kỹ năng & Chứng chỉ</h5>
+                                    <c:choose>
+                                        <c:when test="${not empty sessionScope.user.education}">
+                                            <p class="mb-2"><strong>Học vấn:</strong> ${sessionScope.user.education}</p>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <p class="text-muted mb-2">Chưa có thông tin học vấn</p>
+                                        </c:otherwise>
+                                    </c:choose>
+                                    
+                                    <c:if test="${not empty sessionScope.user.experienceYears}">
+                                        <p class="mb-2"><strong>Kinh nghiệm:</strong> ${sessionScope.user.experienceYears} năm</p>
+                                    </c:if>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delete Confirmation Modal -->
+                <div class="modal fade" id="deleteModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                                    Xác nhận xóa CV
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Bạn có chắc chắn muốn xóa CV "<span id="cvName"></span>"?</p>
+                                <p class="text-muted small">Hành động này không thể hoàn tác.</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                <form id="deleteForm" method="post" action="profile" class="d-inline">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="cvId" id="deleteCvId">
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="fas fa-trash me-2"></i>Xóa CV
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -162,6 +370,37 @@
                 <!-- Scripts -->
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
                 <script src="assets/js/main.js"></script>
+                
+                <script>
+                    function confirmDelete(cvId, cvName) {
+                        document.getElementById('deleteCvId').value = cvId;
+                        document.getElementById('cvName').textContent = cvName;
+                        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+                    }
+
+                    // Auto-submit search form when typing (with debounce)
+                    let searchTimeout;
+                    const searchInput = document.querySelector('input[name="search"]');
+                    if (searchInput) {
+                        searchInput.addEventListener('input', function() {
+                            clearTimeout(searchTimeout);
+                            searchTimeout = setTimeout(() => {
+                                this.form.submit();
+                            }, 500);
+                        });
+                    }
+
+                    // Auto-hide alerts after 5 seconds
+                    setTimeout(() => {
+                        const alerts = document.querySelectorAll('.alert');
+                        alerts.forEach(alert => {
+                            if (alert.querySelector('.btn-close')) {
+                                const bsAlert = new bootstrap.Alert(alert);
+                                bsAlert.close();
+                            }
+                        });
+                    }, 5000);
+                </script>
             </body>
 
             </html>

@@ -18,13 +18,14 @@ public class CVTemplate {
     private String address;
     private String certificates;
     private String workExperience;
+    private String pdfFilePath;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
     public CVTemplate() {}
 
     public CVTemplate(int id, int jobSeekerId, String fullName, String jobPosition, String phone, String email,
-                      String address, String certificates, String workExperience, Timestamp createdAt, Timestamp updatedAt) {
+                      String address, String certificates, String workExperience, String pdfFilePath, Timestamp createdAt, Timestamp updatedAt) {
         this.id = id;
         this.jobSeekerId = jobSeekerId;
         this.fullName = fullName;
@@ -34,6 +35,7 @@ public class CVTemplate {
         this.address = address;
         this.certificates = certificates;
         this.workExperience = workExperience;
+        this.pdfFilePath = pdfFilePath;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -57,6 +59,8 @@ public class CVTemplate {
     public void setCertificates(String certificates) { this.certificates = certificates; }
     public String getWorkExperience() { return workExperience; }
     public void setWorkExperience(String workExperience) { this.workExperience = workExperience; }
+    public String getPdfFilePath() { return pdfFilePath; }
+    public void setPdfFilePath(String pdfFilePath) { this.pdfFilePath = pdfFilePath; }
     public Timestamp getCreatedAt() { return createdAt; }
     public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
     public Timestamp getUpdatedAt() { return updatedAt; }

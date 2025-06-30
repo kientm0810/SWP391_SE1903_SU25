@@ -262,72 +262,68 @@
 
 
 
-                            <!--Khu Bài viết gần đây Start -->
+                            <!-- Latest Jobs (Carousel) Start -->
                             <div class="recent-posts-area section-pad-t30">
                                 <div class="container">
-                                    <!-- Section Tittle -->
+                                    <!-- Section Title -->
                                     <div class="row">
                                         <div class="col-lg-12">
-                                            <div class="section-tittle text-center">
+                                            <div class="section-tittle text-center mb-4">
                                                 <span>Recent Jobs</span>
                                                 <h2>Latest Job Posts</h2>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <!-- Debug info -->
-                                    <div class="row mb-4">
-                                        <div class="col-12">
-                                            <p>Number of posts: ${recentPosts != null ? recentPosts.size() : 0}</p>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <c:if test="${empty recentPosts}">
-                                            <div class="col-12 text-center">
-                                                <p>No recent posts available.</p>
-                                            </div>
-                                        </c:if>
-                                        <c:forEach items="${recentPosts}" var="post">
-                                            <div class="col-xl-4 col-lg-4 col-md-6">
-                                                <div class="job-card">
-                                                    <div class="job-header">
-                                                        <img src="${post.companyLogo}" alt="${post.companyName}"
-                                                            class="company-logo">
-                                                        <div class="job-info">
-                                                            <div class="job-title-wrapper">
-                                                                <h3 class="job-title">
-                                                                    <a href="post/view?id=${post.id}">${post.title}</a>
-                                                                </h3>
-                                                                <div class="job-tag">${post.jobType}</div>
+                                    <c:choose>
+                                        <c:when test="${not empty latestJobs}">
+                                            <div class="job-carousel">
+                                                <c:forEach items="${latestJobs}" var="job">
+                                                    <div class="job-card job-card-carousel animated-card">
+                                                        <div class="job-header">
+                                                            <img src="assets/img/logo/logo.png" alt="logo"
+                                                                 class="company-logo">
+                                                            <div class="job-info">
+                                                                <div class="job-title-wrapper">
+                                                                    <h3 class="job-title mb-0">
+                                                                        <a href="job-detail?id=${job.id}">${job.title}</a>
+                                                                    </h3>
+                                                                    <div class="job-tag">${job.jobType != null ? job.jobType : 'Full-time'}</div>
+                                                                </div>
+                                                                <div class="company-name">${job.recruiterName}</div>
                                                             </div>
-                                                            <div class="company-name">${post.companyName}</div>
+                                                        </div>
+                                                        <div class="job-meta">
+                                                            <c:if test="${job.salaryMin > 0}">
+                                                                <div class="job-meta-item">
+                                                                    <i class="fas fa-money-bill-wave"></i>
+                                                                    <span class="salary"><fmt:formatNumber value="${job.salaryMin}"/> - <fmt:formatNumber value="${job.salaryMax}"/></span>
+                                                                </div>
+                                                            </c:if>
+                                                            <div class="job-meta-item">
+                                                                <i class="fas fa-map-marker-alt"></i>
+                                                                <span class="location">${job.location}</span>
+                                                            </div>
+                                                            <div class="job-meta-item">
+                                                                <i class="fas fa-clock"></i>
+                                                                <span class="deadline">${job.timeAgo}</span>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                    <div class="job-meta">
-                                                        <div class="job-meta-item">
-                                                            <i class="fas fa-money-bill-wave"></i>
-                                                            <span class="salary">${post.salary}</span>
-                                                        </div>
-                                                        <div class="job-meta-item">
-                                                            <i class="fas fa-map-marker-alt"></i>
-                                                            <span class="location">${post.location}</span>
-                                                        </div>
-                                                        <div class="job-meta-item">
-                                                            <i class="fas fa-clock"></i>
-                                                            <span class="deadline">Deadline:
-                                                                <fmt:formatDate value="${post.deadline}"
-                                                                    pattern="dd/MM/yyyy" />
-                                                            </span>
-                                                        </div>
-                                                    </div>
+                                                </c:forEach>
+                                            </div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <div class="row">
+                                                <div class="col-12 text-center">
+                                                    <p>No jobs available for now.</p>
                                                 </div>
                                             </div>
-                                        </c:forEach>
-                                    </div>
-
-                                    <!-- Khu phân trang -->
-                                    <div class="row">
+                                        </c:otherwise>
+                                    </c:choose>
+                                     
+                                    <!-- Pagination remains for Posts search (hidden if no posts) -->
+                                    <div class="row" style="display:${totalPages > 1 ? 'block' : 'none'};">
                                         <div class="col-lg-12">
                                             <div class="pagination-area pb-115 text-center">
                                                 <c:if test="${totalPages > 1}">
@@ -414,7 +410,7 @@
 
                                 </div>
                             </div>
-                            <!-- Khu Bài viết gần đây End -->
+                            <!-- Latest Jobs (Carousel) End -->
 
 
 
@@ -847,6 +843,22 @@
                         <!-- Jquery Plugins, main Jquery -->
                         <script src="./assets/js/plugins.js"></script>
                         <script src="./assets/js/main.js"></script>
+
+                        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const observer = new IntersectionObserver((entries, obs) => {
+                                    entries.forEach(entry => {
+                                        if (entry.isIntersecting) {
+                                            entry.target.classList.add('appear');
+                                            obs.unobserve(entry.target);
+                                        }
+                                    });
+                                }, { threshold: 0.2 });
+
+                                document.querySelectorAll('.animated-card').forEach(card => observer.observe(card));
+                            });
+                        </script>
 
                 </body>
 

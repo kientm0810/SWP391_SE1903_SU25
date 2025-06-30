@@ -810,7 +810,7 @@
                                                     </a>
                                                 </h6>
                                                 <p class="job-company">
-                                                    <c:out value="${job.recruiter.companyName}" escapeXml="true"/>
+                                                    <c:out value="${job.recruiterName}" escapeXml="true"/>
                                                 </p>
                                                 <div class="job-meta">
                                                     <c:if test="${not empty job.salaryMin and not empty job.salaryMax}">

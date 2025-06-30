@@ -1,5 +1,9 @@
 package controllers;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import daos.UserDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -7,13 +11,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
-import java.io.IOException;
 import models.Admin;
 import models.JobSeeker;
 import models.Recruiter;
-import java.util.logging.Logger;
-import java.util.logging.Level;
 
 @WebServlet(name = "LoginController", urlPatterns = {"/login"})
 public class LoginController extends HttpServlet {
@@ -151,7 +151,7 @@ public class LoginController extends HttpServlet {
         String homePage = switch (role) {
             case "admin" -> "home";
             case "recruiter" -> "home";
-            case "job-seeker" -> "home";
+            case "job-seeker" -> "profile";
             default -> "login";
         };
         response.sendRedirect(homePage);

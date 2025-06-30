@@ -5,26 +5,27 @@
 
 package com.vnpay.common;
 
-import dao.OrderDao;
+// import dao.OrderDao;
 import java.io.IOException;
 import java.io.PrintWriter;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import model.Order;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+// import model.Order;
 
 /**
  *
  * @author HP
  */
 public class VnpayReturn extends HttpServlet {
-    OrderDao orderDao = new OrderDao();
+    // OrderDao orderDao = new OrderDao();
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
@@ -58,18 +59,18 @@ public class VnpayReturn extends HttpServlet {
                 
                 String orderId = request.getParameter("vnp_TxnRef");
                 
-                Order order = new Order();
-                order.setId(Integer.parseInt(orderId));
+                // Order order = new Order();
+                // order.setId(Integer.parseInt(orderId));
                 
                 boolean transSuccess = false;
                 if ("00".equals(request.getParameter("vnp_TransactionStatus"))) {
                     //update banking system
-                    order.setStatus("Completed");
+                    // order.setStatus("Completed");
                     transSuccess = true;
                 } else {
-                     order.setStatus("Failed");
+                     // order.setStatus("Failed");
                 }
-                orderDao.updateOrderStatus(order);
+                // orderDao.updateOrderStatus(order);
                 request.setAttribute("transResult", transSuccess);
                 request.getRequestDispatcher("paymentResult.jsp").forward(request, response);
             } else {

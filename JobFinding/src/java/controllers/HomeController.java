@@ -4,20 +4,22 @@
  */
 package controllers;
 
-import daos.RecruiterNotificationDAO;
-import models.RecruiterNotification;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.List;
+import java.util.Vector;
+
+import daos.JobDAO;
 import daos.PostsDAO;
+import daos.RecruiterNotificationDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.util.Vector;
-import java.util.List;
+import models.JobListing;
 import models.Posts;
+import models.RecruiterNotification;
 
 /**
  *
@@ -27,10 +29,12 @@ import models.Posts;
 public class HomeController extends HttpServlet {
 
     private PostsDAO postsDAO;
+    private JobDAO jobDAO;
 
     @Override
     public void init() throws ServletException {
         postsDAO = new PostsDAO();
+        jobDAO = new JobDAO();
     }
 
     /**
@@ -72,6 +76,10 @@ public class HomeController extends HttpServlet {
             // Get posts for current page with search
             List<Posts> recentPosts = postsDAO.getPostsByPageWithSearch(page, pageSize, keyword, jobType, location);
             
+            // Latest job listings for homepage (guest view)
+            List<JobListing> latestJobs = jobDAO.getLatestJobListings(10);
+            request.setAttribute("latestJobs", latestJobs);
+            
             // Set attributes for JSP
             request.setAttribute("recentPosts", recentPosts);
             request.setAttribute("currentPage", page);
@@ -84,6 +92,7 @@ public class HomeController extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             response.sendRedirect("error.jsp");
+            return;
         }
 
         HttpSession session = request.getSession(true);
@@ -145,7 +154,54 @@ public class HomeController extends HttpServlet {
     
     private void processJobSeeker(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        
+        try {
+            HttpSession session = request.getSession();
+            
+            // Get page number from request parameter
+            int page = 1;
+            int pageSize = 6;
+            
+            try {
+                String pageStr = request.getParameter("page");
+                if (pageStr != null && !pageStr.isEmpty()) {
+                    page = Integer.parseInt(pageStr);
+                }
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+            
+            // Get search parameters
+            String keyword = request.getParameter("keyword");
+            String jobType = request.getParameter("jobType");
+            String location = request.getParameter("location");
+            
+            // Get total posts and calculate total pages
+            int totalPosts = postsDAO.getTotalPostsWithSearch(keyword, jobType, location);
+            int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
+            
+            // Get posts for current page with search
+            List<Posts> recentPosts = postsDAO.getPostsByPageWithSearch(page, pageSize, keyword, jobType, location);
+            
+            // Recommended jobs for job seeker: fetch latest 6 active job listings
+            List<JobListing> recommendedJobs = jobDAO.getLatestJobListings(6);
+            request.setAttribute("recommendedJobs", recommendedJobs);
+            
+            // Set attributes for JSP
+            request.setAttribute("recentPosts", recentPosts);
+            request.setAttribute("currentPage", page);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("keyword", keyword);
+            request.setAttribute("jobType", jobType);
+            request.setAttribute("location", location);
+            
+            // Forward to jobseeker home page
+            request.getRequestDispatcher("jobseeker_home.jsp").forward(request, response);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("error.jsp");
+            return;
+        }
     }
     
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

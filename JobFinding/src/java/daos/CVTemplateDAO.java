@@ -8,13 +8,16 @@ package daos;
  *
  * @author PC
  */
-import context.DBContext;
-import models.CVTemplate;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import context.DBContext;
+import models.CVTemplate;
 
 public class CVTemplateDAO extends DBContext {
     private static final Logger LOGGER = Logger.getLogger(CVTemplateDAO.class.getName());
@@ -28,8 +31,8 @@ public class CVTemplateDAO extends DBContext {
     public boolean createCV(CVTemplate cv) throws SQLException {
         checkConnection();
         String sql = "INSERT INTO cv_templates (job_seeker_id, full_name, job_position, phone, email, address, " +
-                     "certificates, work_experience, created_at, updated_at) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
+                     "certificates, work_experience, image_path, created_at, updated_at) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, cv.getJobSeekerId());
             ps.setString(2, cv.getFullName());
@@ -39,6 +42,7 @@ public class CVTemplateDAO extends DBContext {
             ps.setString(6, cv.getAddress());
             ps.setString(7, cv.getCertificates());
             ps.setString(8, cv.getWorkExperience());
+            ps.setString(9, cv.getPdfFilePath());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error creating CV for jobSeekerId: " + cv.getJobSeekerId(), e);
@@ -78,6 +82,7 @@ public class CVTemplateDAO extends DBContext {
                     rs.getString("address"),
                     rs.getString("certificates"),
                     rs.getString("work_experience"),
+                    rs.getString("image_path"),
                     rs.getTimestamp("created_at"),
                     rs.getTimestamp("updated_at")
                 );
@@ -108,6 +113,7 @@ public class CVTemplateDAO extends DBContext {
                     rs.getString("address"),
                     rs.getString("certificates"),
                     rs.getString("work_experience"),
+                    rs.getString("image_path"),
                     rs.getTimestamp("created_at"),
                     rs.getTimestamp("updated_at")
                 );
@@ -122,7 +128,7 @@ public class CVTemplateDAO extends DBContext {
     public boolean updateCV(CVTemplate cv) throws SQLException {
         checkConnection();
         String sql = "UPDATE cv_templates SET full_name = ?, job_position = ?, phone = ?, email = ?, " +
-                     "address = ?, certificates = ?, work_experience = ?, updated_at = GETDATE() " +
+                     "address = ?, certificates = ?, work_experience = ?, image_path = ?, updated_at = GETDATE() " +
                      "WHERE id = ? AND job_seeker_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, cv.getFullName());
@@ -132,8 +138,9 @@ public class CVTemplateDAO extends DBContext {
             ps.setString(5, cv.getAddress());
             ps.setString(6, cv.getCertificates());
             ps.setString(7, cv.getWorkExperience());
-            ps.setInt(8, cv.getId());
-            ps.setInt(9, cv.getJobSeekerId());
+            ps.setString(8, cv.getPdfFilePath());
+            ps.setInt(9, cv.getId());
+            ps.setInt(10, cv.getJobSeekerId());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error updating CV with id: " + cv.getId(), e);

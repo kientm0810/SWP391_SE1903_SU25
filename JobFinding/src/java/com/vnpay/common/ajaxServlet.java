@@ -5,8 +5,9 @@
  */
 package com.vnpay.common;
 
-import dao.OrderDao;
-import java.io.IOException;import java.net.URLEncoder;
+// import dao.OrderDao;
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,12 +18,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import model.Order;
+// import model.Order;
 
 /**
  *
@@ -40,16 +41,16 @@ public class ajaxServlet extends HttpServlet {
         }
         double amountDouble = Double.parseDouble(req.getParameter("totalBill"));
         
-        OrderDao orderDao = new OrderDao();
+        // OrderDao orderDao = new OrderDao();
         //Gia su user login co id = 1
         //phan id user se lay tu sesson (user dang login)
         int userId = 1;
         
-        Order order = new Order();
-        order.setUserID(userId);
-        order.setTotalAmount(amountDouble);
+        // Order order = new Order();
+        // order.setUserID(userId);
+        // order.setTotalAmount(amountDouble);
         
-        int orderId = orderDao.insertOrder(order);
+        int orderId = 1; // orderDao.insertOrder(order);
         
         if(orderId < 1) {
           resp.sendRedirect("cart");

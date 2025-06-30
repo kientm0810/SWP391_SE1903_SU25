@@ -1,10 +1,13 @@
 package daos;
 
-import context.DBContext;
-import models.JobListing;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import context.DBContext;
+import models.JobListing;
 
 public class JobDAO extends DBContext {
     
@@ -22,6 +25,7 @@ public class JobDAO extends DBContext {
                 job.setTitle(rs.getString("title"));
                 job.setRecruiterName(rs.getString("recruiter_name"));
                 job.setLocation(rs.getString("location"));
+                job.setJobType(rs.getString("job_type"));
                 job.setSalaryMin(rs.getDouble("salary_min"));
                 job.setSalaryMax(rs.getDouble("salary_max"));
                 job.setDescription(rs.getString("description"));
@@ -35,7 +39,7 @@ public class JobDAO extends DBContext {
     }
     
     public JobListing getJobListingById(int jobId) throws SQLException {
-        String sql = "SELECT * FROM Job_Listings WHERE id = ?";
+        String sql = "SELECT jl.*, r.company_name AS recruiter_name FROM Job_Listings jl JOIN Recruiter r ON jl.recruiter_id = r.id WHERE jl.id = ?";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, jobId);
@@ -47,6 +51,7 @@ public class JobDAO extends DBContext {
                 job.setTitle(rs.getString("title"));
                 job.setRecruiterName(rs.getString("recruiter_name"));
                 job.setLocation(rs.getString("location"));
+                job.setJobType(rs.getString("job_type"));
                 job.setSalaryMin(rs.getDouble("salary_min"));
                 job.setSalaryMax(rs.getDouble("salary_max"));
                 job.setDescription(rs.getString("description"));
@@ -127,6 +132,31 @@ public class JobDAO extends DBContext {
                 job.setTitle(rs.getString("title"));
                 job.setRecruiterName(rs.getString("recruiter_name"));
                 job.setLocation(rs.getString("location"));
+                job.setJobType(rs.getString("job_type"));
+                job.setSalaryMin(rs.getDouble("salary_min"));
+                job.setSalaryMax(rs.getDouble("salary_max"));
+                job.setDescription(rs.getString("description"));
+                job.setRequirements(rs.getString("requirements"));
+                job.setCreatedAt(rs.getTimestamp("created_at"));
+                job.setStatus(rs.getString("status"));
+                jobs.add(job);
+            }
+        }
+        return jobs;
+    }
+    
+    public List<JobListing> getLatestJobListings(int limit) throws SQLException {
+        List<JobListing> jobs = new ArrayList<>();
+        String sql = "SELECT TOP (" + limit + ") jl.*, r.company_name AS recruiter_name FROM Job_Listings jl JOIN Recruiter r ON jl.recruiter_id = r.id WHERE jl.status IS NULL OR jl.status <> 'deleted' ORDER BY jl.created_at DESC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                JobListing job = new JobListing();
+                job.setId(rs.getInt("id"));
+                job.setTitle(rs.getString("title"));
+                job.setRecruiterName(rs.getString("recruiter_name"));
+                job.setLocation(rs.getString("location"));
+                job.setJobType(rs.getString("job_type"));
                 job.setSalaryMin(rs.getDouble("salary_min"));
                 job.setSalaryMax(rs.getDouble("salary_max"));
                 job.setDescription(rs.getString("description"));
