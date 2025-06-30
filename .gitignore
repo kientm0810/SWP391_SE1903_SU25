@@ -1,44 +1,47 @@
-# =============================
-# ✅ NetBeans Project Settings
-# =============================
+*.class
 
-# Ignore only private settings (cá nhân)
-JobFinding/nbproject/private/
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
 
-# Giữ lại phần còn lại của nbproject/
-!JobFinding/nbproject/
-!JobFinding/nbproject/project.xml
-!JobFinding/nbproject/project.properties
-!JobFinding/nbproject/build-impl.xml
-!JobFinding/nbproject/genfiles.properties
-!JobFinding/nbproject/nbjdk.properties
+# Package Files #
+*.war
+*.ear
 
-# =============================
-# ❌ Ignore build artifacts
-# =============================
-JobFinding/build/
-JobFinding/dist/
-JobFinding/nbbuild/
-JobFinding/nbdist/
-JobFinding/.nb-gradle/
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
 
-# =============================
-# VSCode, IntelliJ, Eclipse
-# =============================
-.vscode/
-.idea/
-*.iml
-*.ipr
-*.iws
+# netbeans
+nbproject/private/
+build/
+nbbuild/
+
+# the dist file could make some problems
+# dist/
+nbdist/
+nbactions.xml
+nb-configuration.xml
+.nb-gradle/
+
+# Eclipse
 .classpath
 .project
 .settings/
-.DS_Store
-.env
 
-# =============================
-# Cá nhân hoặc môi trường
-# =============================
-JobFinding/src/java/context/DBContext.java  # Nếu chứa config nhạy cảm
-*.log
-*.tmp
+# Intellij
+.idea/
+*.iml
+*.iws
+
+# Mac
+.DS_Store
+
+# Maven
+log/
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+/dist/
