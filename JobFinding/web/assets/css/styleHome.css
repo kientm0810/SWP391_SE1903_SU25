@@ -214,3 +214,41 @@ a:hover {
     /* SỬA ĐỔI QUAN TRỌNG: Đảm bảo cột là flex container */
     display: flex; 
 }
+
+/* === HORIZONTAL JOB CAROUSEL === */
+.job-carousel {
+    display: flex;
+    overflow-x: auto;
+    gap: 1.5rem;
+    padding: 5px 0 15px 0;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-color) transparent;
+}
+
+.job-carousel::-webkit-scrollbar {
+    height: 8px;
+}
+
+.job-carousel::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
+    border-radius: 4px;
+}
+
+.job-card-carousel {
+    min-width: 300px;
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+}
+
+/* Animation */
+.animated-card {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.animated-card.appear {
+    opacity: 1;
+    transform: translateY(0);
+}

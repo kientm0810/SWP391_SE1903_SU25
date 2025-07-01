@@ -1,12 +1,16 @@
 package daos;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
 import context.DBContext;
 import models.Application;
 import models.JobListing;
 import models.JobSeeker;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ApplicationDAO extends DBContext {
     
@@ -131,5 +135,27 @@ public class ApplicationDAO extends DBContext {
             }
         }
         return null;
+    }
+    
+    public int insertApplication(Application app) throws SQLException {
+        String sql = "INSERT INTO Applications (job_listing_id, job_seeker_id, cv_file, cover_letter, status) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, app.getJob().getId());
+            ps.setInt(2, app.getJobseeker().getId());
+            ps.setString(3, app.getCvFile());
+            ps.setString(4, app.getCoverLetter());
+            ps.setString(5, app.getStatus());
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Creating application failed, no rows affected.");
+            }
+            try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return generatedKeys.getInt(1);
+                } else {
+                    throw new SQLException("Creating application failed, no ID obtained.");
+                }
+            }
+        }
     }
 } 

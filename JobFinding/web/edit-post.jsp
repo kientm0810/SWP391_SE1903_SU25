@@ -18,8 +18,7 @@
                 <div class="container mt-4">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/post">Danh sách
-                                    tin</a></li>
+                            <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/home">Home</a></li>
                             <li class="breadcrumb-item"><a
                                     href="${pageContext.request.contextPath}/post/view?id=${post.id}">${post.title}</a>
                             </li>
@@ -235,14 +234,26 @@
                     </div>
                 </div>
 
-                                            
+
                 <!--API CKEditor-->
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                <script src="tinymce/tinymce.min.js"></script>
                 <script>
-                    // Khởi tạo CKEditor cho các textarea cần rich text
-                    ClassicEditor.create(document.querySelector('#jobDescription'));
-                    ClassicEditor.create(document.querySelector('#requirements'));
-                    ClassicEditor.create(document.querySelector('#benefits'));
+                    // Khởi tạo TinyMCE cho các textarea cần rich text
+                    tinymce.init({
+                        selector: '#jobDescription, #requirements, #benefits',
+                        height: 300,
+                        menubar: false,
+                        plugins: [
+                            'advlist autolink lists link image charmap print preview anchor',
+                            'searchreplace visualblocks code fullscreen',
+                            'insertdatetime media table paste code help wordcount'
+                        ],
+                        toolbar: 'undo redo | formatselect | bold italic backcolor | \
+                        alignleft aligncenter alignright alignjustify | \
+                        bullist numlist outdent indent | removeformat | help',
+                        branding: false
+                    });
 
                     // Logo preview function
                     function previewLogo(event) {
@@ -336,6 +347,9 @@
                             alert('Vui lòng điền đầy đủ các trường bắt buộc');
                             return;
                         }
+
+                        // Đồng bộ nội dung TinyMCE vào textarea trước khi submit
+                        tinymce.triggerSave();
 
                         // Submit form using fetch API
                         fetch(form.action, {

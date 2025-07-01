@@ -1,9 +1,13 @@
 package daos;
 
-import context.DBContext;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import context.DBContext;
 import models.Posts;
 
 public class PostsDAO {
@@ -669,5 +673,59 @@ public class PostsDAO {
 
     public Connection getConnection() {
         return conn;
+    }
+
+    // Get latest posts for homepage or recommendation
+    public List<Posts> getLatestPosts(int limit) {
+        List<Posts> posts = new ArrayList<>();
+        // NOTE: SQL Server does not allow parameterising the TOP clause directly,
+        // so we build the query string dynamically. The limit value is controlled
+        // inside the application (an integer), therefore the risk of SQL injection
+        // is mitigated as it cannot be influenced by end-users.
+        String query = "SELECT TOP (" + limit + ") * FROM Posts WHERE deleted_at IS NULL ORDER BY created_at DESC";
+        try {
+            ps = conn.prepareStatement(query);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Posts post = new Posts();
+                post.setId(rs.getInt("id"));
+                post.setUserId(rs.getInt("user_id"));
+                post.setUserType(rs.getString("user_type"));
+                post.setParentId(rs.getInt("parent_id"));
+                post.setPostType(rs.getString("post_type"));
+                post.setTitle(rs.getString("title"));
+                post.setStatus(rs.getString("status"));
+                post.setViewCount(rs.getInt("view_count"));
+                post.setLikeCount(rs.getInt("like_count"));
+                post.setCommentCount(rs.getInt("comment_count"));
+                post.setCreatedAt(rs.getTimestamp("created_at"));
+                post.setUpdatedAt(rs.getTimestamp("updated_at"));
+                post.setDeletedAt(rs.getTimestamp("deleted_at"));
+                post.setExperience(rs.getString("experience"));
+                post.setDeadline(rs.getDate("deadline"));
+                post.setWorkingTime(rs.getString("working_time"));
+                post.setJobDescription(rs.getString("job_description"));
+                post.setRequirements(rs.getString("requirements"));
+                post.setBenefits(rs.getString("benefits"));
+                post.setContactAddress(rs.getString("contact_address"));
+                post.setApplicationMethod(rs.getString("application_method"));
+                post.setCompanyName(rs.getString("company_name"));
+                post.setCompanyLogo(rs.getString("company_logo"));
+                post.setSalary(rs.getString("salary"));
+                post.setLocation(rs.getString("location"));
+                post.setJobType(rs.getString("job_type"));
+                post.setRank(rs.getString("rank"));
+                post.setIndustry(rs.getString("industry"));
+                post.setContactPerson(rs.getString("contact_person"));
+                post.setCompanySize(rs.getString("company_size"));
+                post.setCompanyWebsite(rs.getString("company_website"));
+                post.setCompanyDescription(rs.getString("company_description"));
+                post.setKeywords(rs.getString("keywords"));
+                posts.add(post);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return posts;
     }
 }

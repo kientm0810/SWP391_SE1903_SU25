@@ -1,13 +1,15 @@
 package controllers;
 
-import daos.PostsDAO;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+
+import daos.PostsDAO;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,6 +45,8 @@ public class PostController extends HttpServlet {
             uploadDir.mkdirs();
         }
     }
+    
+    
 
     /**
      *
@@ -55,6 +59,11 @@ public class PostController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String path = request.getPathInfo();
+        // Nếu truy cập /post/home thì redirect về /home
+        if ("/home".equals(path)) {
+            response.sendRedirect(request.getContextPath() + "/home");
+            return;
+        }
         if (path == null || path.equals("/")) {
             String view = request.getParameter("view");
             HttpSession session = request.getSession();
@@ -125,7 +134,6 @@ public class PostController extends HttpServlet {
             } else {
                 response.sendRedirect(request.getContextPath() + "/post");
             }
-
         } else if (path.equals("/edit")) {
             // Show edit form
             int id = Integer.parseInt(request.getParameter("id"));
@@ -440,6 +448,7 @@ public class PostController extends HttpServlet {
         }
     }
 
+    
     private String getSubmittedFileName(Part part) {
         String contentDisp = part.getHeader("content-disposition");
         String[] tokens = contentDisp.split(";");

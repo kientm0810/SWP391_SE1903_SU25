@@ -1,0 +1,122 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f4fdf6;
+    margin: 0;
+    padding: 40px 20px;
+    color: #2e2e2e;
+}
+
+.container {
+    max-width: 1000px;
+    margin: auto;
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.05);
+    border-left: 6px solid #2e7d32;
+}
+
+h1 {
+    color: #2e7d32;
+    margin-bottom: 30px;
+    font-size: 32px;
+}
+
+h2 {
+    color: #1b5e20;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    font-size: 24px;
+    border-bottom: 2px solid #c8e6c9;
+    padding-bottom: 8px;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 25px;
+    color: #2e7d32;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.back-link:hover {
+    color: #1b5e20;
+}
+
+.detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.detail-table th,
+.detail-table td {
+    padding: 14px 18px;
+    border-bottom: 1px solid #e0e0e0;
+    vertical-align: top;
+}
+
+.detail-table th {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    width: 200px;
+    font-weight: 600;
+    text-align: left;
+    border-radius: 6px 0 0 6px;
+}
+
+.detail-table td {
+    color: #444;
+    border-radius: 0 6px 6px 0;
+}
+
+.profile-img,
+.logo-img {
+    max-width: 120px;
+    height: auto;
+    border-radius: 10px;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(46, 125, 50, 0.2);
+}
+
+.detail-table a {
+    color: #2e7d32;
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+.detail-table a:hover {
+    color: #1b5e20;
+}
+
+@media (max-width: 768px) {
+    .detail-table th,
+    .detail-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .detail-table th {
+        background-color: transparent;
+        font-weight: bold;
+        border-bottom: none;
+        padding-top: 20px;
+    }
+
+    .detail-table td {
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 15px;
+    }
+
+    .container {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+}

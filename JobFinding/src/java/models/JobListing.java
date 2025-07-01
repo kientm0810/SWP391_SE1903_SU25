@@ -20,6 +20,7 @@ public class JobListing {
     private double salaryMax;
     private String description;
     private String requirements;
+    private String jobType;
     private Timestamp createdAt;
     private String status;
 
@@ -87,6 +88,14 @@ public class JobListing {
 
     public void setRequirements(String requirements) {
         this.requirements = requirements;
+    }
+
+    public String getJobType() {
+        return jobType;
+    }
+
+    public void setJobType(String jobType) {
+        this.jobType = jobType;
     }
 
     public Timestamp getCreatedAt() {

@@ -26,6 +26,11 @@
                                 <i class="fas fa-briefcase"></i> Jobs
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="blog.jsp">
+                                <i class="fas fa-blog"></i> Blog
+                            </a>
+                        </li>
                         <c:if test="${sessionScope.role == 'recruiter'}">
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="communityDropdown" role="button"
@@ -58,12 +63,83 @@
                                 <i class="fas fa-envelope"></i> Contact
                             </a>
                         </li>
+                        <c:if test="${sessionScope.role == 'admin'}">
+                            <li class="nav-item">
+                                <a class="nav-link" href="admin_dashboard.jsp">
+                                    <i class="fas fa-tools"></i> Dashboard
+                                </a>
+                            </li>
+                        </c:if>
                     </ul>
 
                     <!-- User Menu -->
                     <div class="d-flex align-items-center">
                         <c:choose>
                             <c:when test="${not empty sessionScope.user}">
+                                <c:if test="${sessionScope.role == 'recruiter'}">
+                                    <div class="dropdown" data-bs-auto-close="outside">
+                                        <button class="btn btn-light dropdown-toggle" type="button" id="notiDropdown"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-bell"></i>
+                                        </button>
+
+                                        <ul class="dropdown-menu dropdown-menu-end notifications"
+                                            aria-labelledby="notiDropdown">
+
+                                            <!-- Notification filter tabs -->
+                                            <div class="d-flex justify-content-center px-3 pt-2">
+                                                <button type="button"
+                                                    class="btn btn-sm btn-outline-primary me-1 tab-btn active"
+                                                    data-target="all">
+                                                    All
+                                                </button>
+                                                <button type="button"
+                                                    class="btn btn-sm btn-outline-primary me-1 tab-btn"
+                                                    data-target="unread">
+                                                    Unread
+                                                </button>
+                                            </div>
+                                            <hr class="my-2" />
+
+                                            <!-- All notifications -->
+                                            <div class="tab-content all">
+                                                <c:forEach var="noti" items="${notice}">
+                                                    <a href="notification?service=detail&type=all&id=${noti.id}"
+                                                        class="text-decoration-none text-dark">
+                                                        <li class="notification-item ${noti.is_read ? '' : 'unread'}">
+                                                            <div class="notification-title">${noti.title}</div>
+                                                            <div class="notification-content">${noti.content}</div>
+                                                            <span class="notification-time">${noti.created_at}</span>
+                                                        </li>
+                                                    </a>
+                                                </c:forEach>
+                                            </div>
+
+                                            <!-- Unread notifications only -->
+                                            <div class="tab-content unread d-none">
+                                                <c:forEach var="noti" items="${unread}">
+                                                    <c:if test="${!noti.is_read}">
+                                                        <a href="notification?service=detail&type=all&id=${noti.id}"
+                                                            class="text-decoration-none text-dark">
+                                                            <li class="notification-item unread">
+                                                                <div class="notification-title">${noti.title}</div>
+                                                                <div class="notification-content">${noti.content}</div>
+                                                                <span
+                                                                    class="notification-time">${noti.created_at}</span>
+                                                            </li>
+                                                        </a>
+                                                    </c:if>
+                                                </c:forEach>
+                                            </div>
+
+                                            <li class="view-all text-center mt-2">
+                                                <a href="notification" class="text-primary text-decoration-none">View
+                                                    all</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </c:if>
+                                <div>&nbsp;</div>
                                 <div class="dropdown">
                                     <button class="btn btn-light dropdown-toggle" type="button" id="userDropdown"
                                         data-bs-toggle="dropdown" aria-expanded="false">
@@ -78,22 +154,29 @@
                                         </li>
                                         <c:if test="${sessionScope.role == 'recruiter'}">
                                             <li>
-                                                <a class="dropdown-item" href="post?view=my">
+                                                <a class="dropdown-item" href="post">
                                                     <i class="fas fa-file-alt"></i> My Posts
                                                 </a>
                                             </li>
                                         </c:if>
                                         <li>
-                                            <a class="dropdown-item"
-                                                href="${pageContext.request.contextPath}/saved-jobs">
+                                            <a class="dropdown-item" href="list_cv">
+                                                <i class="fas fa-user"></i> My CV
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="my-posts">
+                                                <i class="fas fa-file-alt"></i> My Posts
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="saved-jobs">
                                                 <i class="fas fa-heart"></i> Saved Jobs
                                             </a>
                                         </li>
-                                        <c:if
-                                            test="${sessionScope.role == 'recruiter' || sessionScope.role == 'admin'}">
+                                        <c:if test="${sessionScope.role == 'recruiter'}">
                                             <li>
-                                                <a class="dropdown-item"
-                                                    href="${pageContext.request.contextPath}/recruitment">
+                                                <a class="dropdown-item" href="recruitment_dashboard.jsp">
                                                     <i class="fas fa-tachometer-alt"></i> DashBoard Control
                                                 </a>
                                             </li>
@@ -124,301 +207,10 @@
         </nav>
     </header>
 
-    <style>
-        :root {
-            --topcv-primary: #00B14F;
-            --topcv-primary-hover: #009443;
-            --topcv-secondary: #F5F5F5;
-            --topcv-text: #333333;
-            --topcv-light-text: #666666;
-            --topcv-border: #E5E5E5;
-            --topcv-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            --topcv-success: #00B14F;
-            --topcv-warning: #FFB800;
-            --topcv-danger: #FF4D4F;
-            --topcv-link: #00B14F;
-            --topcv-link-hover: #009443;
-        }
-
-        .header-area {
-            margin-bottom: 70px;
-        }
-
-        .navbar {
-            padding: 0.75rem 0;
-            background-color: #fff !important;
-            box-shadow: var(--topcv-box-shadow);
-            border-bottom: 1px solid var(--topcv-border);
-        }
-
-        .navbar-brand {
-            padding: 0;
-        }
-
-        .navbar-brand img {
-            height: 32px;
-            transition: transform 0.3s ease;
-        }
-
-        .navbar-brand:hover img {
-            transform: scale(1.05);
-        }
-
-        .nav-link {
-            color: var(--topcv-text) !important;
-            padding: 0.5rem 1rem !important;
-            font-weight: 500;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .nav-link:hover {
-            color: var(--topcv-primary) !important;
-        }
-
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: 0;
-            left: 50%;
-            background-color: var(--topcv-primary);
-            transition: all 0.3s ease;
-            transform: translateX(-50%);
-        }
-
-        .nav-link:hover::after {
-            width: 100%;
-        }
-
-        .nav-link i {
-            margin-right: 0.5rem;
-            font-size: 16px;
-            color: var(--topcv-primary);
-        }
-
-        /* Dropdown Styles */
-        .dropdown-menu {
-            border: 1px solid var(--topcv-border);
-            box-shadow: var(--topcv-box-shadow);
-            border-radius: 8px;
-            padding: 0.5rem;
-            min-width: 200px;
-        }
-
-        .dropdown-item {
-            padding: 0.75rem 1rem;
-            color: var(--topcv-text);
-            font-size: 14px;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-        }
-
-        .dropdown-item:hover {
-            background-color: var(--topcv-secondary);
-            color: var(--topcv-primary);
-            transform: translateX(5px);
-        }
-
-        .dropdown-item i {
-            margin-right: 0.75rem;
-            width: 16px;
-            text-align: center;
-            color: var(--topcv-primary);
-        }
-
-        .dropdown-item:hover i {
-            color: var(--topcv-primary-hover);
-        }
-
-        .dropdown-divider {
-            margin: 0.5rem 0;
-            border-color: var(--topcv-border);
-        }
-
-        /* Button Styles */
-        .btn {
-            padding: 0.5rem 1.25rem;
-            font-weight: 500;
-            font-size: 14px;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary {
-            background-color: var(--topcv-primary);
-            border-color: var(--topcv-primary);
-        }
-
-        .btn-primary:hover {
-            background-color: var(--topcv-primary-hover);
-            border-color: var(--topcv-primary-hover);
-            transform: translateY(-1px);
-        }
-
-        .btn-outline-primary {
-            color: var(--topcv-primary);
-            border-color: var(--topcv-primary);
-        }
-
-        .btn-outline-primary:hover {
-            background-color: var(--topcv-primary);
-            border-color: var(--topcv-primary);
-            transform: translateY(-1px);
-        }
-
-        .btn-light {
-            background-color: var(--topcv-secondary);
-            border-color: var(--topcv-border);
-            color: var(--topcv-text);
-        }
-
-        .btn-light:hover {
-            background-color: var(--topcv-border);
-            border-color: var(--topcv-border);
-            color: var(--topcv-primary);
-        }
-
-        .dropdown-toggle::after {
-            margin-left: 0.5rem;
-            vertical-align: middle;
-            border-top-color: var(--topcv-primary);
-        }
-
-        /* User Menu */
-        .user-menu {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background-color: var(--topcv-secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--topcv-primary);
-            font-size: 16px;
-            border: 2px solid var(--topcv-primary);
-        }
-
-        /* Active States */
-        .nav-link.active {
-            color: var(--topcv-primary) !important;
-        }
-
-        .nav-link.active::after {
-            width: 100%;
-        }
-
-        .dropdown-item.active {
-            background-color: var(--topcv-primary);
-            color: white;
-        }
-
-        .dropdown-item.active i {
-            color: white;
-        }
-
-        /* Mobile Styles */
-        @media (max-width: 991.98px) {
-            .navbar-collapse {
-                padding: 1rem 0;
-                background-color: white;
-                border-radius: 8px;
-                box-shadow: var(--topcv-box-shadow);
-                margin-top: 1rem;
-            }
-
-            .navbar-nav {
-                margin-bottom: 1rem !important;
-            }
-
-            .nav-link::after {
-                display: none;
-            }
-
-            .d-flex {
-                display: block !important;
-                width: 100%;
-            }
-
-            .btn {
-                display: block;
-                width: 100%;
-                margin: 0.5rem 0;
-                text-align: center;
-            }
-
-            .user-menu {
-                flex-direction: column;
-                width: 100%;
-            }
-
-            .dropdown-menu {
-                position: static !important;
-                box-shadow: none;
-                border: none;
-                padding: 0;
-            }
-
-            .navbar-toggler {
-                border: none;
-                padding: 0.5rem;
-                color: var(--topcv-primary);
-            }
-
-            .navbar-toggler:focus {
-                box-shadow: none;
-                outline: none;
-            }
-
-            .navbar-toggler-icon {
-                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(0, 177, 79, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-            }
-        }
-
-        /* Animation */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .dropdown-menu.show {
-            animation: fadeIn 0.3s ease;
-        }
-
-        /* Notification Badge */
-        .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: var(--topcv-primary);
-            color: white;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 11px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid white;
-        }
-    </style>
-
     <!-- Bootstrap and Font Awesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="assets/css/header.css">
+
+    <script src="assets/js/header.js"></script>

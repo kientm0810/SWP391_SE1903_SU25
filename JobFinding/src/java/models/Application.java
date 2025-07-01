@@ -8,6 +8,8 @@ public class Application {
     private JobSeeker jobseeker;
     private String status;
     private Timestamp createdAt;
+    private String cvFile;
+    private String coverLetter;
     
     public Application() {
     }
@@ -58,5 +60,21 @@ public class Application {
     
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
+    }
+    
+    public String getCvFile() {
+        return cvFile;
+    }
+    
+    public void setCvFile(String cvFile) {
+        this.cvFile = cvFile;
+    }
+    
+    public String getCoverLetter() {
+        return coverLetter;
+    }
+    
+    public void setCoverLetter(String coverLetter) {
+        this.coverLetter = coverLetter;
     }
 } 

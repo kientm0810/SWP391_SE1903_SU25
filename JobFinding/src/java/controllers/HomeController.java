@@ -4,29 +4,39 @@
  */
 package controllers;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Vector;
+
+import daos.JobDAO;
 import daos.PostsDAO;
+import daos.RecruiterNotificationDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.List;
+import jakarta.servlet.http.HttpSession;
+import models.JobListing;
+import models.JobTypeCount;
 import models.Posts;
+import models.RecruiterNotification;
+import utils.Constants;
 
 /**
  *
- * @author SHD
+ * @author andin
  */
 @WebServlet(name = "HomeController", urlPatterns = {"/home", "/"})
 public class HomeController extends HttpServlet {
 
     private PostsDAO postsDAO;
+    private JobDAO jobDAO;
 
     @Override
     public void init() throws ServletException {
         postsDAO = new PostsDAO();
+        jobDAO = new JobDAO();
     }
 
     /**
@@ -41,32 +51,7 @@ public class HomeController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet HomeController</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet HomeController at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
         try {
             // Get page number from request parameter
             int page = 1;
@@ -93,6 +78,14 @@ public class HomeController extends HttpServlet {
             // Get posts for current page with search
             List<Posts> recentPosts = postsDAO.getPostsByPageWithSearch(page, pageSize, keyword, jobType, location);
             
+            // Latest job listings for homepage (guest view)
+            List<JobListing> latestJobs = jobDAO.getLatestJobListings(10);
+            request.setAttribute("latestJobs", latestJobs);
+            
+            // Top job categories (job types) for displaying in Browse Top Categories
+            List<JobTypeCount> jobCategories = jobDAO.getJobTypeCounts(8);
+            request.setAttribute("jobCategories", jobCategories);
+            
             // Set attributes for JSP
             request.setAttribute("recentPosts", recentPosts);
             request.setAttribute("currentPage", page);
@@ -101,11 +94,79 @@ public class HomeController extends HttpServlet {
             request.setAttribute("jobType", jobType);
             request.setAttribute("location", location);
             
-            request.getRequestDispatcher("/home.jsp").forward(request, response);
+            // request.getRequestDispatcher("/home.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
             response.sendRedirect("error.jsp");
+            return;
         }
+
+        HttpSession session = request.getSession(true);
+
+        String role = (String) session.getAttribute("role");
+        if (Constants.RECRUITER_ROLE.equals(role)) {
+            processRecruiter(request, response);
+            return;
+        }
+        // Job seeker sẽ dùng cùng trang home với khách, không dùng dashboard riêng
+
+        // Mặc định (khách, job-seeker, hoặc role khác) hiển thị home.jsp như chưa đăng nhập
+        request.getRequestDispatcher("home.jsp").forward(request, response);
+    }
+
+    private void processRecruiter(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String service = request.getParameter("service");
+        if (service == null) {
+            service = "list";
+        }
+
+        if (service.equals("list")){
+            listNoticeRecruiter(request, response);
+        } else if (service.equals("")){
+            
+        }
+    }
+
+    private void listNoticeRecruiter(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException {
+        HttpSession session = request.getSession(true);
+        String role = (String) session.getAttribute("role");
+        int id = (int) session.getAttribute("userId");
+        RecruiterNotificationDAO dao = new RecruiterNotificationDAO();
+        
+        int topk = 5;
+        Vector<RecruiterNotification> list = dao.getNotice(id, topk);
+        Vector<RecruiterNotification> unread = dao.getUnreadNotice(id, topk);
+        request.setAttribute("notice", list);
+        request.setAttribute("unread", unread);
+
+//        String sql = "SELECT " + (topk == -1 ? "*" : "TOP (" + topk + ")")
+//                + "  FROM [project_SWP391].[dbo].[RecruiterNotification]\n"
+//                + "  WHERE [recruiter_id] = " + id 
+//                + " ORDER BY created_at DESC";
+//        
+//        log(sql);
+        
+                log("" + list.size());
+//                log("" + id);
+//                response.sendRedirect("admin_dashboard.jsp");
+//                return;
+        request.getRequestDispatcher("home.jsp").forward(request, response);
+    }
+    
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    /** 
+     * Handles the HTTP <code>GET</code> method.
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
     }
 
     /**
