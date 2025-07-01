@@ -8,6 +8,7 @@ import java.util.List;
 
 import context.DBContext;
 import models.JobListing;
+import models.JobTypeCount;
 
 public class JobDAO extends DBContext {
     
@@ -167,5 +168,27 @@ public class JobDAO extends DBContext {
             }
         }
         return jobs;
+    }
+    
+    public List<JobTypeCount> getJobTypeCounts(int limit) throws SQLException {
+        List<JobTypeCount> list = new ArrayList<>();
+        if (limit <= 0) {
+            limit = 8; // default safeguard
+        }
+        String sql = "SELECT TOP (" + limit + ") job_type, COUNT(*) AS cnt "
+                   + "FROM Job_Listings "
+                   + "WHERE (status IS NULL OR status <> 'deleted') "
+                   + "GROUP BY job_type "
+                   + "ORDER BY cnt DESC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                JobTypeCount jtc = new JobTypeCount();
+                jtc.setJobType(rs.getString("job_type"));
+                jtc.setCount(rs.getInt("cnt"));
+                list.add(jtc);
+            }
+        }
+        return list;
     }
 } 

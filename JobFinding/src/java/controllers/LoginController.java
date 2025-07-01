@@ -151,7 +151,7 @@ public class LoginController extends HttpServlet {
         String homePage = switch (role) {
             case "admin" -> "home";
             case "recruiter" -> "home";
-            case "job-seeker" -> "profile";
+            case "job-seeker" -> "home";
             default -> "login";
         };
         response.sendRedirect(homePage);

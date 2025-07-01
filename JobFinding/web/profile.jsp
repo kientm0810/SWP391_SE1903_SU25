@@ -41,19 +41,16 @@
                         <div class="col-lg-4">
                             <div class="card mb-4">
                                 <div class="card-body text-center">
-                                                        <img src="${sessionScope.user.profilePicture != null ? sessionScope.user.profilePicture : 'assets/img/elements/user.png'}" alt="Avatar" class="rounded-circle img-fluid"
-                        style="width: 150px;">
+                                                        <form id="avatarForm" method="post" action="avatar-upload" enctype="multipart/form-data">
+                                                            <input type="hidden" name="action" value="uploadAvatar">
+                                                            <input type="file" name="avatarFile" id="avatarFile" class="d-none" accept="image/png, image/jpeg" onchange="document.getElementById('avatarForm').submit();">
+                                                            <img src="${sessionScope.user.profilePicture != null ? sessionScope.user.profilePicture : 'assets/img/elements/user.png'}" alt="Avatar" class="rounded-circle img-fluid" style="width: 150px; cursor:pointer;" onclick="document.getElementById('avatarFile').click();">
+                                                            <small class="text-muted d-block mt-2">Nhấp vào ảnh để thay đổi</small>
+                                                        </form>
                     <h5 class="my-3">${sessionScope.user.fullName}</h5>
                     <p class="text-muted mb-1">${sessionScope.user.desiredJobTitle != null ? sessionScope.user.desiredJobTitle : 'Tìm việc làm'}</p>
                     <p class="text-muted mb-4">${sessionScope.user.address != null ? sessionScope.user.address : 'Việt Nam'}</p>
-                                    <div class="d-flex justify-content-center mb-2">
-                                        <a href="edit_profile.jsp" class="btn btn-primary me-2">
-                                            <i class="fas fa-edit me-2"></i>Chỉnh sửa
-                                        </a>
-                                        <a href="settings.jsp" class="btn btn-outline-primary">
-                                            <i class="fas fa-cog me-2"></i>Cài đặt
-                                        </a>
-                                    </div>
+                                    <!-- Buttons removed as per new design -->
                                 </div>
                             </div>
 
@@ -83,82 +80,10 @@
                                     </c:if>
                                 </div>
                             </div>
-
-                            <!-- Skills -->
-                            <div class="card mb-4">
-                                <div class="card-body">
-                                    <h5 class="mb-3">Kỹ năng</h5>
-                                    <div class="d-flex flex-wrap gap-2">
-                                        <c:choose>
-                                            <c:when test="${not empty sessionScope.user.skills}">
-                                                <c:forEach items="${sessionScope.user.skills}" var="skill">
-                                                    <span class="badge bg-primary">${skill}</span>
-                                                </c:forEach>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <span class="text-muted">Chưa có kỹ năng nào</span>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
                         <!-- Main Content -->
                         <div class="col-lg-8">
-                            <!-- About -->
-                            <div class="card mb-4">
-                                <div class="card-body">
-                                    <h5 class="mb-3">Giới thiệu</h5>
-                                    <p>${sessionScope.user.profileSummary != null ? sessionScope.user.profileSummary : 'Chưa có thông tin giới thiệu'}</p>
-                                </div>
-                            </div>
-
-                            <!-- Experience & Education -->
-                            <div class="card mb-4">
-                                <div class="card-body">
-                                    <h5 class="mb-3">Thông tin nghề nghiệp</h5>
-                                    
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <h6 class="text-primary">Vị trí mong muốn</h6>
-                                            <p>${sessionScope.user.desiredJobTitle != null ? sessionScope.user.desiredJobTitle : 'Chưa xác định'}</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <h6 class="text-primary">Mức lương mong muốn</h6>
-                                            <p>
-                                                <c:choose>
-                                                    <c:when test="${not empty sessionScope.user.desiredSalary}">
-                                                        <fmt:formatNumber value="${sessionScope.user.desiredSalary}" type="currency" currencySymbol="" />₫
-                                                    </c:when>
-                                                    <c:otherwise>Thỏa thuận</c:otherwise>
-                                                </c:choose>
-                                            </p>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <h6 class="text-primary">Kinh nghiệm</h6>
-                                            <p>${sessionScope.user.experienceYears != null ? sessionScope.user.experienceYears : 0} năm</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <h6 class="text-primary">Nơi làm việc</h6>
-                                            <p>${sessionScope.user.preferredLocation != null ? sessionScope.user.preferredLocation : 'Toàn quốc'}</p>
-                                        </div>
-                                    </div>
-                                    
-                                    <c:if test="${not empty sessionScope.user.jobCategory}">
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <h6 class="text-primary">Lĩnh vực</h6>
-                                                <p>${sessionScope.user.jobCategory}</p>
-                                            </div>
-                                        </div>
-                                    </c:if>
-                                </div>
-                            </div>
-
                             <!-- CV Management -->
                             <div class="card mb-4">
                                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -313,25 +238,6 @@
                                             </c:if>
                                         </c:otherwise>
                                     </c:choose>
-                                </div>
-                            </div>
-
-                            <!-- Certifications -->
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="mb-3">Kỹ năng & Chứng chỉ</h5>
-                                    <c:choose>
-                                        <c:when test="${not empty sessionScope.user.education}">
-                                            <p class="mb-2"><strong>Học vấn:</strong> ${sessionScope.user.education}</p>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <p class="text-muted mb-2">Chưa có thông tin học vấn</p>
-                                        </c:otherwise>
-                                    </c:choose>
-                                    
-                                    <c:if test="${not empty sessionScope.user.experienceYears}">
-                                        <p class="mb-2"><strong>Kinh nghiệm:</strong> ${sessionScope.user.experienceYears} năm</p>
-                                    </c:if>
                                 </div>
                             </div>
                         </div>

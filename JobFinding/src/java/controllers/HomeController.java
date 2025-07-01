@@ -18,8 +18,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import models.JobListing;
+import models.JobTypeCount;
 import models.Posts;
 import models.RecruiterNotification;
+import utils.Constants;
 
 /**
  *
@@ -80,6 +82,10 @@ public class HomeController extends HttpServlet {
             List<JobListing> latestJobs = jobDAO.getLatestJobListings(10);
             request.setAttribute("latestJobs", latestJobs);
             
+            // Top job categories (job types) for displaying in Browse Top Categories
+            List<JobTypeCount> jobCategories = jobDAO.getJobTypeCounts(8);
+            request.setAttribute("jobCategories", jobCategories);
+            
             // Set attributes for JSP
             request.setAttribute("recentPosts", recentPosts);
             request.setAttribute("currentPage", page);
@@ -98,17 +104,14 @@ public class HomeController extends HttpServlet {
         HttpSession session = request.getSession(true);
 
         String role = (String) session.getAttribute("role");
-        if (role != null) {
-//            int id = (int) session.getAttribute("userId");
-            if (role.equals("recruiter")) {
-                processRecruiter(request, response);
-            } else if (role.equals("job-seeker")){
-                processJobSeeker(request, response);
-            }
-        } else {
-
-            request.getRequestDispatcher("home.jsp").forward(request, response);
+        if (Constants.RECRUITER_ROLE.equals(role)) {
+            processRecruiter(request, response);
+            return;
         }
+        // Job seeker sẽ dùng cùng trang home với khách, không dùng dashboard riêng
+
+        // Mặc định (khách, job-seeker, hoặc role khác) hiển thị home.jsp như chưa đăng nhập
+        request.getRequestDispatcher("home.jsp").forward(request, response);
     }
 
     private void processRecruiter(HttpServletRequest request, HttpServletResponse response)
@@ -150,58 +153,6 @@ public class HomeController extends HttpServlet {
 //                response.sendRedirect("admin_dashboard.jsp");
 //                return;
         request.getRequestDispatcher("home.jsp").forward(request, response);
-    }
-    
-    private void processJobSeeker(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        try {
-            HttpSession session = request.getSession();
-            
-            // Get page number from request parameter
-            int page = 1;
-            int pageSize = 6;
-            
-            try {
-                String pageStr = request.getParameter("page");
-                if (pageStr != null && !pageStr.isEmpty()) {
-                    page = Integer.parseInt(pageStr);
-                }
-            } catch (NumberFormatException e) {
-                page = 1;
-            }
-            
-            // Get search parameters
-            String keyword = request.getParameter("keyword");
-            String jobType = request.getParameter("jobType");
-            String location = request.getParameter("location");
-            
-            // Get total posts and calculate total pages
-            int totalPosts = postsDAO.getTotalPostsWithSearch(keyword, jobType, location);
-            int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
-            
-            // Get posts for current page with search
-            List<Posts> recentPosts = postsDAO.getPostsByPageWithSearch(page, pageSize, keyword, jobType, location);
-            
-            // Recommended jobs for job seeker: fetch latest 6 active job listings
-            List<JobListing> recommendedJobs = jobDAO.getLatestJobListings(6);
-            request.setAttribute("recommendedJobs", recommendedJobs);
-            
-            // Set attributes for JSP
-            request.setAttribute("recentPosts", recentPosts);
-            request.setAttribute("currentPage", page);
-            request.setAttribute("totalPages", totalPages);
-            request.setAttribute("keyword", keyword);
-            request.setAttribute("jobType", jobType);
-            request.setAttribute("location", location);
-            
-            // Forward to jobseeker home page
-            request.getRequestDispatcher("jobseeker_home.jsp").forward(request, response);
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.sendRedirect("error.jsp");
-            return;
-        }
     }
     
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

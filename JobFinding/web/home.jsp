@@ -139,94 +139,48 @@
                                         </div>
                                     </div>
                                     <div class="row d-flex justify-contnet-center">
-                                        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                                            <div class="single-services text-center mb-30">
-                                                <div class="services-ion">
-                                                    <span class="flaticon-tour"></span>
+                                        <c:choose>
+                                            <c:when test="${not empty jobCategories}">
+                                                <c:forEach items="${jobCategories}" var="cat">
+                                                    <c:set var="displayName">
+                                                        <c:choose>
+                                                            <c:when test="${cat.jobType == 'full_time'}">Full-time</c:when>
+                                                            <c:when test="${cat.jobType == 'part_time'}">Part-time</c:when>
+                                                            <c:when test="${cat.jobType == 'internship'}">Internship</c:when>
+                                                            <c:when test="${cat.jobType == 'freelance'}">Freelance</c:when>
+                                                            <c:when test="${cat.jobType == 'contract'}">Contract</c:when>
+                                                            <c:otherwise>${cat.jobType}</c:otherwise>
+                                                        </c:choose>
+                                                    </c:set>
+                                                    <c:set var="iconClass">
+                                                        <c:choose>
+                                                            <c:when test="${cat.jobType == 'full_time'}">flaticon-helmet</c:when>
+                                                            <c:when test="${cat.jobType == 'part_time'}">flaticon-cms</c:when>
+                                                            <c:when test="${cat.jobType == 'internship'}">flaticon-tour</c:when>
+                                                            <c:when test="${cat.jobType == 'freelance'}">flaticon-app</c:when>
+                                                            <c:when test="${cat.jobType == 'contract'}">flaticon-content</c:when>
+                                                            <c:otherwise>flaticon-high-tech</c:otherwise>
+                                                        </c:choose>
+                                                    </c:set>
+                                                    <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
+                                                        <div class="single-services text-center mb-30">
+                                                            <div class="services-ion">
+                                                                <span class="${iconClass}"></span>
+                                                            </div>
+                                                            <div class="services-cap">
+                                                                <h5><a href="home?jobType=${cat.jobType}">${displayName}</a></h5>
+                                                                <span>(${cat.count})</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </c:forEach>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <div class="col-12 text-center">
+                                                    <p>Không có dữ liệu để hiển thị.</p>
                                                 </div>
-                                                <div class="services-cap">
-                                                    <h5><a href="job_listing.html">Design & Creative</a></h5>
-                                                    <span>(653)</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                                            <div class="single-services text-center mb-30">
-                                                <div class="services-ion">
-                                                    <span class="flaticon-cms"></span>
-                                                </div>
-                                                <div class="services-cap">
-                                                    <h5><a href="job_listing.html">Design & Development</a></h5>
-                                                    <span>(658)</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                                            <div class="single-services text-center mb-30">
-                                                <div class="services-ion">
-                                                    <span class="flaticon-report"></span>
-                                                </div>
-                                                <div class="services-cap">
-                                                    <h5><a href="job_listing.html">Sales & Marketing</a></h5>
-                                                    <span>(658)</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                                            <div class="single-services text-center mb-30">
-                                                <div class="services-ion">
-                                                    <span class="flaticon-app"></span>
-                                                </div>
-                                                <div class="services-cap">
-                                                    <h5><a href="job_listing.html">Mobile Application</a></h5>
-                                                    <span>(658)</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                                            <div class="single-services text-center mb-30">
-                                                <div class="services-ion">
-                                                    <span class="flaticon-helmet"></span>
-                                                </div>
-                                                <div class="services-cap">
-                                                    <h5><a href="job_listing.html">Construction</a></h5>
-                                                    <span>(658)</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                                            <div class="single-services text-center mb-30">
-                                                <div class="services-ion">
-                                                    <span class="flaticon-high-tech"></span>
-                                                </div>
-                                                <div class="services-cap">
-                                                    <h5><a href="job_listing.html">Information Technology</a></h5>
-                                                    <span>(658)</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                                            <div class="single-services text-center mb-30">
-                                                <div class="services-ion">
-                                                    <span class="flaticon-real-estate"></span>
-                                                </div>
-                                                <div class="services-cap">
-                                                    <h5><a href="job_listing.html">Real Estate</a></h5>
-                                                    <span>(658)</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                                            <div class="single-services text-center mb-30">
-                                                <div class="services-ion">
-                                                    <span class="flaticon-content"></span>
-                                                </div>
-                                                <div class="services-cap">
-                                                    <h5><a href="job_listing.html">Content Writer</a></h5>
-                                                    <span>(658)</span>
-                                                </div>
-                                            </div>
-                                        </div>
+                                            </c:otherwise>
+                                        </c:choose>
                                     </div>
                                     <!-- More Btn -->
                                     <!-- Section Button -->
