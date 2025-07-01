@@ -65,8 +65,9 @@
                                         </span>
                                     </div>
                                     <div class="job-header-action-row">
-                                        <a href="#" class="btn btn-success btn-apply-topcv" id="openApplyJobBtn"><i
-                                                class="fas fa-paper-plane"></i> Ứng tuyển ngay</a>
+                                        <a href="#" class="btn btn-success btn-apply-topcv" id="openApplyPopup"
+                                            data-post-id="${post.id}"><i class="fas fa-paper-plane"></i> Ứng tuyển
+                                            ngay</a>
                                         <form action="${pageContext.request.contextPath}/saved-jobs" method="post"
                                             style="display:inline;">
                                             <input type="hidden" name="postId" value="${post.id}" />
@@ -192,33 +193,39 @@
                     </div>
                 </div>
 
-                <div id="applyJobModal"></div>
-
-                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                <!-- Popup overlay sẽ được thêm vào cuối body -->
+                <div id="applyJobOverlay" style="display:none;"></div>
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {
-                        var applyBtn = document.getElementById('openApplyJobBtn');
-                        if (applyBtn) {
-                            applyBtn.addEventListener('click', function (e) {
+                        var btn = document.getElementById('openApplyPopup');
+                        if (btn) {
+                            btn.addEventListener('click', function (e) {
                                 e.preventDefault();
-                                var postId = "${post.id}";
-                                fetch('apply-job.jsp?id=' + postId)
-                                    .then(res => res.text())
-                                    .then(html => {
-                                        document.getElementById('applyJobModal').innerHTML = html;
-                                        document.body.style.overflow = 'hidden';
-                                    });
+                                var postId = btn.getAttribute('data-post-id');
+                                var overlay = document.getElementById('applyJobOverlay');
+                                overlay.style.display = 'flex';
+                                overlay.style.position = 'fixed';
+                                overlay.style.top = 0;
+                                overlay.style.left = 0;
+                                overlay.style.width = '100vw';
+                                overlay.style.height = '100vh';
+                                overlay.style.background = 'rgba(0,0,0,0.18)';
+                                overlay.style.zIndex = 9999;
+                                overlay.style.alignItems = 'center';
+                                overlay.style.justifyContent = 'center';
+                                overlay.innerHTML = '<iframe src="' + '${pageContext.request.contextPath}/apply-job.jsp?id=' + postId + '" style="width:480px;max-width:98vw;height:98vh;border:none;border-radius:18px;box-shadow:0 8px 32px rgba(60,60,60,0.18);background:#fff;"></iframe>';
+                                // Đóng popup khi click ra ngoài
+                                overlay.onclick = function (e) {
+                                    if (e.target === overlay) {
+                                        overlay.style.display = 'none';
+                                        overlay.innerHTML = '';
+                                    }
+                                };
                             });
                         }
-                        // Đóng popup khi click overlay hoặc nút X
-                        document.addEventListener('click', function (e) {
-                            if (e.target.classList.contains('apply-overlay') || e.target.classList.contains('close-btn')) {
-                                document.getElementById('applyJobModal').innerHTML = '';
-                                document.body.style.overflow = '';
-                            }
-                        });
                     });
                 </script>
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
             </body>
 
             </html>
