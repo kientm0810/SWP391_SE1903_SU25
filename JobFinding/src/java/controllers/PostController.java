@@ -294,7 +294,7 @@ public class PostController extends HttpServlet {
                 post.setCompanyDescription(request.getParameter("companyDescription") != null ? request.getParameter("companyDescription").trim() : null);
                 post.setKeywords(request.getParameter("keywords") != null ? request.getParameter("keywords").trim() : null);
 
-                // Validate all required fields
+                // Xác thực tất cả các trường bắt buộc
                 if (post.getTitle() == null || post.getTitle().trim().isEmpty()
                         || post.getCompanyName() == null || post.getCompanyName().trim().isEmpty()
                         || post.getSalary() == null || post.getSalary().trim().isEmpty()

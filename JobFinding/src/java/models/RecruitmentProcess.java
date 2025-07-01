@@ -6,8 +6,8 @@ public class RecruitmentProcess {
 
     private int id;
     private int applicationId;
-    private String currentStage; // initial_screening, phone_interview, skills_test, final_interview, decision, offer
-    private String status; // in_progress, completed, rejected, hired
+    private String currentStage; 
+    private String status; 
     private Timestamp createdAt;
     private Timestamp updatedAt;
     private String notes;

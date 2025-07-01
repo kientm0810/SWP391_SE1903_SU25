@@ -122,13 +122,10 @@
                                             <c:otherwise>
                                                 <tr>
                                                     <td colspan="6" class="text-center py-5">
-                                                        <img src="assets/images/empty-application.png"
-                                                            alt="No applications" class="mb-3" style="width: 150px;">
+                                                  
                                                         <h5>Chưa có ứng tuyển nào</h5>
                                                         <p class="text-muted">Bạn chưa ứng tuyển vào vị trí nào</p>
-                                                        <a href="job_search.jsp" class="btn btn-primary mt-3">
-                                                            <i class="fas fa-search me-2"></i>Tìm việc ngay
-                                                        </a>
+                                                     
                                                     </td>
                                                 </tr>
                                             </c:otherwise>

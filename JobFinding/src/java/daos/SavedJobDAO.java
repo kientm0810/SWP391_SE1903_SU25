@@ -13,55 +13,22 @@ public class SavedJobDAO {
         conn = new DBContext().getConnection();
     }
 
-    public boolean saveJob(int userId, int postId) {
-        String sql = "INSERT INTO Saved_Jobs (user_id, post_id) VALUES (?, ?)";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            ps.setInt(2, postId);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
+    // =========================================================================
+    // == PHƯƠNG THỨC MỚI CHO JOB SEEKER VÀ RECRUITER
+    // =========================================================================
 
-    public boolean unsaveJob(int userId, int postId) {
-        String sql = "DELETE FROM Saved_Jobs WHERE user_id = ? AND post_id = ?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            ps.setInt(2, postId);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
+    // --- Methods for Job Seeker ---
 
-    public List<Integer> getSavedPostIds(int userId) {
-        List<Integer> postIds = new ArrayList<>();
-        String sql = "SELECT post_id FROM Saved_Jobs WHERE user_id = ?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                postIds.add(rs.getInt("post_id"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return postIds;
-    }
-
-    public List<SavedJob> getSavedJobs(int userId) {
+    public List<SavedJob> getSavedJobsByJobSeeker(int jobSeekerId) {
         List<SavedJob> savedJobs = new ArrayList<>();
-        String sql = "SELECT id, user_id, post_id, saved_at FROM Saved_Jobs WHERE user_id = ? ORDER BY saved_at DESC";
+        String sql = "SELECT id, job_seeker_id, post_id, saved_at FROM Saved_Jobs WHERE job_seeker_id = ? ORDER BY saved_at DESC";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
+            ps.setInt(1, jobSeekerId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 SavedJob savedJob = new SavedJob();
                 savedJob.setId(rs.getInt("id"));
-                savedJob.setUserId(rs.getInt("user_id"));
+                savedJob.setJob_seeker_id(rs.getInt("job_seeker_id"));
                 savedJob.setPostId(rs.getInt("post_id"));
                 savedJob.setSavedAt(rs.getTimestamp("saved_at"));
                 savedJobs.add(savedJob);
@@ -72,10 +39,10 @@ public class SavedJobDAO {
         return savedJobs;
     }
 
-    public boolean isJobSaved(int userId, int postId) {
-        String sql = "SELECT COUNT(*) FROM Saved_Jobs WHERE user_id = ? AND post_id = ?";
+    public boolean isJobSavedByJobSeeker(int jobSeekerId, int postId) {
+        String sql = "SELECT COUNT(*) FROM Saved_Jobs WHERE job_seeker_id = ? AND post_id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
+            ps.setInt(1, jobSeekerId);
             ps.setInt(2, postId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -87,24 +54,84 @@ public class SavedJobDAO {
         return false;
     }
 
-    public int getSavedJobsCount(int userId) {
-        String sql = "SELECT COUNT(*) FROM Saved_Jobs WHERE user_id = ?";
+    public boolean saveJobForJobSeeker(int jobSeekerId, int postId) {
+        String sql = "INSERT INTO Saved_Jobs (job_seeker_id, post_id) VALUES (?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
+            ps.setInt(1, jobSeekerId);
+            ps.setInt(2, postId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean unsaveJobForJobSeeker(int jobSeekerId, int postId) {
+        String sql = "DELETE FROM Saved_Jobs WHERE job_seeker_id = ? AND post_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, jobSeekerId);
+            ps.setInt(2, postId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // --- Methods for Recruiter ---
+
+    public List<SavedJob> getSavedJobsByRecruiter(int recruiterId) {
+        List<SavedJob> savedJobs = new ArrayList<>();
+        String sql = "SELECT id, recruiter_id, post_id, saved_at FROM Saved_Jobs WHERE recruiter_id = ? ORDER BY saved_at DESC";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, recruiterId);
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1);
+            while (rs.next()) {
+                SavedJob savedJob = new SavedJob();
+                savedJob.setId(rs.getInt("id"));
+                savedJob.setRecruiter_id(rs.getInt("recruiter_id"));
+                savedJob.setPostId(rs.getInt("post_id"));
+                savedJob.setSavedAt(rs.getTimestamp("saved_at"));
+                savedJobs.add(savedJob);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return 0;
+        return savedJobs;
     }
 
-    public boolean deleteSavedJob(int id) {
-        String sql = "DELETE FROM Saved_Jobs WHERE id = ?";
+    public boolean isJobSavedByRecruiter(int recruiterId, int postId) {
+        String sql = "SELECT COUNT(*) FROM Saved_Jobs WHERE recruiter_id = ? AND post_id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
+            ps.setInt(1, recruiterId);
+            ps.setInt(2, postId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean saveJobForRecruiter(int recruiterId, int postId) {
+        String sql = "INSERT INTO Saved_Jobs (recruiter_id, post_id) VALUES (?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, recruiterId);
+            ps.setInt(2, postId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean unsaveJobForRecruiter(int recruiterId, int postId) {
+        String sql = "DELETE FROM Saved_Jobs WHERE recruiter_id = ? AND post_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, recruiterId);
+            ps.setInt(2, postId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();

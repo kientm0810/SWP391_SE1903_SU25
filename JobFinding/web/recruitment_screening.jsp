@@ -246,7 +246,7 @@
                     </c:choose>
 
                     <div class="action-buttons">
-                        <a href="recruitment_dashboard.jsp" class="btn btn-secondary">
+                        <a href="${pageContext.request.contextPath}/recruitment" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Quay lại Dashboard
                         </a>
                         <a href="recruitment/phone-interview" class="btn btn-primary">

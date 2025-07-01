@@ -89,6 +89,15 @@
                                                 <i class="fas fa-heart"></i> Saved Jobs
                                             </a>
                                         </li>
+                                        <c:if
+                                            test="${sessionScope.role == 'recruiter' || sessionScope.role == 'admin'}">
+                                            <li>
+                                                <a class="dropdown-item"
+                                                    href="${pageContext.request.contextPath}/recruitment">
+                                                    <i class="fas fa-tachometer-alt"></i> DashBoard Control
+                                                </a>
+                                            </li>
+                                        </c:if>
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
