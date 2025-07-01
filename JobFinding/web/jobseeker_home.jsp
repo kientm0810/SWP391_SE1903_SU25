@@ -478,6 +478,27 @@
                     border: 1px solid #000;
                 }
             }
+
+            /* Job Categories */
+            .category-card {
+                background: white;
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+                padding: 1rem 1.25rem;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+            .category-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                text-decoration: none;
+            }
+            .category-card i {
+                font-size: 1.75rem;
+                color: var(--primary-color);
+            }
         </style>
     </head>
 
@@ -873,6 +894,44 @@
                                 </div>
                             </c:otherwise>
                         </c:choose>
+                    </section>
+
+                    <!-- Top Job Categories -->
+                    <section class="profile-card mt-4" aria-labelledby="top-categories">
+                        <div class="section-title">
+                            <h5 id="top-categories">Ngành nghề phổ biến</h5>
+                        </div>
+                        <div class="p-4">
+                            <c:choose>
+                                <c:when test="${not empty jobCategories}">
+                                    <div class="row g-3">
+                                        <c:forEach items="${jobCategories}" var="cat">
+                                            <div class="col-12 col-md-6 col-lg-4">
+                                                <a href="${pageContext.request.contextPath}/home?jobType=${cat.jobType}" class="category-card" aria-label="${cat.jobType} (${cat.count}) việc làm">
+                                                    <i class="fas fa-briefcase" aria-hidden="true"></i>
+                                                    <div>
+                                                        <h6 class="mb-0">
+                                                            <c:choose>
+                                                                <c:when test="${cat.jobType == 'full_time'}">Full-time</c:when>
+                                                                <c:when test="${cat.jobType == 'part_time'}">Part-time</c:when>
+                                                                <c:when test="${cat.jobType == 'internship'}">Internship</c:when>
+                                                                <c:when test="${cat.jobType == 'freelance'}">Freelance</c:when>
+                                                                <c:when test="${cat.jobType == 'contract'}">Contract</c:when>
+                                                                <c:otherwise>${cat.jobType}</c:otherwise>
+                                                            </c:choose>
+                                                        </h6>
+                                                        <small class="text-muted">(${cat.count}) việc làm</small>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </c:forEach>
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <p>Không có dữ liệu ngành nghề.</p>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
                     </section>
 
                     <!-- Quick Actions -->

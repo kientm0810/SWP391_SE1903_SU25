@@ -4,14 +4,15 @@
  */
 package daos;
 
-import context.DBContext;
-
-import java.sql.*;
-import models.JobSeeker;
-import context.DBContext;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+
+import context.DBContext;
+import models.JobSeeker;
 
 /**
  *
@@ -414,5 +415,16 @@ public class JobSeekerDAO extends DBContext {
         return result;
     }
 
+    public boolean updateProfilePicture(int jobSeekerId, String profilePicturePath) {
+        String sql = "UPDATE Job_Seekers SET profile_picture = ?, updated_at = GETDATE() WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, profilePicturePath);
+            ps.setInt(2, jobSeekerId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
 }

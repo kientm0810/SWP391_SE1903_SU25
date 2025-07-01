@@ -65,4 +65,43 @@ public class CVTemplate {
     public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
     public Timestamp getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Timestamp updatedAt) { this.updatedAt = updatedAt; }
+
+    public String getEducation() {
+        return parseCertificateValue("Học vấn");
+    }
+
+    public int getExperienceYears() {
+        String value = parseCertificateValue("Kinh nghiệm");
+        if (value == null || value.trim().isEmpty()) {
+            return -1; // indicates not set
+        }
+        // Remove non-digit characters (e.g., " năm") then parse
+        try {
+            String digits = value.replaceAll("[^0-9]", "");
+            return digits.isEmpty() ? -1 : Integer.parseInt(digits);
+        } catch (NumberFormatException ex) {
+            return -1;
+        }
+    }
+
+    public String getSkills() {
+        return parseCertificateValue("Kỹ năng");
+    }
+
+    /**
+     * Helper method to extract a specific field value from the composite certificates string.
+     * The expected pattern of each segment is: "<label>: <value>" and segments are separated by " | ".
+     */
+    private String parseCertificateValue(String label) {
+        if (certificates == null) {
+            return null;
+        }
+        String[] parts = certificates.split("\\s*\\|\\s*");
+        for (String part : parts) {
+            if (part.startsWith(label + ":")) {
+                return part.substring((label + ":").length()).trim();
+            }
+        }
+        return null;
+    }
 }
