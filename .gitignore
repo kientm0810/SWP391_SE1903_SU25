@@ -4,7 +4,6 @@
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.ear
 
@@ -13,8 +12,14 @@ hs_err_pid*
 
 # netbeans
 nbproject/private/
+JobFinding/nbproject/private/
 build/
 nbbuild/
+JobFinding/build/
+JobFinding/dist/
+JobFinding/nbbuild/
+JobFinding/nbdist/
+JobFinding/.nb-gradle/
 
 # the dist file could make some problems
 # dist/
@@ -45,3 +50,5 @@ pom.xml.versionsBackup
 pom.xml.next
 release.properties
 dependency-reduced-pom.xml
+/dist/
+JobFinding/nbproject/private/private.properties
