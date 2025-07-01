@@ -12,6 +12,7 @@ hs_err_pid*
 
 # netbeans
 nbproject/private/
+JobFinding/nbproject/private/
 build/
 nbbuild/
 
