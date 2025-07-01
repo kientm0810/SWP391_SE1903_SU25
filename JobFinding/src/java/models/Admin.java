@@ -31,6 +31,21 @@ public class Admin {
     public Admin() {
     }
 
+    public Admin(int id, String username, String password, String email, String fullName, String phone, Date dateOfBirth, String gender, String address, String profilePicture, boolean isActive, String role) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.fullName = fullName;
+        this.phone = phone;
+        this.dateOfBirth = dateOfBirth;
+        this.gender = gender;
+        this.address = address;
+        this.profilePicture = profilePicture;
+        this.isActive = isActive;
+        this.role = role;
+    }
+
     public Admin(String username, String password, String email, String fullName, String phone, Date dateOfBirth, String gender, String address, String profilePicture, boolean isActive, String role) {
         this.username = username;
         this.password = password;

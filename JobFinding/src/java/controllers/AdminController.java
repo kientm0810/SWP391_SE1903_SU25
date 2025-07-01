@@ -26,12 +26,18 @@ import models.RecruiterNotification;
 import utils.JavaMail;
 import models.Admin;
 import daos.AdminDAO;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
+import utils.InputSanitizer;
+import utils.UploadPicture;
 
 /**
  *
  * @author andin
  */
 @WebServlet(name = "AdminController", urlPatterns = {"/AdminController"})
+@MultipartConfig
 public class AdminController extends HttpServlet {
 
     /**
@@ -46,6 +52,15 @@ public class AdminController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        
+        HttpSession session = request.getSession(true);
+        if (session.getAttribute("role") == null){
+            response.sendRedirect("home");
+            return;
+        } else if (!session.getAttribute("role").equals("admin")){
+            response.sendRedirect("home");
+            return;
+        }
 
         String target = request.getParameter("target");
         if (target == null) {
@@ -60,10 +75,12 @@ public class AdminController extends HttpServlet {
             processManager(request, response);
         } else if (target.equals("Saler")){
             processSaler(request, response);
+        } else if (target.equals("Staff")){
+            processManager(request, response);
         }
 
     }
-
+    
     private void processManager(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String service = request.getParameter("service");
@@ -79,6 +96,8 @@ public class AdminController extends HttpServlet {
             banManager(request, response);
         } else if (service.equals("Detail")) {
             detailManager(request, response);
+        } else if (service.equals("Update")){
+            updateManager(request, response);
         }
     }
     
@@ -117,7 +136,7 @@ public class AdminController extends HttpServlet {
             String username = request.getParameter("username");
             String email = request.getParameter("email");
             String phone = request.getParameter("phone");
-            String companyName = request.getParameter("companyName");
+            String companyName = InputSanitizer.cleanSearchQuery(request.getParameter("companyName"));
             String companyAddress = request.getParameter("companyAddress");
             String companySize = request.getParameter("companySize");
             String industry = request.getParameter("industry");
@@ -215,7 +234,7 @@ public class AdminController extends HttpServlet {
             String idStr = request.getParameter("id");
             String username = request.getParameter("username");
             String email = request.getParameter("email");
-            String fullName = request.getParameter("fullName");
+            String fullName = InputSanitizer.cleanSearchQuery(request.getParameter("fullName"));
             String phone = request.getParameter("phone");
             String gender = request.getParameter("gender");
             String address = request.getParameter("address");
@@ -249,12 +268,12 @@ public class AdminController extends HttpServlet {
             criteria.setActive(true);
             
 
-            vec = dao.searchAdminWithPagingAndSorting(criteria, "manager", page, recordsPerPage, sortField, sortOrder);
-            totalRecords = dao.getTotalSearchResults(criteria, "manager");
+            vec = dao.searchStaffWithPagingAndSorting(criteria, page, recordsPerPage, sortField, sortOrder);
+            totalRecords = dao.getTotalStaff(criteria);
             request.setAttribute("param", criteria);
         } else {
-            vec = dao.getAdminsWithPagingAndSorting("manager", page, recordsPerPage, sortField, sortOrder);
-            totalRecords = dao.getTotalAdmins("manager");
+            vec = dao.getStaffWithPagingAndSorting(page, recordsPerPage, sortField, sortOrder);
+            totalRecords = dao.getTotalStaff();
         }
 
         int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
@@ -302,7 +321,7 @@ public class AdminController extends HttpServlet {
             String idStr = request.getParameter("id");
             String username = request.getParameter("username");
             String email = request.getParameter("email");
-            String fullName = request.getParameter("fullName");
+            String fullName = InputSanitizer.cleanSearchQuery(request.getParameter("fullName"));
             String phone = request.getParameter("phone");
             String gender = request.getParameter("gender");
             String address = request.getParameter("address");
@@ -432,18 +451,101 @@ public class AdminController extends HttpServlet {
             String dateOfBirthStr = request.getParameter("dateOfBirth");
             String gender = request.getParameter("gender");
             String address = request.getParameter("address");
-            String profilePicture = request.getParameter("profilePicture");
+            String role = request.getParameter("role");
+            
+            
+            String profilePicture = "";
+            try {
+                Part filePart = request.getPart("profilePicture");
+
+                String contentType = filePart.getContentType();
+
+                if (contentType != null && contentType.startsWith("image/")) {
+                } else {
+                    // Không phải ảnh
+                    request.setAttribute("mustbeImg", "Chỉ cho phép upload file ảnh!");
+                    request.getRequestDispatcher("admin_add_manager.jsp").forward(request, response);
+                    return;
+                }
+
+                profilePicture = UploadPicture.uploadImage(filePart, profilePicture);
+
+            } catch (Exception e) {
+                log(e.getMessage());
+            }
+            
             String isActiveStr = request.getParameter("isActive");
 
             Date dateOfBirth = Date.valueOf(dateOfBirthStr);
             boolean isActive = Boolean.parseBoolean(isActiveStr);
 
             Admin manager = new Admin(username, password, email, fullName, phone,
-                    dateOfBirth, gender, address, profilePicture, isActive, "manager");
+                    dateOfBirth, gender, address, profilePicture, isActive, role);
 
-            dao.registerAdmin(manager, "manager"); // bạn cần viết hàm này trong UserDAO
+            dao.registerAdmin(manager, role); // bạn cần viết hàm này trong UserDAO
 
-            response.sendRedirect("AdminController?target=Manager");
+            response.sendRedirect("AdminController?target=Staff");
+        }
+    }
+    
+    private void updateManager(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+        AdminDAO dao = new AdminDAO();
+
+        String submit = request.getParameter("submit");
+        if (submit == null) {
+            int id = Integer.parseInt(request.getParameter("ID"));
+            Admin x = dao.getSpecificStaff(id);
+            request.setAttribute("manager", x);
+            request.getRequestDispatcher("admin_add_manager.jsp").forward(request, response);
+        } else {
+            String username = request.getParameter("username");
+            String password = request.getParameter("password");
+            String email = request.getParameter("email");
+            String fullName = request.getParameter("fullName");
+            String phone = request.getParameter("phone");
+            String dateOfBirthStr = request.getParameter("dateOfBirth");
+            String gender = request.getParameter("gender");
+            String address = request.getParameter("address");
+            String role = request.getParameter("role");
+            
+            int id = Integer.parseInt(request.getParameter("ID"));
+            Admin x = dao.getSpecificStaff(id);
+            
+            String profilePicture = x.getProfilePicture();
+            try {
+                Part filePart = request.getPart("profilePicture");
+
+                if (filePart != null && filePart.getSize() > 0){
+                    String contentType = filePart.getContentType();
+                    
+                    if (contentType != null && contentType.startsWith("image/")) {
+                    } else {
+                        // Không phải ảnh
+                        request.setAttribute("mustbeImg", "Chỉ cho phép upload file ảnh!");
+                        request.setAttribute("manager", x);
+                        request.getRequestDispatcher("admin_add_manager.jsp").forward(request, response);
+                        return;
+                    }
+                }
+
+                profilePicture = UploadPicture.uploadImage(filePart, profilePicture);
+
+            } catch (Exception e) {
+                log(e.getMessage());
+            }
+            
+            String isActiveStr = request.getParameter("isActive");
+
+            Date dateOfBirth = Date.valueOf(dateOfBirthStr);
+            boolean isActive = Boolean.parseBoolean(isActiveStr);
+
+            Admin manager = new Admin(id, username, password, email, fullName, phone,
+                    dateOfBirth, gender, address, profilePicture, isActive, role);
+
+            dao.updateAdmin(manager); // cần viết hàm này trong UserDAO
+
+            response.sendRedirect("AdminController?target=Staff");
         }
     }
 
@@ -456,7 +558,7 @@ public class AdminController extends HttpServlet {
         status = !status;
         dao.changeStatus(ID, status); // bạn cần viết hàm này trong AdminDAO
 
-        response.sendRedirect("AdminController?target=Manager");
+        response.sendRedirect("AdminController?target=Staff");
     }
 
     private void detailManager(HttpServletRequest request, HttpServletResponse response)
@@ -464,7 +566,7 @@ public class AdminController extends HttpServlet {
         int ID = Integer.parseInt(request.getParameter("ID"));
 
         AdminDAO dao = new AdminDAO();
-        Admin manager = dao.getSpecificAdmin(ID, "manager"); // bạn cần viết hàm này trong AdminDAO
+        Admin manager = dao.getSpecificStaff(ID); // bạn cần viết hàm này trong AdminDAO
 
         request.setAttribute("Manager", manager);
 

@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!-- Sidebar Component -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <div class="sidebar">
@@ -16,40 +17,46 @@
             <span>Dashboard</span>
         </a>
 
-        <a href="AdminController?target=JobSeeker" class="menu-item ${param.target == 'JobSeeker' ? 'active' : ''}">
-            <i class="fas fa-users"></i>
-            <span>Manage Job Seekers</span>
-        </a>
+        <c:if test="${sessionScope.adminRole == 'manager' || sessionScope.adminRole == 'admin'}">
+            <a href="AdminController?target=Recruiter" class="menu-item ${param.target == 'Recruiter' ? 'active' : ''}">
+                <i class="fas fa-building"></i>
+                <span>Manage Recruiters</span>
+            </a>
 
-        <a href="AdminController?target=Recruiter" class="menu-item ${param.target == 'Recruiter' ? 'active' : ''}">
-            <i class="fas fa-building"></i>
-            <span>Manage Recruiters</span>
-        </a>
+            <a href="AdminController?target=Staff" class="menu-item ${param.target == 'Staff' ? 'active' : ''}">
+                <i class="fas fa-user-tie"></i>
+                <span>Manage Staff</span>
+            </a>
 
-        <a href="AdminController?target=Manager" class="menu-item ${param.target == 'Manager' ? 'active' : ''}">
-            <i class="fas fa-user-tie"></i>
-            <span>Manage Managers</span>
-        </a>
+<!--            <a href="AdminController?target=Saler" class="menu-item ${param.target == 'Saler' ? 'active' : ''}">
+                <i class="fas fa-user-tag"></i>
+                <span>Manage Salers</span>
+            </a>-->
+        </c:if>
 
-        <a href="AdminController?target=Saler" class="menu-item ${param.target == 'Saler' ? 'active' : ''}">
-            <i class="fas fa-user-tag"></i>
-            <span>Manage Salers</span>
-        </a>
+        <c:if test="${sessionScope.adminRole == 'saler' || sessionScope.adminRole == 'admin'}">
+            <a href="AdminSalerController?target=blog" class="menu-item ${param.target == 'blog' ? 'active' : ''}">
+                <i class="fas fa-blog"></i>
+                <span>Manage Blogs</span>
+            </a>
 
-        <a href="AdminSalerController?target=blog" class="menu-item ${param.target == 'blog' ? 'active' : ''}">
-            <i class="fas fa-blog"></i>
-            <span>Manage Blogs</span>
-        </a>
+            <a href="AdminSalerController?target=banner" class="menu-item ${param.target == 'banner' ? 'active' : ''}">
+                <i class="fas fa-image"></i>
+                <span>Manage Banners</span>
+            </a>
+        </c:if>
+        
+        <c:if test="${sessionScope.adminRole == 'manager' || sessionScope.adminRole == 'admin'}">
+            <a href="AdminSalerController?target=program" class="menu-item ${param.target == 'program' ? 'active' : ''}">
+                <i class="fas fa-bullseye"></i>
+                <span>Program</span>
+            </a>
 
-        <a href="AdminSalerController?target=banner" class="menu-item ${param.target == 'banner' ? 'active' : ''}">
-            <i class="fas fa-image"></i>
-            <span>Manage Banners</span>
-        </a>
-
-        <a href="reports.jsp" class="menu-item ${pageContext.request.servletPath == '/reports.jsp' ? 'active' : ''}">
-            <i class="fas fa-chart-bar"></i>
-            <span>Reports</span>
-        </a>
+            <a href="reports.jsp" class="menu-item ${pageContext.request.servletPath == '/reports.jsp' ? 'active' : ''}">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
+            </a>
+        </c:if>
 
         <hr style="margin: 20px 25px; opacity: 0.2;">
 

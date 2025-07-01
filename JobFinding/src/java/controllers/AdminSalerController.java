@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Vector;
+import utils.InputSanitizer;
 import utils.UploadPicture;
 
 /**
@@ -97,7 +98,7 @@ public class AdminSalerController extends HttpServlet {
         String recordsPerPageStr = request.getParameter("recordsPerPage");
         String sortField = request.getParameter("sortField");
         String sortOrder = request.getParameter("sortOrder");
-        String searchTitle = request.getParameter("title");
+        String searchTitle = InputSanitizer.cleanSearchQuery(request.getParameter("title"));
         
         int page = 1;
         int recordsPerPage = 10;
@@ -156,7 +157,7 @@ public class AdminSalerController extends HttpServlet {
         String recordsPerPageStr = request.getParameter("recordsPerPage");
         String sortField = request.getParameter("sortField");
         String sortOrder = request.getParameter("sortOrder");
-        String searchTitle = request.getParameter("title");
+        String searchTitle = InputSanitizer.cleanSearchQuery(request.getParameter("title"));
         
         int page = 1;
         int recordsPerPage = 10;

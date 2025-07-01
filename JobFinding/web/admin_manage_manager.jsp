@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Managers - Admin Panel</title>
+    <title>Manage Staffs - Admin Panel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <jsp:include page="admin-common-styles.jsp" />
 </head>
@@ -16,18 +16,18 @@
         
         <div class="main-content">
             <div class="page-header">
-                <h1>Manage Managers</h1>
+                <h1>Manage Staffs</h1>
                 <div class="header-actions">
-                    <a href="AdminController?target=Manager&service=Add" class="btn btn-primary">
+                    <a href="AdminController?target=Staff&service=Add" class="btn btn-primary">
                         <i class="fas fa-plus"></i>
-                        Add New Manager
+                        Add New Staff
                     </a>
                 </div>
             </div>
             
             <div class="search-filter-section">
                 <form action="AdminController" method="get">
-                    <input type="hidden" name="target" value="Manager">
+                    <input type="hidden" name="target" value="Staff">
                     <input type="hidden" name="service" value="list">
                     
                     <div class="search-filter-row">
@@ -99,6 +99,7 @@
                             <th>Phone</th>
                             <th>Gender</th>
                             <th>Address</th>
+                            <th>Role</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -113,6 +114,7 @@
                                 <td>${manager.phone}</td>
                                 <td>${manager.gender}</td>
                                 <td>${manager.address}</td>
+                                <td>${manager.role}</td>
                                 <td>
                                     <c:choose>
                                         <c:when test="${manager.active}">
@@ -125,15 +127,15 @@
                                 </td>
                                 <td>
                                     <div class="action-buttons">
-                                        <a href="AdminController?target=Manager&service=Detail&ID=${manager.id}" 
+                                        <a href="AdminController?target=Staff&service=Detail&ID=${manager.id}" 
                                            class="action-btn view-btn">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="AdminController?target=Manager&service=Update&ID=${manager.id}" 
+                                        <a href="AdminController?target=Staff&service=Update&ID=${manager.id}" 
                                            class="action-btn edit-btn">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="AdminController?target=Manager&service=Ban&ID=${manager.id}&status=${manager.active}" 
+                                        <a href="AdminController?target=Staff&service=Ban&ID=${manager.id}&status=${manager.active}" 
                                            class="action-btn ${manager.active ? 'delete-btn' : 'edit-btn'}"
                                            onclick="return confirm('Are you sure you want to change the status?')">
                                             <i class="fas ${manager.active ? 'fa-ban' : 'fa-check-circle'}"></i>
@@ -145,7 +147,7 @@
                         
                         <c:if test="${empty vec}">
                             <tr>
-                                <td colspan="9" class="text-center">No managers found.</td>
+                                <td colspan="9" class="text-center">No Staff found.</td>
                             </tr>
                         </c:if>
                     </tbody>
@@ -181,7 +183,7 @@
 
                             <c:if test="${currentPage < totalPages}">
                                 <li class="page-item">
-                                    <a class="page-link" href="AdminController?target=Manager&page=${currentPage + 1}&recordsPerPage=${recordsPerPage}&sortField=${sortField}&sortOrder=${sortOrder}${searchParams != null ? '&submit=Search&fullName=' + searchParams.fullName : ''}">
+                                    <a class="page-link" href="AdminController?target=Staff&page=${currentPage + 1}&recordsPerPage=${recordsPerPage}&sortField=${sortField}&sortOrder=${sortOrder}${searchParams != null ? '&submit=Search&fullName=' + searchParams.fullName : ''}">
                                         <i class="fas fa-chevron-right"></i>
                                     </a>
                                 </li>

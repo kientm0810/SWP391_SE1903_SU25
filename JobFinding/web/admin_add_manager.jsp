@@ -1,11 +1,15 @@
 <!-- admin_add_manager.jsp -->
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Manager - Admin Panel</title>
+    <title><c:choose>
+        <c:when test="${not empty manager.id}">Update Staff</c:when>
+        <c:otherwise>Create New Staff</c:otherwise>
+    </c:choose> - Admin Panel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <jsp:include page="admin-common-styles.jsp" />
 </head>
@@ -15,9 +19,19 @@
         
         <div class="main-content">
             <div class="page-header">
-                <h1>Add New Manager</h1>
+                
+                <c:choose>
+                    <c:when test="${not empty manager.id}">
+                        <h1>Update Staff</h1>
+                    </c:when>
+                    <c:otherwise>
+                        <h1>Add New Staff</h1>
+                    </c:otherwise>
+                </c:choose>
+                
+                
                 <div class="header-actions">
-                    <a href="AdminController?target=Manager" class="btn btn-secondary">
+                    <a href="AdminController?target=Staff" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i>
                         Back to List
                     </a>
@@ -25,37 +39,37 @@
             </div>
             
             <div class="form-container">
-                <form action="AdminController" method="POST">
+                <form action="AdminController" method="POST" enctype="multipart/form-data">
                     <div class="form-row">
                         <div class="form-group">
                             <label>Username</label>
-                            <input type="text" name="username" class="form-control" required>
+                            <input type="text" name="username" class="form-control" value="${manager.username}" required>
                         </div>
                         <div class="form-group">
                             <label>Password</label>
-                            <input type="password" name="password" class="form-control" required>
+                            <input type="password" name="password" class="form-control" value="${manager.password}" required>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
                             <label>Email</label>
-                            <input type="email" name="email" class="form-control" required>
+                            <input type="email" name="email" class="form-control" value="${manager.email}" required>
                         </div>
                         <div class="form-group">
                             <label>Full Name</label>
-                            <input type="text" name="fullName" class="form-control" required>
+                            <input type="text" name="fullName" class="form-control" value="${manager.fullName}" required>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
                             <label>Phone</label>
-                            <input type="tel" name="phone" class="form-control" required>
+                            <input type="tel" name="phone" class="form-control" value="${manager.phone}" required>
                         </div>
                         <div class="form-group">
                             <label>Date of Birth</label>
-                            <input type="date" name="dateOfBirth" class="form-control" required>
+                            <input type="date" name="dateOfBirth" class="form-control" value="${manager.dateOfBirth}" required>
                         </div>
                     </div>
                     
@@ -63,7 +77,7 @@
                         <div class="form-group">
                             <label>Gender</label>
                             <select name="gender" class="form-control" required>
-                                <option value="">Select Gender</option>
+                                <option value="${manager.gender}">Select Gender</option>
                                 <option value="male">Male</option>
                                 <option value="female">Female</option>
                                 <option value="other">Other</option>
@@ -71,13 +85,31 @@
                         </div>
                         <div class="form-group">
                             <label>Address</label>
-                            <input type="text" name="address" class="form-control" required>
+                            <input type="text" name="address" class="form-control" value="${manager.address}" required>
                         </div>
                     </div>
                     
                     <div class="form-group">
                         <label>Profile Picture URL</label>
-                        <input type="text" name="profilePicture" class="form-control">
+                        <c:choose>
+                            <c:when test="${not empty manager.id}">
+                                <input type="file" name="profilePicture" accept="image/*" class="form-control">
+                            </c:when>
+                            <c:otherwise>
+                                <input type="file" name="profilePicture" accept="image/*" class="form-control" required>
+                            </c:otherwise>
+                        </c:choose>
+                        <c:if test="${not empty mustbeImg}">
+                            ${mustbeImg}
+                        </c:if>
+                        
+                        <label>Role</label>
+                        <select name="role" class="form-control" required>
+                            <option value="${manager.role}">Select role</option>
+                            <option value="admin">Admin</option>
+                            <option value="manager">Manager</option>
+                            <option value="saler">Saler</option>
+                        </select>
                     </div>
                     
                     <div class="form-group">
@@ -95,16 +127,27 @@
                     </div>
                     
                     <div class="form-actions">
-                        <button type="submit" name="submit" value="Add Manager" class="btn btn-primary">
+                        <button type="submit" name="submit" value="submit" class="btn btn-primary">
                             <i class="fas fa-save"></i>
-                            Add Manager
+                            Confirm
                         </button>
                         <button type="reset" class="btn btn-secondary">
                             <i class="fas fa-redo"></i>
                             Reset
                         </button>
-                        <input type="hidden" name="service" value="Add">
-                        <input type="hidden" name="target" value="Manager">
+                       
+                        <c:choose>
+                            <c:when test="${not empty manager.id}">
+                                <input type="hidden" name="ID" value="${manager.id}">
+                                <input type="hidden" name="service" value="Update">
+                            </c:when>
+                            <c:otherwise>
+                                <input type="hidden" name="service" value="Add">
+                            </c:otherwise>
+                        </c:choose>
+                        
+                        
+                        <input type="hidden" name="target" value="Staff">
                     </div>
                 </form>
             </div>

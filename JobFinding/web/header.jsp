@@ -63,6 +63,13 @@
                             <i class="fas fa-envelope"></i> Contact
                         </a>
                     </li>
+                    <c:if test="${sessionScope.role == 'admin'}">
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin_dashboard.jsp">
+                                <i class="fas fa-tools"></i> Dashboard
+                            </a>
+                        </li>
+                    </c:if>
                 </ul>
 
                 <!-- User Menu -->
