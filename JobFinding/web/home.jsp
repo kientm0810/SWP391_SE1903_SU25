@@ -765,7 +765,7 @@
 
                         <!-- All JS Custom Plugins Link Here here -->
                         <script src="./assets/js/vendor/modernizr-3.5.0.min.js"></script>
-                        <!-- Jquery, Popper, Bootstrap -->
+                        <!-- Jquery, Popper, Bootstrap bo cai dau buoi nay di-->
                         <script src="./assets/js/vendor/jquery-1.12.4.min.js"></script>
                         <script src="./assets/js/popper.min.js"></script>
                         <script src="./assets/js/bootstrap.min.js"></script>
@@ -798,7 +798,7 @@
                         <script src="./assets/js/plugins.js"></script>
                         <script src="./assets/js/main.js"></script>
 
-                        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                        <!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>-->
                         <script>
                             document.addEventListener('DOMContentLoaded', function () {
                                 const observer = new IntersectionObserver((entries, obs) => {
