@@ -614,7 +614,7 @@ public class AdminDAO extends DBContext {
                 + "      ,[is_active] = ?\n"
                 + "      ,[role] = ?\n"
                 + " WHERE [id] = ? ";
-        
+
         try {
             PreparedStatement stmt = connection.prepareStatement(sql);
             stmt.setString(1, criteria.getUsername());
@@ -635,6 +635,25 @@ public class AdminDAO extends DBContext {
             ex.getStackTrace();
         }
         return false;
+    }
+
+    public boolean checkEmailPhone(Admin criteria) {
+        String sql = "SELECT * "
+                + "  FROM [project_SWP391].[dbo].[Admin] "
+                + "WHERE [email] = ? or [phone] = ?";
+        
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setString(1, criteria.getEmail());
+            stmt.setString(2, criteria.getPhone());
+            ResultSet res = stmt.executeQuery();
+            while (res.next()){
+                return false;
+            }
+        } catch (SQLException ex) {
+            ex.getStackTrace();
+        }
+        return true;
     }
 
 }

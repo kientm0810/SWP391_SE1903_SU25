@@ -509,6 +509,8 @@ public class AdminController extends HttpServlet {
             String address = request.getParameter("address");
             String role = request.getParameter("role");
             
+            
+            
             int id = Integer.parseInt(request.getParameter("ID"));
             Admin x = dao.getSpecificStaff(id);
             
@@ -533,6 +535,17 @@ public class AdminController extends HttpServlet {
 
             } catch (Exception e) {
                 log(e.getMessage());
+            }
+            
+            Admin nwAdmin = new Admin();
+            nwAdmin.setEmail(email);
+            nwAdmin.setPhone(phone);
+            
+            if (!dao.checkEmailPhone(nwAdmin)){
+                request.setAttribute("messError", "email hoặc SĐT bị trùng!");
+                request.setAttribute("manager", x);
+                request.getRequestDispatcher("admin_add_manager.jsp").forward(request, response);
+                return;
             }
             
             String isActiveStr = request.getParameter("isActive");

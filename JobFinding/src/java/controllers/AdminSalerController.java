@@ -236,7 +236,20 @@ public class AdminSalerController extends HttpServlet {
         log(submit + " ye");
         
         if (submit.equals("submit")) {
-            String title = request.getParameter("title");
+            String title = InputSanitizer.cleanSearchQuery(request.getParameter("title"));
+            
+            log("blah" + title + "blah");
+            log("blah" + title.length() + "blah");
+            
+            if (title == null){
+                request.setAttribute("message", "Tiêu đề không được để trống!");
+                request.getRequestDispatcher("admin_saler_add_blog.jsp").forward(request, response);
+                return;
+            } else if (title.length() == 0){
+                request.setAttribute("message", "Tiêu đề không được để trống!");
+                request.getRequestDispatcher("admin_saler_add_blog.jsp").forward(request, response);
+                return;
+            }
             
             ///
             String thumbnail = "";
@@ -298,7 +311,7 @@ public class AdminSalerController extends HttpServlet {
         }
 
         if (submit.equals("submit")) {
-            String title = request.getParameter("title");
+            String title = InputSanitizer.cleanSearchQuery(request.getParameter("title"));
             
             int blogId = Integer.parseInt(request.getParameter("blogId"));
             BlogDAO dao = new BlogDAO();
@@ -422,7 +435,7 @@ public class AdminSalerController extends HttpServlet {
         }
         
         if (submit.equals("submit")) {
-            String title = request.getParameter("title");
+            String title = InputSanitizer.cleanSearchQuery(request.getParameter("title"));
             log("da qua day ");
             
             /// xu li check xem co phai la file anh hay khong
@@ -474,7 +487,7 @@ public class AdminSalerController extends HttpServlet {
         }
 
         if (submit.equals("submit")) {
-            String title = request.getParameter("title");
+            String title = InputSanitizer.cleanSearchQuery(request.getParameter("title"));
             int bannerId = Integer.parseInt(request.getParameter("bannerId"));
             BannerDAO dao = new BannerDAO();
             Banner x = dao.getBannerById(bannerId);

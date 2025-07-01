@@ -46,6 +46,7 @@
                                 <input name="title" type="text" class="form-control" required>
                             </c:otherwise>
                         </c:choose>
+                        <span>${message}</span>
                     </div>
 
                     <div class="form-group">

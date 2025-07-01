@@ -145,7 +145,7 @@
                                 <input type="hidden" name="service" value="Add">
                             </c:otherwise>
                         </c:choose>
-                        
+                        <span> ${messError}</span>
                         
                         <input type="hidden" name="target" value="Staff">
                     </div>
