@@ -1,12 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.vnpay.common;
 
-//import dao.OrderDao;
-import java.io.IOException;import java.net.URLEncoder;
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,57 +17,48 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-//import model.Order;
 
-/**
- *
- * @author CTT VNPAY
- */
 public class ajaxServlet extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        HttpSession session = request.getSession();
         String bankCode = request.getParameter("bankCode");
+        String paymentType = request.getParameter("paymentType");
+        String paymentIdStr = request.getParameter("paymentId");
+        
         if(request.getParameter("totalBill") == null) {
-         response.sendRedirect("home");//quay lai trang chu
-         return;
+            response.sendRedirect("home");
+            return;
         }
+        
         double amountDouble = Double.parseDouble(request.getParameter("totalBill"));
         
-//        OrderDao orderDao = new OrderDao();
-//        //Gia su user login co id = 1
-//        //phan id user se lay tu sesson (user dang login)
-//        int userId = 1;
-//        
-//        Order order = new Order();
-//        order.setUserID(userId);
-//        order.setTotalAmount(amountDouble);
-//        
-//        int orderId = orderDao.insertOrder(order);
-//        
-//        if(orderId < 1) {
-//          resp.sendRedirect("cart");
-//          return;
-//        }
-        String orderId = "U1"; //test
+        // Create order ID based on transaction type
+        String transactionType = request.getParameter("transactionType");
+        String transactionIdStr = request.getParameter("transactionId");
+        
+        String orderId;
+        if ("registration".equals(transactionType)) {
+            orderId = "REG_" + transactionIdStr;
+        } else if ("normal".equals(transactionType)) {
+            orderId = "NORMAL_" + transactionIdStr;
+        } else if ("featured".equals(transactionType)) {
+            orderId = "FEAT_" + transactionIdStr;
+        } else if ("premium".equals(transactionType)) {
+            orderId = "PREM_" + transactionIdStr;
+        } else {
+            orderId = "ORDER_" + transactionIdStr;
+        }
 
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String orderType = "other";
         
         long amount = (long) (amountDouble * 100);
-        String vnp_TxnRef = orderId+"";//dky ma rieng
+        String vnp_TxnRef = orderId;
         String vnp_IpAddr = Config.getIpAddress(request);
-
         String vnp_TmnCode = Config.vnp_TmnCode;
         
         Map<String, String> vnp_Params = new HashMap<>();
@@ -86,7 +72,18 @@ public class ajaxServlet extends HttpServlet {
             vnp_Params.put("vnp_BankCode", bankCode);
         }
         vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
-        vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + vnp_TxnRef);
+        
+        // Set order info based on payment type
+        String orderInfo;
+        if ("registration".equals(paymentType)) {
+            orderInfo = "Thanh toan phi dang ky recruiter: " + vnp_TxnRef;
+        } else if ("homepage_feature".equals(paymentType)) {
+            orderInfo = "Thanh toan dang tin noi bat trang chu: " + vnp_TxnRef;
+        } else {
+            orderInfo = "Thanh toan don hang: " + vnp_TxnRef;
+        }
+        
+        vnp_Params.put("vnp_OrderInfo", orderInfo);
         vnp_Params.put("vnp_OrderType", orderType);
 
         String locate = request.getParameter("language");
@@ -116,11 +113,9 @@ public class ajaxServlet extends HttpServlet {
             String fieldName = (String) itr.next();
             String fieldValue = (String) vnp_Params.get(fieldName);
             if ((fieldValue != null) && (fieldValue.length() > 0)) {
-                //Build hash data
                 hashData.append(fieldName);
                 hashData.append('=');
                 hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
-                //Build query
                 query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
                 query.append('=');
                 query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));

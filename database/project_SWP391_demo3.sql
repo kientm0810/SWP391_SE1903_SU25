@@ -418,6 +418,62 @@ CREATE TABLE Saved_Jobs (
     FOREIGN KEY (post_id) REFERENCES Posts(id)
 );
 
+-- 1. Create Post_Pricing table
+CREATE TABLE Post_Pricing (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    position_name NVARCHAR(100) NOT NULL,
+    position_code VARCHAR(50) NOT NULL UNIQUE,
+    price DECIMAL(12, 2) NOT NULL,
+    duration_days INT NOT NULL,
+    description NVARCHAR(255),
+    is_active BIT DEFAULT 1,
+    created_at DATETIME DEFAULT GETDATE()
+);
+
+-- Insert sample pricing data
+INSERT INTO Post_Pricing (position_name, position_code, price, duration_days, description) 
+VALUES 
+(N'Bài viết thường', 'normal', 100000, 30, N'Hiển thị trong danh sách tìm kiếm'),
+(N'Bài viết nổi bật', 'featured', 300000, 30, N'Hiển thị ở vị trí nổi bật'),
+(N'Bài viết Premium', 'premium', 500000, 30, N'Hiển thị ở trang chủ và đầu danh sách'),
+(N'Phí đăng ký', 'registration', 50000, 0, N'Phí đăng ký tài khoản nhà tuyển dụng');
+
+-- 2. Modify Promotion_Programs table to add admin_id and position info
+ALTER TABLE Promotion_Programs
+ADD admin_id INT NULL,
+    position_type VARCHAR(20) DEFAULT 'normal' CHECK (position_type IN ('normal', 'featured', 'premium')),
+    quantity INT DEFAULT -1; -- -1 means unlimited
+
+-- Add foreign key constraint
+ALTER TABLE Promotion_Programs
+ADD CONSTRAINT fk_promotion_admin FOREIGN KEY (admin_id) REFERENCES Admin(id);
+
+-- 3. Modify Featured_Jobs table to add transaction_id
+ALTER TABLE Featured_Jobs
+ADD transaction_id INT NULL;
+
+-- Add foreign key constraint
+ALTER TABLE Featured_Jobs
+ADD CONSTRAINT fk_featured_jobs_transaction FOREIGN KEY (transaction_id) REFERENCES Financial_Transactions(id);
+
+-- 4. Update Financial_Transactions constraint to include new transaction types
+ALTER TABLE Financial_Transactions
+DROP CONSTRAINT CK__Financial__trans__5F7E2DAC; -- Drop existing constraint if exists
+
+ALTER TABLE Financial_Transactions
+ADD CONSTRAINT CK_Financial_Transactions_transaction_type 
+CHECK (transaction_type IN ('normal', 'featured', 'premium', 'registration', 'cv_service', 'advertising', 'subscription', 'checkout', 'other'));
+
+-- 5. Add post_type to Job_Listings table
+ALTER TABLE Job_Listings
+ADD post_type VARCHAR(20) DEFAULT 'normal' CHECK (post_type IN ('normal', 'featured', 'premium')),
+    payment_expiry DATETIME NULL;
+
+-- 6. Create indexes for better performance
+CREATE INDEX idx_post_pricing_code ON Post_Pricing(position_code);
+CREATE INDEX idx_job_listings_post_type ON Job_Listings(post_type, payment_expiry);
+CREATE INDEX idx_financial_transactions_type ON Financial_Transactions(transaction_type, status);
+
 -- Sample Data Insert
 SET IDENTITY_INSERT Posts ON;
 INSERT INTO Posts (id, user_id, user_type, parent_id, post_type, title, content, status, view_count, like_count, comment_count, created_at, updated_at, deleted_at)

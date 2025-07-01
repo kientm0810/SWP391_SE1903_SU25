@@ -1,41 +1,36 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
-
 package com.vnpay.common;
 
-//import dao.OrderDao;
+import daos.FinancialTransactionDAO;
+import daos.RecruiterDAO;
+import daos.JobListingDAO;
+import models.FinancialTransaction;
+import utils.JavaMail;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-//import model.Order;
+import java.sql.Timestamp;
+import java.util.Calendar;
 
-/**
- *
- * @author HP
- */
 public class VnpayReturn extends HttpServlet {
-//    OrderDao orderDao = new OrderDao();
-    /** 
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    
+    private FinancialTransactionDAO transactionDAO = new FinancialTransactionDAO();
+    private RecruiterDAO recruiterDAO = new RecruiterDAO();
+    private JobListingDAO jobDAO = new JobListingDAO();
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try ( PrintWriter out = response.getWriter()) {
+        
+        try (PrintWriter out = response.getWriter()) {
             Map fields = new HashMap();
             for (Enumeration params = request.getParameterNames(); params.hasMoreElements();) {
                 String fieldName = URLEncoder.encode((String) params.nextElement(), StandardCharsets.US_ASCII.toString());
@@ -52,68 +47,162 @@ public class VnpayReturn extends HttpServlet {
             if (fields.containsKey("vnp_SecureHash")) {
                 fields.remove("vnp_SecureHash");
             }
+            
             String signValue = Config.hashAllFields(fields);
+            
             if (signValue.equals(vnp_SecureHash)) {
                 String paymentCode = request.getParameter("vnp_TransactionNo");
-                
                 String orderId = request.getParameter("vnp_TxnRef");
+                String responseCode = request.getParameter("vnp_ResponseCode");
                 
-//                Order order = new Order();
-//                order.setId(Integer.parseInt(orderId));
+                boolean transSuccess = "00".equals(request.getParameter("vnp_TransactionStatus"));
                 
-                boolean transSuccess = false;
-                if ("00".equals(request.getParameter("vnp_TransactionStatus"))) {
-                    //update banking system
-//                    order.setStatus("Completed");
-                    transSuccess = true;
-                } else {
-//                     order.setStatus("Failed");
-                }
-//                orderDao.updateOrderStatus(order);
-                request.setAttribute("num", orderId);
-                request.setAttribute("transResult", transSuccess);
-                request.getRequestDispatcher("admin_test_vnpay.jsp").forward(request, response);
+                // Process based on order type
+                processPaymentResult(orderId, paymentCode, responseCode, transSuccess, request, response);
+                
             } else {
-                //RETURN PAGE ERROR
-                System.out.println("GD KO HOP LE (invalid signature)");
+                request.setAttribute("error", "Invalid signature");
+                request.getRequestDispatcher("payment_error.jsp").forward(request, response);
             }
         }
     }
+    
+    private void processPaymentResult(String orderId, String paymentCode, String responseCode, 
+            boolean transSuccess, HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        HttpSession session = request.getSession();
+        
+        try {
+            if (orderId.startsWith("REG_")) {
+                handleRegistrationPayment(orderId, paymentCode, responseCode, transSuccess, session, request, response);
+            } else if (orderId.startsWith("FEAT_")) {
+                handleHomepageFeaturePayment(orderId, paymentCode, responseCode, transSuccess, session, request, response);
+            } else {
+                handleGeneralPayment(orderId, paymentCode, responseCode, transSuccess, request, response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Error processing payment: " + e.getMessage());
+            request.getRequestDispatcher("payment_error.jsp").forward(request, response);
+        }
+    }
+    
+    private void processPaymentResult(String orderId, String paymentCode, String responseCode, 
+            boolean transSuccess, HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        HttpSession session = request.getSession();
+        
+        try {
+            if (orderId.startsWith("REG_")) {
+                handleRegistrationPayment(orderId, paymentCode, responseCode, transSuccess, session, request, response);
+            } else if (orderId.startsWith("NORMAL_") || orderId.startsWith("FEAT_") || orderId.startsWith("PREM_")) {
+                handleJobPostPayment(orderId, paymentCode, responseCode, transSuccess, session, request, response);
+            } else {
+                handleGeneralPayment(orderId, paymentCode, responseCode, transSuccess, request, response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Error processing payment: " + e.getMessage());
+            request.getRequestDispatcher("payment_error.jsp").forward(request, response);
+        }
+    }
+    
+    private void handleRegistrationPayment(String orderId, String paymentCode, String responseCode, 
+            boolean transSuccess, HttpSession session, HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        String transactionIdStr = orderId.substring(4); // Remove "REG_" prefix
+        int transactionId = Integer.parseInt(transactionIdStr);
+        
+        FinancialTransaction transaction = transactionDAO.getTransactionById(transactionId);
+        if (transaction != null) {
+            transaction.setTransactionCode(paymentCode);
+            transaction.setStatus(transSuccess ? "completed" : "failed");
+            transactionDAO.updateTransaction(transaction);
+            
+            if (transSuccess) {
+                // Update recruiter verification status
+                recruiterDAO.updateVerificationStatus(transaction.getRecruiterId(), "verified");
+                
+                // Send confirmation email
+                String recruiterEmail = recruiterDAO.getRecruiterEmail(transaction.getRecruiterId());
+                if (recruiterEmail != null) {
+                    JavaMail.sendNotification(recruiterEmail);
+                }
+                
+                session.setAttribute("paymentSuccess", "Registration successful! Your account is now verified.");
+                response.sendRedirect("recruiter_dashboard.jsp");
+            } else {
+                session.setAttribute("paymentError", "Registration payment failed. Please try again.");
+                response.sendRedirect("checkout?action=registration");
+            }
+        }
+    }
+    
+    private void handleJobPostPayment(String orderId, String paymentCode, String responseCode, 
+            boolean transSuccess, HttpSession session, HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        String transactionIdStr = orderId.substring(orderId.indexOf("_") + 1);
+        int transactionId = Integer.parseInt(transactionIdStr);
+        
+        FinancialTransaction transaction = transactionDAO.getTransactionById(transactionId);
+        if (transaction != null) {
+            transaction.setTransactionCode(paymentCode);
+            transaction.setStatus(transSuccess ? "completed" : "failed");
+            transactionDAO.updateTransaction(transaction);
+            
+            if (transSuccess) {
+                Integer jobId = (Integer) session.getAttribute("jobId");
+                String positionCode = (String) session.getAttribute("positionCode");
+                Integer durationDays = (Integer) session.getAttribute("durationDays");
+                
+                if (jobId != null && positionCode != null) {
+                    // Update job listing with post type and expiry
+                    Calendar cal = Calendar.getInstance();
+                    cal.add(Calendar.DAY_OF_MONTH, durationDays);
+                    Timestamp expiryDate = new Timestamp(cal.getTimeInMillis());
+                    
+                    jobDAO.updateJobPostType(jobId, positionCode, expiryDate);
+                }
+                
+                // Clean session
+                session.removeAttribute("jobId");
+                session.removeAttribute("positionCode");
+                session.removeAttribute("durationDays");
+                session.removeAttribute("pendingTransactionId");
+                session.removeAttribute("checkoutType");
+                
+                session.setAttribute("paymentSuccess", "Job post payment successful!");
+                response.sendRedirect("recruiter_dashboard.jsp");
+            } else {
+                session.setAttribute("paymentError", "Job post payment failed. Please try again.");
+                response.sendRedirect("recruiter_dashboard.jsp");
+            }
+        }
+    }
+    
+    private void handleGeneralPayment(String orderId, String paymentCode, String responseCode, 
+            boolean transSuccess, HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        request.setAttribute("orderId", orderId);
+        request.setAttribute("transSuccess", transSuccess);
+        request.setAttribute("paymentCode", paymentCode);
+        request.getRequestDispatcher("payment_result.jsp").forward(request, response);
+    }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /** 
-     * Handles the HTTP <code>GET</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        processRequest(request, response);
-    } 
-
-    /** 
-     * Handles the HTTP <code>POST</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         processRequest(request, response);
     }
 
-    /** 
-     * Returns a short description of the servlet.
-     * @return a String containing servlet description
-     */
     @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
 }
