@@ -13,7 +13,6 @@ import daos.ApplicationDAO;
 import daos.ScreeningResultDAO;
 import daos.SkillsTestDAO;
 import models.RecruitmentProcess;
-import models.Application;
 import models.ScreeningResult;
 import models.SkillsTest;
 
@@ -199,7 +198,7 @@ public class RecruitmentController extends HttpServlet {
         
         recruitmentDAO.updateStage(processId, newStage, notes);
         
-        response.sendRedirect(request.getContextPath() + "/recruitment/dashboard");
+        response.sendRedirect(request.getContextPath() + "/recruitment");
     }
     
     private void saveScreeningResult(HttpServletRequest request, HttpServletResponse response) 
@@ -244,7 +243,11 @@ public class RecruitmentController extends HttpServlet {
         String nextStage = interviewType.equals("phone") ? "phone_interview" : "final_interview";
         recruitmentDAO.updateStage(processId, nextStage, "Interview scheduled for " + scheduledDate);
         
-        response.sendRedirect(request.getContextPath() + "/recruitment/dashboard");
+        if (nextStage.equals("phone_interview")) {
+            response.sendRedirect(request.getContextPath() + "/recruitment/phone-interview");
+        } else {
+            response.sendRedirect(request.getContextPath() + "/recruitment/final-interview");
+        }
     }
     
     private void scheduleSkillsTest(HttpServletRequest request, HttpServletResponse response) 

@@ -1,13 +1,15 @@
 package controllers;
 
-import daos.PostsDAO;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+
+import daos.PostsDAO;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -57,6 +59,11 @@ public class PostController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String path = request.getPathInfo();
+        // Nếu truy cập /post/home thì redirect về /home
+        if ("/home".equals(path)) {
+            response.sendRedirect(request.getContextPath() + "/home");
+            return;
+        }
         if (path == null || path.equals("/")) {
             String view = request.getParameter("view");
             HttpSession session = request.getSession();
@@ -295,7 +302,7 @@ public class PostController extends HttpServlet {
                 post.setCompanyDescription(request.getParameter("companyDescription") != null ? request.getParameter("companyDescription").trim() : null);
                 post.setKeywords(request.getParameter("keywords") != null ? request.getParameter("keywords").trim() : null);
 
-                // Validate all required fields
+                // Xác thực tất cả các trường bắt buộc
                 if (post.getTitle() == null || post.getTitle().trim().isEmpty()
                         || post.getCompanyName() == null || post.getCompanyName().trim().isEmpty()
                         || post.getSalary() == null || post.getSalary().trim().isEmpty()
