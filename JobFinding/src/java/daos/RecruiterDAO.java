@@ -632,5 +632,19 @@ public class RecruiterDAO extends DBContext {
         
         return p;
     }
+    
+    public int countActiveRecruiters() {
+        String sql = "SELECT COUNT(*) FROM [project_SWP391].[dbo].[Recruiter] WHERE [is_active] = 1";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 
 }
