@@ -35,6 +35,24 @@ public class HomeDAO extends DBContext {
         return posts;
     }
     
+    public List<Integer> getAllPostsIDbaseOnID(int id) {
+        List<Integer> posts = new ArrayList<>();
+        String query = "SELECT [post_id]\n"
+                + "  FROM [project_SWP391].[dbo].[Featured_Jobs]"
+                + "  WHERE [promotion_id] = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                posts.add(rs.getInt(1));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return posts;
+    }
+    
     public static void main(String[] args) {
         HomeDAO dao = new HomeDAO();
         System.out.println(dao.getAllPostsID().size());

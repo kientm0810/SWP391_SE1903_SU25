@@ -7,6 +7,11 @@ package daos;
 import context.DBContext;
 import java.sql.SQLException;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import models.Posts;
 
 /**
  *
@@ -50,5 +55,27 @@ public class FeaturedJobDAO extends DBContext {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+    
+    public List<Posts> listPostBaseOnFeature(int id){
+        HomeDAO homeDao = new HomeDAO();
+        PostsDAO postDao = new PostsDAO();
+        List<Integer> list = homeDao.getAllPostsIDbaseOnID(id);
+        List<Posts> premiumPost = new ArrayList<>();
+        Set<Integer> visitedIds = new HashSet<>(); // Dùng để đánh dấu ID đã duyệt
+
+        for (int i : list) {
+            if (!visitedIds.contains(i)) {
+                Posts post = postDao.getPostById(i);
+                if (post != null) {
+                    premiumPost.add(post);
+                    visitedIds.add(i); // đánh dấu đã đi qua
+                }
+            } else {
+                System.out.println("Đã bỏ qua ID trùng: " + i);
+            }
+        }
+        
+        return premiumPost;
     }
 }

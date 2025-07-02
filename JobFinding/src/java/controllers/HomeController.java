@@ -4,6 +4,7 @@
  */
 package controllers;
 
+import daos.FeaturedJobDAO;
 import daos.HomeDAO;
 import java.io.IOException;
 import java.util.List;
@@ -106,24 +107,8 @@ public class HomeController extends HttpServlet {
         }
         
         try {
-            HomeDAO homeDao = new HomeDAO();
-            PostsDAO postDao = new PostsDAO();
-            List<Integer> list = homeDao.getAllPostsID();
-            List<Posts> premiumPost = new ArrayList<>();
-            Set<Integer> visitedIds = new HashSet<>(); // Dùng để đánh dấu ID đã duyệt
-
-            for (int id : list) {
-                if (!visitedIds.contains(id)) {
-                    Posts post = postDao.getPostById(id);
-                    if (post != null) {
-                        premiumPost.add(post);
-                        visitedIds.add(id); // đánh dấu đã đi qua
-                    }
-                } else {
-                    System.out.println("Đã bỏ qua ID trùng: " + id);
-                }
-            }
-
+            FeaturedJobDAO fjDao = new FeaturedJobDAO();
+            List<Posts> premiumPost = fjDao.listPostBaseOnFeature(4);
             
             request.setAttribute("premiumPost", premiumPost);
         } catch (Exception e) {
