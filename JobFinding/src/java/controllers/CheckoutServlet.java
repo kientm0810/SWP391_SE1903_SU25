@@ -2,6 +2,7 @@ package controllers;
 
 import daos.PostPricingDAO;
 import daos.FinancialTransactionDAO;
+import daos.PromotionProgramDAO;
 import daos.RecruiterDAO;
 import models.PostPricing;
 import models.FinancialTransaction;
@@ -95,8 +96,15 @@ public class CheckoutServlet extends HttpServlet {
     
     private void handleJobPostCheckout(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        Integer recruiterId = (Integer) session.getAttribute("recruiterId");
+        HttpSession session = request.getSession(true);
+        String role = (String) session.getAttribute("role");
+        
+//        if (!role.equals("recruiter")){
+//            response.sendRedirect("home");
+//            return;
+//        }
+        
+        Integer recruiterId = (Integer) session.getAttribute("userId");
         
         if (recruiterId == null) {
             response.sendRedirect("login.jsp");
@@ -116,6 +124,8 @@ public class CheckoutServlet extends HttpServlet {
             
             // Get pricing info
             PostPricing pricing = pricingDAO.getPricingByCode(positionCode);
+            
+            // Maybe never reach there
             if (pricing == null) {
                 request.setAttribute("error", "Invalid position code");
                 request.getRequestDispatcher("error.jsp").forward(request, response);
@@ -133,13 +143,21 @@ public class CheckoutServlet extends HttpServlet {
             
             int transactionId = transactionDAO.createTransaction(transaction);
             
+            log("da di den day cua checkout");
+            
             if (transactionId > 0) {
                 // Store in session for payment callback
+                log("di vao nhanh nay");
                 session.setAttribute("pendingTransactionId", transactionId);
                 session.setAttribute("checkoutType", "jobPost");
                 session.setAttribute("jobId", jobId);
                 session.setAttribute("positionCode", positionCode);
                 session.setAttribute("durationDays", pricing.getDurationDays());
+                // set promotionID cho de insert
+                PromotionProgramDAO programDao = new PromotionProgramDAO();
+                session.setAttribute("programID", programDao.findProgramIDBy(positionCode));
+                
+                // 
                 
                 // Redirect to VNPay payment
                 response.sendRedirect("payment?totalBill=" + pricing.getPrice() + 
@@ -149,13 +167,15 @@ public class CheckoutServlet extends HttpServlet {
                 request.getRequestDispatcher("error.jsp").forward(request, response);
             }
         } catch (NumberFormatException e) {
-            response.sendRedirect("recruiter_dashboard.jsp");
+            response.sendRedirect("home");
         }
     }
     
     private void showPricingOptions(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String jobId = request.getParameter("jobId");
+        
+        log("size: " + pricingDAO.getJobPostPricing().size());
         
         request.setAttribute("jobId", jobId);
         request.setAttribute("pricingOptions", pricingDAO.getJobPostPricing());

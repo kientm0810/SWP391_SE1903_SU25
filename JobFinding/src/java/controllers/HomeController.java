@@ -4,6 +4,7 @@
  */
 package controllers;
 
+import daos.HomeDAO;
 import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
@@ -17,11 +18,14 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
 import models.JobListing;
 import models.JobTypeCount;
 import models.Posts;
 import models.Notification;
 import utils.Constants;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  *
@@ -99,6 +103,31 @@ public class HomeController extends HttpServlet {
             e.printStackTrace();
 //            response.sendRedirect("error.jsp");
 //            return;
+        }
+        
+        try {
+            HomeDAO homeDao = new HomeDAO();
+            PostsDAO postDao = new PostsDAO();
+            List<Integer> list = homeDao.getAllPostsID();
+            List<Posts> premiumPost = new ArrayList<>();
+            Set<Integer> visitedIds = new HashSet<>(); // Dùng để đánh dấu ID đã duyệt
+
+            for (int id : list) {
+                if (!visitedIds.contains(id)) {
+                    Posts post = postDao.getPostById(id);
+                    if (post != null) {
+                        premiumPost.add(post);
+                        visitedIds.add(id); // đánh dấu đã đi qua
+                    }
+                } else {
+                    System.out.println("Đã bỏ qua ID trùng: " + id);
+                }
+            }
+
+            
+            request.setAttribute("premiumPost", premiumPost);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         HttpSession session = request.getSession(true);

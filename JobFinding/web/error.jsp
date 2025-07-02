@@ -1,4 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" isErrorPage="true" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
     <!DOCTYPE html>
     <html>
 
@@ -19,6 +21,9 @@
                             <p class="text-muted mb-4">
                                 We're sorry, but there was an error processing your request.
                                 Please try again later or contact support if the problem persists.
+                            </p>
+                            <p class="text-muted mb-4">
+                                ${error}
                             </p>
                             <% if (exception !=null) { %>
                                 <div class="alert alert-danger text-start">

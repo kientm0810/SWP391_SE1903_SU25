@@ -209,5 +209,49 @@ public class MailUtil {
 
         sendEmail("chubohamhoc@gmail.com", Constants.TITLEXACTHUC, Constants.XACTHUC);
     }
+    
+    public static boolean sendEmailThanhToan(String toEmail, String title, String type, String jobTitle) {
+        Properties pros = new Properties();
+        pros.put("mail.smtp.host", "smtp.gmail.com"); //using SMTP host of gmail
+        pros.put("mail.smtp.port", "587"); //using TLS: port 587, if use SSL port: 465
+        pros.put("mail.smtp.auth", "true"); // require authentication step
+        pros.put("mail.smtp.starttls.enable", "true"); // encode with tls
+        pros.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+
+        // method for logging in email
+        Authenticator auth = new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(FROM, PASSWORD);
+            }
+        };
+        // create a java mail session
+        Session session = Session.getInstance(pros, auth);
+        MimeMessage msg = new MimeMessage(session);
+        try {
+            msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
+            msg.setFrom(FROM);
+            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
+            msg.setSubject(title);
+            
+            String content = "<html>"
+                    + " <body style='font-family: Arial, sans-serif;'>"
+                    + "     <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>"
+                    + "         <h2 style='color: #2e7d32; margin-bottom: 20px;'>Thanh toán thành công</h2>"
+                    + "         <p>Xin chào,</p>"
+                    + "         <p>Bạn đã thanh toán thành công gói " + type + "cho bài tuyển dụng " + jobTitle + " </p>"
+                    + "         <p style='margin-top: 30px;'>Trân trọng,<br>Đội ngũ Job Finding</p>"
+                    + "     </div>"
+                    + " </body>"
+                    + "</html>";
+            
+            msg.setContent(content, "text/html; charset=UTF-8");
+            Transport.send(msg); //send email with the message
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
 }

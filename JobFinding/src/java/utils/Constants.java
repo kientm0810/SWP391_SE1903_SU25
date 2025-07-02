@@ -138,7 +138,9 @@ public final class Constants {
                     + "     </div>"
                     + " </body>"
                     + "</html>";
-    public static final String TITLEXACTHUC = "[Notification - Job Finding] ACCOUNT_APPROVED";
+    public static final String TITLEXACTHUC = "[Notification - Job Finding] ACCOUNT APPROVED";
+    // Thanh toan
+    public static final String TITLETHANHTOAN = "[Notification - Job Finding] PAYMENT SUCCESSFULL";
     
     // Security Constants
     public static final int PASSWORD_MIN_LENGTH = 8;

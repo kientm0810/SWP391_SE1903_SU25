@@ -126,6 +126,11 @@
                 </div>
             </div>
             <!-- slider Area End-->
+            
+            <%@ include file="premium_post.jsp" %>
+            <%--<jsp:include file="premium_post.jsp">--%>
+            
+            
             <!-- Our Services Start -->
             <div class="our-services section-pad-t30">
                 <div class="container">

@@ -140,9 +140,8 @@ CREATE TABLE Promotion_Programs (
 CREATE TABLE Financial_Transactions (
     id INT PRIMARY KEY IDENTITY(1,1),
     recruiter_id INT NOT NULL,
-    promotion_id INT NULL,
     type VARCHAR(10) NOT NULL CHECK (type IN ('income', 'expense')),
-    transaction_type VARCHAR(20) NOT NULL CHECK (transaction_type IN ('featured_job', 'advertising', 'subscription', 'cv_service', 'checkout', 'other', 'registration')),
+    transaction_type VARCHAR(20) NOT NULL CHECK (transaction_type IN ('normal', 'featured', 'premium', 'featured_job', 'advertising', 'subscription', 'cv_service', 'checkout', 'other', 'registration')),
     amount DECIMAL(12, 2) NOT NULL,
     description NTEXT,
     status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'failed')),
@@ -150,7 +149,6 @@ CREATE TABLE Financial_Transactions (
     payment_method NVARCHAR(50),
     transaction_code VARCHAR(100),
     FOREIGN KEY (recruiter_id) REFERENCES Recruiter(id),
-    FOREIGN KEY (promotion_id) REFERENCES Promotion_Programs(id)
 );
 
 -- Posts Table
@@ -387,15 +385,6 @@ CREATE INDEX idx_saved_jobs_recruiter_post ON Saved_Jobs(recruiter_id, post_id);
 CREATE INDEX idx_post_pricing_code ON Post_Pricing(position_code);
 CREATE INDEX idx_financial_transactions_type ON Financial_Transactions(transaction_type, status);
 
-
--- Insert sample pricing data
-INSERT INTO Post_Pricing (position_name, position_code, price, duration_days, description) 
-VALUES 
-(N'Bài viết thường', 'normal', 100000, 30, N'Hiển thị trong danh sách tìm kiếm'),
-(N'Bài viết nổi bật', 'featured', 300000, 30, N'Hiển thị ở vị trí nổi bật'),
-(N'Bài viết Premium', 'premium', 500000, 30, N'Hiển thị ở trang chủ và đầu danh sách'),
-(N'Phí đăng ký', 'registration', 50000, 0, N'Phí đăng ký tài khoản nhà tuyển dụng');
-
 -- Insert data into Admin table
 INSERT INTO Admin (username, password, email, full_name, phone, date_of_birth, gender, address, profile_picture)
 VALUES 
@@ -446,14 +435,6 @@ VALUES
  'Data Scientist', 3000.00, 'Data Science', 'HCMC, Remote', 'Senior', 'Full-time', 
  'Data scientist with expertise in machine learning and big data technologies', 
  'https://github.com/hoangba-ds', 'English: Professional, Vietnamese: Native');
-
--- Insert data into Promotion_Programs table
-INSERT INTO Promotion_Programs (name, cost, duration_days, description, is_active)
-VALUES
-('Basic Featured Job', 300.00, 14, 'Standard featured job listing', 1),
-('Premium Featured Job', 500.00, 30, 'Premium featured job with top placement', 1),
-('Homepage Banner', 1000.00, 7, 'Banner advertisement on homepage', 1),
-('CV Access Package', 200.00, 30, 'Access to premium CV database', 1);
 
 -- Insert data into Applications table
 INSERT INTO Applications (post_id, job_seeker_id, cv_file, cover_letter, status)
@@ -593,3 +574,18 @@ VALUES
 (4, 1, N'recruiter', NULL, N'post', N'Tuyển dụng Developer tại FPT Software', N'Chúng tôi đang tìm kiếm những developer tài năng...', N'active', 0, 0, 0, '2025-05-25 23:18:38.147', '2025-05-25 23:18:38.147', NULL),
 (7, 1, N'recruiter', NULL, N'post', N'Tuyển dụng Developer tại FPT Software', N'Chúng tôi đang tìm kiếm những developer tài năng...', N'active', 0, 0, 0, '2025-05-25 23:20:43.017', '2025-05-25 23:20:43.017', NULL);
 SET IDENTITY_INSERT Posts OFF;
+
+-- Insert sample pricing data
+INSERT INTO Post_Pricing (position_name, position_code, price, duration_days, description) 
+VALUES 
+(N'Bài viết thường', 'normal', 100000, 30, N'Hiển thị trong danh sách tìm kiếm'),
+(N'Bài viết nổi bật', 'featured', 300000, 30, N'Hiển thị ở vị trí nổi bật'),
+(N'Bài viết Premium', 'premium', 500000, 30, N'Hiển thị ở trang chủ và đầu danh sách'),
+(N'Phí đăng ký', 'registration', 50000, 0, N'Phí đăng ký tài khoản nhà tuyển dụng');
+
+-- Insert data into Promotion_Programs table
+INSERT INTO Promotion_Programs (name, cost, duration_days, description, is_active, admin_id, position_type)
+VALUES
+(N'Bài viết thường', 100000, 30, N'Hiển thị trong danh sách tìm kiếm', 1, 1, 'normal'),
+(N'Bài viết nổi bật', 300000, 30, N'Hiển thị ở vị trí nổi bật', 1, 1, 'featured'),
+(N'Bài viết Premium', 500000, 30, N'Hiển thị ở trang chủ và đầu danh sách', 1, 1, 'premium');
