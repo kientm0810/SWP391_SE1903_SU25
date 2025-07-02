@@ -20,10 +20,14 @@ public class CheckoutServlet extends HttpServlet {
     private FinancialTransactionDAO transactionDAO = new FinancialTransactionDAO();
     private RecruiterDAO recruiterDAO = new RecruiterDAO();
     
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");
+        
+        if (action == null){
+            response.sendRedirect("home");
+            return;
+        }
         
         if ("registration".equals(action)) {
             handleRegistrationCheckout(request, response);
@@ -33,26 +37,26 @@ public class CheckoutServlet extends HttpServlet {
             showPricingOptions(request, response);
         }
     }
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doGet(request, response);
+        processRequest(request, response);
     }
     
     private void handleRegistrationCheckout(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        Integer recruiterId = (Integer) session.getAttribute("recruiterId");
-        
-        if (recruiterId == null) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
+        HttpSession session = request.getSession(true);
+        Integer recruiterId = Integer.parseInt(request.getParameter("recruiterId"));
         
         // Check if already verified
         if ("verified".equals(recruiterDAO.getVerificationStatus(recruiterId))) {
-            response.sendRedirect("recruiter_dashboard.jsp");
+            response.sendRedirect("home");
             return;
         }
         

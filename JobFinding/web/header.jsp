@@ -76,7 +76,7 @@
                     <div class="d-flex align-items-center">
                         <c:choose>
                             <c:when test="${not empty sessionScope.user}">
-                                <c:if test="${sessionScope.role == 'recruiter'}">
+                                <c:if test="${sessionScope.role != 'admin'}">
                                     <div class="dropdown" data-bs-auto-close="outside">
                                         <button class="btn btn-light dropdown-toggle" type="button" id="notiDropdown"
                                             data-bs-toggle="dropdown" aria-expanded="false">

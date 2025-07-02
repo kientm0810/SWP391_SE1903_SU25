@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import utils.Constants;
+import utils.MailUtil;
 
 public class VnpayReturn extends HttpServlet {
     
@@ -67,26 +69,26 @@ public class VnpayReturn extends HttpServlet {
         }
     }
     
-    private void processPaymentResult(String orderId, String paymentCode, String responseCode, 
-            boolean transSuccess, HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
-        
-        HttpSession session = request.getSession();
-        
-        try {
-            if (orderId.startsWith("REG_")) {
-                handleRegistrationPayment(orderId, paymentCode, responseCode, transSuccess, session, request, response);
-            } else if (orderId.startsWith("FEAT_")) {
-                handleHomepageFeaturePayment(orderId, paymentCode, responseCode, transSuccess, session, request, response);
-            } else {
-                handleGeneralPayment(orderId, paymentCode, responseCode, transSuccess, request, response);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", "Error processing payment: " + e.getMessage());
-            request.getRequestDispatcher("payment_error.jsp").forward(request, response);
-        }
-    }
+//    private void processPaymentResult(String orderId, String paymentCode, String responseCode, 
+//            boolean transSuccess, HttpServletRequest request, HttpServletResponse response) 
+//            throws ServletException, IOException {
+//        
+//        HttpSession session = request.getSession();
+//        
+//        try {
+//            if (orderId.startsWith("REG_")) {
+//                handleRegistrationPayment(orderId, paymentCode, responseCode, transSuccess, session, request, response);
+//            } else if (orderId.startsWith("FEAT_")) {
+//                handleHomepageFeaturePayment(orderId, paymentCode, responseCode, transSuccess, session, request, response);
+//            } else {
+//                handleGeneralPayment(orderId, paymentCode, responseCode, transSuccess, request, response);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            request.setAttribute("error", "Error processing payment: " + e.getMessage());
+//            request.getRequestDispatcher("payment_error.jsp").forward(request, response);
+//        }
+//    }
     
     private void processPaymentResult(String orderId, String paymentCode, String responseCode, 
             boolean transSuccess, HttpServletRequest request, HttpServletResponse response) 
@@ -128,15 +130,17 @@ public class VnpayReturn extends HttpServlet {
                 
                 // Send confirmation email
                 String recruiterEmail = recruiterDAO.getRecruiterEmail(transaction.getRecruiterId());
+                log("email: " + recruiterEmail);
                 if (recruiterEmail != null) {
-                    JavaMail.sendNotification(recruiterEmail);
+                    log("send email:" + MailUtil.sendEmail(recruiterEmail, Constants.TITLEXACTHUC, Constants.XACTHUC));
                 }
                 
+                
                 session.setAttribute("paymentSuccess", "Registration successful! Your account is now verified.");
-                response.sendRedirect("recruiter_dashboard.jsp");
+                response.sendRedirect("login.jsp");
             } else {
-                session.setAttribute("paymentError", "Registration payment failed. Please try again.");
-                response.sendRedirect("checkout?action=registration");
+//                session.setAttribute("paymentError", "Registration payment failed. Please try again.");
+                response.sendRedirect("home");
             }
         }
     }

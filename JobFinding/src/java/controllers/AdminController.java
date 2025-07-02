@@ -21,8 +21,8 @@ import java.sql.Date;
 //import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
-import daos.RecruiterNotificationDAO;
-import models.RecruiterNotification;
+import daos.NotificationDAO;
+import models.Notification;
 import utils.JavaMail;
 import models.Admin;
 import daos.AdminDAO;
@@ -964,7 +964,7 @@ public class AdminController extends HttpServlet {
         } else if (service.equals("Detail")) {
             detailRecruiter(request, response);
         } else if (service.equals("UpdateVerificationStatus")) {
-            updateVerificationStatus(request, response);
+//            updateVerificationStatus(request, response);
         }
     }
 
@@ -1112,34 +1112,34 @@ public class AdminController extends HttpServlet {
         request.getRequestDispatcher("admin_detail_recruiter.jsp").forward(request, response);
     }
 
-    private void updateVerificationStatus(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        // Lấy tham số từ request
-        String idStr = request.getParameter("id");
-        String status = request.getParameter("verificationStatus");
-        String email = request.getParameter("email");
-        
-        if (idStr != null && status != null && !idStr.isEmpty() && !status.isEmpty()) {
-            int id = Integer.parseInt(idStr);
-
-            RecruiterDAO dao = new RecruiterDAO();
-            dao.updateVerificationStatus(id, status);
-            
-            // truyền thông báo đến recruiter
-            RecruiterNotificationDAO noticeDAO = new RecruiterNotificationDAO();
-            int insert = noticeDAO.insertNotice(new RecruiterNotification(id, 
-                    "ACCOUNT_APPROVED",
-                    "ACCOUNT " + status.toUpperCase(), 
-                    "your account have been " + status.toUpperCase(),
-                    false));
-            
-            if (status.equals("verified") && insert > 0){
-                JavaMail.sendNotification(email);
-            }
-        }
-        
-        response.sendRedirect("AdminController?target=Recruiter");
-    }
+//    private void updateVerificationStatus(HttpServletRequest request, HttpServletResponse response)
+//            throws ServletException, IOException {
+//        // Lấy tham số từ request
+//        String idStr = request.getParameter("id");
+//        String status = request.getParameter("verificationStatus");
+//        String email = request.getParameter("email");
+//        
+//        if (idStr != null && status != null && !idStr.isEmpty() && !status.isEmpty()) {
+//            int id = Integer.parseInt(idStr);
+//
+//            RecruiterDAO dao = new RecruiterDAO();
+//            dao.updateVerificationStatus(id, status);
+//            
+//            // truyền thông báo đến recruiter
+//            NotificationDAO noticeDAO = new NotificationDAO();
+//            int insert = noticeDAO.insertNotice(new Notification(id, 
+//                    "ACCOUNT_APPROVED",
+//                    "ACCOUNT " + status.toUpperCase(), 
+//                    "your account have been " + status.toUpperCase(),
+//                    false));
+//            
+//            if (status.equals("verified") && insert > 0){
+//                JavaMail.sendNotification(email);
+//            }
+//        }
+//        
+//        response.sendRedirect("AdminController?target=Recruiter");
+//    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**

@@ -1,4 +1,4 @@
-DROP DATABASE IF EXISTS project_SWP391;
+﻿DROP DATABASE IF EXISTS project_SWP391;
 CREATE DATABASE project_SWP391;
 
 USE project_SWP391;
@@ -78,18 +78,16 @@ CREATE TABLE Recruiter (
     is_active BIT DEFAULT 1
 );
 
--- RecruiterNotification Table
-CREATE TABLE RecruiterNotification (
+-- Notifications Table
+CREATE TABLE Notifications (
     id BIGINT PRIMARY KEY IDENTITY(1,1),
-    recruiter_id INT NOT NULL,
-    type NVARCHAR(50),
-    title NVARCHAR(255),
-    content NTEXT,
+    user_id INT NOT NULL,
+    user_type VARCHAR(20) NOT NULL CHECK (user_type IN ('admin', 'recruiter', 'job_seeker')),
+    title NVARCHAR(255) NOT NULL,
+	redirect_url NVARCHAR(255),
+    content NTEXT NOT NULL,
     is_read BIT DEFAULT 0,
-    created_at DATETIME DEFAULT GETDATE(),
-    CONSTRAINT fk_recruiter_notification FOREIGN KEY (recruiter_id)
-        REFERENCES Recruiter(id)
-        ON DELETE CASCADE
+    created_at DATETIME DEFAULT GETDATE()
 );
 
 -- Job_Seekers Table
@@ -122,45 +120,6 @@ CREATE TABLE Job_Seekers (
     is_active BIT DEFAULT 1
 );
 
--- Job_SeekersNotification Table
-CREATE TABLE Job_SeekersNotification (
-    id BIGINT PRIMARY KEY IDENTITY(1,1),
-    jobseeker_id INT NOT NULL,
-    type NVARCHAR(50),
-    title NVARCHAR(255),
-    content NTEXT,
-    is_read BIT DEFAULT 0,
-    created_at DATETIME DEFAULT GETDATE(),
-    CONSTRAINT fk_jobseeker_notification FOREIGN KEY (jobseeker_id)
-        REFERENCES Job_Seekers(id)
-        ON DELETE CASCADE
-);
-
--- Email Table
-CREATE TABLE Email (
-    id INT PRIMARY KEY IDENTITY(1,1),
-    sender_id INT NOT NULL,
-    sender_type VARCHAR(20) NOT NULL CHECK (sender_type IN ('admin', 'recruiter', 'job_seeker')),
-    recipient_id INT NOT NULL,
-    recipient_type VARCHAR(20) NOT NULL CHECK (recipient_type IN ('admin', 'recruiter', 'job_seeker')),
-    subject NVARCHAR(MAX) NOT NULL,
-    body NTEXT NOT NULL,
-    is_read BIT DEFAULT 0,
-    sent_at DATETIME DEFAULT GETDATE(),
-    attachments VARCHAR(255)
-);
-
--- Notifications Table
-CREATE TABLE Notifications (
-    id INT PRIMARY KEY IDENTITY(1,1),
-    user_id INT NOT NULL,
-    user_type VARCHAR(20) NOT NULL CHECK (user_type IN ('admin', 'recruiter', 'job_seeker')),
-    type VARCHAR(50) NOT NULL,
-    content NTEXT NOT NULL,
-    is_read BIT DEFAULT 0,
-    created_at DATETIME DEFAULT GETDATE()
-);
-
 -- Promotion_Programs Table
 CREATE TABLE Promotion_Programs (
     id INT PRIMARY KEY IDENTITY(1,1),
@@ -188,27 +147,6 @@ CREATE TABLE Financial_Transactions (
     transaction_code VARCHAR(100),
     FOREIGN KEY (recruiter_id) REFERENCES Recruiter(id),
     FOREIGN KEY (promotion_id) REFERENCES Promotion_Programs(id)
-);
-
--- Job_Listings Table
-CREATE TABLE Job_Listings (
-    id INT PRIMARY KEY IDENTITY(1,1),
-    recruiter_id INT NOT NULL,
-    title NVARCHAR(100) NOT NULL,
-    description NTEXT NOT NULL,
-    requirements NTEXT,
-    location NVARCHAR(100),
-    salary_min DECIMAL(12, 2),
-    salary_max DECIMAL(12, 2),
-    job_type VARCHAR(20) NOT NULL CHECK (job_type IN ('full_time', 'part_time', 'freelance', 'internship', 'contract')),
-    experience_level VARCHAR(50),
-    is_featured BIT DEFAULT 0,
-    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'paused', 'filled', 'expired')),
-    application_deadline DATETIME,
-    created_at DATETIME DEFAULT GETDATE(),
-    updated_at DATETIME DEFAULT GETDATE(),
-    expires_at DATETIME,
-    FOREIGN KEY (recruiter_id) REFERENCES Recruiter(id)
 );
 
 -- Applications Table

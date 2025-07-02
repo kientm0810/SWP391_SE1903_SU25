@@ -41,6 +41,10 @@
                 <div class="text-center">
                     <a href="reset_password.jsp" class="text-decoration-none text-dark">🔁 Forgot password?</a>
                 </div>
+                
+                <c:if test="${not empty sessionScope.paymentSuccess}">
+                    <span>${sessionScope.paymentSuccess}</span>
+                </c:if>
 
                 <c:if test="${not empty error}">
                     <div class="alert alert-danger mt-3" role="alert">

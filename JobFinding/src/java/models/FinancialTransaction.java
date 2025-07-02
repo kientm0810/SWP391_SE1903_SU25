@@ -19,6 +19,29 @@ public class FinancialTransaction {
     public FinancialTransaction() {
     }
 
+    public FinancialTransaction(int recruiterId, String type, String transactionType, double amount, String description, String status, Timestamp transactionDate, String transactionCode) {
+        this.recruiterId = recruiterId;
+        this.type = type;
+        this.transactionType = transactionType;
+        this.amount = amount;
+        this.description = description;
+        this.status = status;
+        this.transactionDate = transactionDate;
+        this.transactionCode = transactionCode;
+    }
+
+    public FinancialTransaction(int id, int recruiterId, String type, String transactionType, double amount, String description, String status, Timestamp transactionDate, String transactionCode) {
+        this.id = id;
+        this.recruiterId = recruiterId;
+        this.type = type;
+        this.transactionType = transactionType;
+        this.amount = amount;
+        this.description = description;
+        this.status = status;
+        this.transactionDate = transactionDate;
+        this.transactionCode = transactionCode;
+    }
+
     // Getters and Setters
     public int getId() {
         return id;

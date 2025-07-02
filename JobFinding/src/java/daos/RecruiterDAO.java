@@ -558,5 +558,79 @@ public class RecruiterDAO extends DBContext {
         return result;
     }
 
+    // Thêm vào RecruiterDAO.java
+    public String getVerificationStatus(int recruiterId) {
+        String sql = "SELECT verification_status FROM [project_SWP391].[dbo].[Recruiter] WHERE id = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, recruiterId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString("verification_status");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "pending";
+    }
+
+    public String getRecruiterEmail(int recruiterId) {
+        String sql = "SELECT email FROM [project_SWP391].[dbo].[Recruiter] WHERE id = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, recruiterId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString("email");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    public Recruiter getSpeccificRecruiterByEmail(String email){
+        String sql = "SELECT *\n"
+            + "  FROM [project_SWP391].[dbo].[Recruiter]"
+            + " WHERE email = ?";
+        
+        Recruiter p = new Recruiter();
+        try {
+            PreparedStatement ptm = connection.prepareStatement(sql);
+            ptm.setString(1, email);
+            ResultSet res = ptm.executeQuery();
+            while (res.next()) {
+//                p = new Recruiter(res.getInt(1),
+//                        res.getString(2),
+//                        res.getString(3),
+//                        res.getString(4),
+//                        res.getString(5),
+//                        res.getString(6),
+//                        res.getDate(7),
+//                        res.getString(8),
+//                        res.getString(9),
+//                        res.getString(10),
+//                        res.getString(11),
+//                        res.getString(12),
+//                        res.getString(13),
+//                        res.getString(14),
+//                        res.getString(15),
+//                        res.getString(16),
+//                        res.getString(17),
+//                        res.getString(18),
+//                        res.getDouble(19),
+//                        res.getString(20),
+//                        res.getDate(21),
+//                        res.getDate(22),
+//                        res.getBoolean(23));
+                p = mapResultSetToRecruiter(res);
+            }
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            ex.getStackTrace();
+        }
+        
+        return p;
+    }
 
 }

@@ -10,51 +10,54 @@ import java.sql.Date;
  *
  * @author andin
  */
-public class RecruiterNotification {
+public class Notification {
     private int id;
-    private int recruiter_id;
+    private int user_id;
     private String type;
     private String title;
+    private String redirect_url;
     private String content;
     private boolean is_read;
     private Date created_at;
 
-    public RecruiterNotification() {
+    public Notification() {
     }
 
-    public RecruiterNotification(int recruiter_id, String type, String title, String content, boolean is_read) {
-        this.recruiter_id = recruiter_id;
-        this.type = type;
-        this.title = title;
-        this.content = content;
-        this.is_read = is_read;
-    }
-
-    public RecruiterNotification(int id, int recruiter_id, String type, String title, String content, boolean is_read, Date created_at) {
+    public Notification(int id, int recruiter_id, String type, String title, String redirect_url, String content, boolean is_read, Date created_at) {
         this.id = id;
-        this.recruiter_id = recruiter_id;
+        this.user_id = recruiter_id;
         this.type = type;
         this.title = title;
+        this.redirect_url = redirect_url;
         this.content = content;
         this.is_read = is_read;
         this.created_at = created_at;
     }
 
-    public RecruiterNotification(int recruiter_id, String type, String title, String content, boolean is_read, Date created_at) {
-        this.recruiter_id = recruiter_id;
+    public Notification(int recruiter_id, String type, String title, String redirect_url, String content, boolean is_read, Date created_at) {
+        this.user_id = recruiter_id;
         this.type = type;
         this.title = title;
+        this.redirect_url = redirect_url;
         this.content = content;
         this.is_read = is_read;
         this.created_at = created_at;
+    }
+
+    public void setRedirect_url(String redirect_url) {
+        this.redirect_url = redirect_url;
+    }
+
+    public String getRedirect_url() {
+        return redirect_url;
     }
 
     public void setId(int id) {
         this.id = id;
     }
 
-    public void setRecruiter_id(int recruiter_id) {
-        this.recruiter_id = recruiter_id;
+    public void setUser_id(int recruiter_id) {
+        this.user_id = recruiter_id;
     }
 
     public void setType(String type) {
@@ -81,8 +84,8 @@ public class RecruiterNotification {
         return id;
     }
 
-    public int getRecruiter_id() {
-        return recruiter_id;
+    public int getUser_id() {
+        return user_id;
     }
 
     public String getType() {

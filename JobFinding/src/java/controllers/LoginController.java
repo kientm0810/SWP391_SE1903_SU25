@@ -60,6 +60,16 @@ public class LoginController extends HttpServlet {
             Object user = authenticateUser(username, password, role);
 
             if (user != null) {
+                if (role.equals("recruiter")){
+                    Recruiter recruiter = (Recruiter) user;
+                    if ("verified".equalsIgnoreCase(recruiter.getVerificationStatus())){
+                        handleSuccessfulLogin(user, role, session, response);
+                    } else {
+                        request.setAttribute("recruiterId", recruiter.getId());
+                        request.getRequestDispatcher("registration_checkout.jsp").forward(request, response);
+                    }
+                    return;
+                }
                 handleSuccessfulLogin(user, role, session, response);
             } else {
                 handleFailedLogin(request, response);
@@ -93,8 +103,7 @@ public class LoginController extends HttpServlet {
                 
             case "recruiter":
                 Recruiter recruiter = userDAO.loginRecruiter(username, password);
-                return (recruiter != null && recruiter.isActive() && 
-                       "verified".equalsIgnoreCase(recruiter.getVerificationStatus())) 
+                return (recruiter != null && recruiter.isActive()) 
                        ? recruiter : null;
                 
             case "job-seeker":

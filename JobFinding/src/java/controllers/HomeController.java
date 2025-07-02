@@ -10,7 +10,7 @@ import java.util.Vector;
 
 import daos.JobDAO;
 import daos.PostsDAO;
-import daos.RecruiterNotificationDAO;
+import daos.NotificationDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -20,7 +20,7 @@ import jakarta.servlet.http.HttpSession;
 import models.JobListing;
 import models.JobTypeCount;
 import models.Posts;
-import models.RecruiterNotification;
+import models.Notification;
 import utils.Constants;
 
 /**
@@ -133,16 +133,16 @@ public class HomeController extends HttpServlet {
         HttpSession session = request.getSession(true);
         String role = (String) session.getAttribute("role");
         int id = (int) session.getAttribute("userId");
-        RecruiterNotificationDAO dao = new RecruiterNotificationDAO();
+        NotificationDAO dao = new NotificationDAO();
         
         int topk = 5;
-        Vector<RecruiterNotification> list = dao.getNotice(id, topk);
-        Vector<RecruiterNotification> unread = dao.getUnreadNotice(id, topk);
+        Vector<Notification> list = dao.getNotice(id, topk, role);
+        Vector<Notification> unread = dao.getUnreadNotice(id, topk, role);
         request.setAttribute("notice", list);
         request.setAttribute("unread", unread);
 
 //        String sql = "SELECT " + (topk == -1 ? "*" : "TOP (" + topk + ")")
-//                + "  FROM [project_SWP391].[dbo].[RecruiterNotification]\n"
+//                + "  FROM [project_SWP391].[dbo].[Notification]\n"
 //                + "  WHERE [recruiter_id] = " + id 
 //                + " ORDER BY created_at DESC";
 //        

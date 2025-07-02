@@ -122,6 +122,23 @@ public final class Constants {
     public static final String EMAIL_FROM = "noreply@jobfinding.com";
     public static final String EMAIL_USERNAME = "fcareinsurance@gmail.com";
     public static final String EMAIL_PASSWWORD = "cifxowsnfwdnywed";
+    // Xac thuc
+    public static final String XACTHUC = "<html>"
+                    + " <body style='font-family: Arial, sans-serif;'>"
+                    + "     <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>"
+                    + "         <h2 style='color: #2e7d32; margin-bottom: 20px;'>Xác thực tài khoản</h2>"
+                    + "         <p>Xin chào,</p>"
+                    + "         <p>Tài khoản của bạn đã được phê duyệt</p>"
+                    + "         <p><strong>Từ giờ bạn có thể:</strong></p>"
+                    + "         <ul>"
+                    + "             <li>Đăng bài tuyển dụng.</li>"
+                    + "             <li>Đăng kí các gói đăng tin của chúng tôi.</li>"
+                    + "         </ul>"
+                    + "         <p style='margin-top: 30px;'>Trân trọng,<br>Đội ngũ Job Finding</p>"
+                    + "     </div>"
+                    + " </body>"
+                    + "</html>";
+    public static final String TITLEXACTHUC = "[Notification - Job Finding] ACCOUNT_APPROVED";
     
     // Security Constants
     public static final int PASSWORD_MIN_LENGTH = 8;

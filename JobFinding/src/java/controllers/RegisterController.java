@@ -5,6 +5,7 @@
 
 package controllers;
 
+import daos.RecruiterDAO;
 import daos.UserDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -151,6 +152,13 @@ public class RegisterController extends HttpServlet {
             }
 
             if (success) {
+                if ("recruiter".equals(role)){
+                    RecruiterDAO rDao = new RecruiterDAO();
+                    Recruiter x = rDao.getSpeccificRecruiterByEmail(email);
+                    req.setAttribute("recruiterId", x.getId());
+                    req.getRequestDispatcher("registration_checkout.jsp").forward(req, resp);
+                    return;
+                }
                 req.setAttribute("message", "Đăng ký thành công! Vui lòng đăng nhập.");
                 req.getRequestDispatcher("login.jsp").forward(req, resp);
             } else {
