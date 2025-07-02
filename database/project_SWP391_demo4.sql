@@ -129,7 +129,11 @@ CREATE TABLE Promotion_Programs (
     description NTEXT,
     is_active BIT DEFAULT 1,
     created_at DATETIME DEFAULT GETDATE(),
-    updated_at DATETIME DEFAULT GETDATE()
+    updated_at DATETIME DEFAULT GETDATE(),
+	admin_id INT NULL,
+    position_type VARCHAR(20) DEFAULT 'normal' CHECK (position_type IN ('normal', 'featured', 'premium')),
+    quantity INT DEFAULT -1, -- -1 means unlimited
+	FOREIGN KEY (admin_id) REFERENCES Admin(id)
 );
 
 -- Financial_Transactions Table
@@ -149,29 +153,69 @@ CREATE TABLE Financial_Transactions (
     FOREIGN KEY (promotion_id) REFERENCES Promotion_Programs(id)
 );
 
+-- Posts Table
+CREATE TABLE Posts (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    user_id INT NOT NULL,
+    user_type VARCHAR(20) NOT NULL CHECK (user_type IN ('admin', 'recruiter', 'job_seeker')),
+    parent_id INT NULL,
+    post_type VARCHAR(20) NOT NULL CHECK (post_type IN ('post', 'comment', 'like')),
+    title NVARCHAR(MAX) NULL,
+    content NVARCHAR(MAX),
+    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'deleted')),
+    view_count INT DEFAULT 0,
+    like_count INT DEFAULT 0,
+    comment_count INT DEFAULT 0,
+    created_at DATETIME DEFAULT GETDATE(),
+    updated_at DATETIME DEFAULT GETDATE(),
+    deleted_at DATETIME NULL,
+    company_name NVARCHAR(255),
+    company_logo VARCHAR(500),
+    salary NVARCHAR(100),
+    location NVARCHAR(255),
+    job_type NVARCHAR(50),
+    experience VARCHAR(100),
+    deadline DATE,
+    working_time NVARCHAR(200),
+    job_description TEXT,
+    requirements TEXT,
+    benefits TEXT,
+    contact_address NVARCHAR(500),
+    application_method TEXT,
+    quantity INT NULL,
+    rank NVARCHAR(100) NULL,
+    industry NVARCHAR(255) NULL,
+    contact_person NVARCHAR(255) NULL,
+    company_size NVARCHAR(100) NULL,
+    company_website VARCHAR(500) NULL,
+    company_description NVARCHAR(MAX) NULL,
+    keywords NVARCHAR(500) NULL,
+    FOREIGN KEY (user_id) REFERENCES Recruiter(id)
+);
+
 -- Applications Table
 CREATE TABLE Applications (
     id INT PRIMARY KEY IDENTITY(1,1),
-    job_listing_id INT NOT NULL,
+    post_id INT NOT NULL,
     job_seeker_id INT NOT NULL,
     cv_file VARCHAR(255),
     cover_letter NTEXT,
     status VARCHAR(20) DEFAULT 'new' CHECK (status IN ('new', 'reviewed', 'interviewed', 'offered', 'rejected')),
     applied_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (job_listing_id) REFERENCES Job_Listings(id),
+    FOREIGN KEY (post_id) REFERENCES Posts(id),
     FOREIGN KEY (job_seeker_id) REFERENCES Job_Seekers(id)
 );
 
 -- Recruitment_Stages Table
 CREATE TABLE Recruitment_Stages (
     id INT PRIMARY KEY IDENTITY(1,1),
-    job_listing_id INT NOT NULL,
+    post_id INT NOT NULL,
     stage_name VARCHAR(50) NOT NULL,
     order_num INT NOT NULL,
     description NTEXT,
     expected_duration INT,
-    FOREIGN KEY (job_listing_id) REFERENCES Job_Listings(id)
+    FOREIGN KEY (post_id) REFERENCES Posts(id)
 );
 
 -- Application_Stages Table
@@ -189,12 +233,14 @@ CREATE TABLE Application_Stages (
 -- Featured_Jobs Table
 CREATE TABLE Featured_Jobs (
     id INT PRIMARY KEY IDENTITY(1,1),
-    job_listing_id INT NOT NULL,
+    post_id INT NOT NULL,
     promotion_id INT NOT NULL,
     start_date DATETIME NOT NULL,
     end_date DATETIME NOT NULL,
-    FOREIGN KEY (job_listing_id) REFERENCES Job_Listings(id),
-    FOREIGN KEY (promotion_id) REFERENCES Promotion_Programs(id)
+	transaction_id INT NULL,
+    FOREIGN KEY (post_id) REFERENCES Posts(id),
+    FOREIGN KEY (promotion_id) REFERENCES Promotion_Programs(id),
+	FOREIGN KEY (transaction_id) REFERENCES Financial_Transactions(id)
 );
 
 -- Search_History Table
@@ -257,46 +303,6 @@ CREATE TABLE Reports (
     data NTEXT,
     created_at DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (generated_by) REFERENCES Admin(id)
-);
-
--- Posts Table
-CREATE TABLE Posts (
-    id INT PRIMARY KEY IDENTITY(1,1),
-    user_id INT NOT NULL,
-    user_type VARCHAR(20) NOT NULL CHECK (user_type IN ('admin', 'recruiter', 'job_seeker')),
-    parent_id INT NULL,
-    post_type VARCHAR(20) NOT NULL CHECK (post_type IN ('post', 'comment', 'like')),
-    title NVARCHAR(MAX) NULL,
-    content NVARCHAR(MAX),
-    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'deleted')),
-    view_count INT DEFAULT 0,
-    like_count INT DEFAULT 0,
-    comment_count INT DEFAULT 0,
-    created_at DATETIME DEFAULT GETDATE(),
-    updated_at DATETIME DEFAULT GETDATE(),
-    deleted_at DATETIME NULL,
-    company_name NVARCHAR(255),
-    company_logo VARCHAR(500),
-    salary NVARCHAR(100),
-    location NVARCHAR(255),
-    job_type NVARCHAR(50),
-    experience VARCHAR(100),
-    deadline DATE,
-    working_time NVARCHAR(200),
-    job_description TEXT,
-    requirements TEXT,
-    benefits TEXT,
-    contact_address NVARCHAR(500),
-    application_method TEXT,
-    quantity INT NULL,
-    rank NVARCHAR(100) NULL,
-    industry NVARCHAR(255) NULL,
-    contact_person NVARCHAR(255) NULL,
-    company_size NVARCHAR(100) NULL,
-    company_website VARCHAR(500) NULL,
-    company_description NVARCHAR(MAX) NULL,
-    keywords NVARCHAR(500) NULL,
-    FOREIGN KEY (user_id) REFERENCES Recruiter(id)
 );
 
 -- Interviews Table
@@ -368,54 +374,8 @@ CREATE TABLE Post_Pricing (
     created_at DATETIME DEFAULT GETDATE()
 );
 
--- Insert sample pricing data
-INSERT INTO Post_Pricing (position_name, position_code, price, duration_days, description) 
-VALUES 
-(N'Bài viết thường', 'normal', 100000, 30, N'Hiển thị trong danh sách tìm kiếm'),
-(N'Bài viết nổi bật', 'featured', 300000, 30, N'Hiển thị ở vị trí nổi bật'),
-(N'Bài viết Premium', 'premium', 500000, 30, N'Hiển thị ở trang chủ và đầu danh sách'),
-(N'Phí đăng ký', 'registration', 50000, 0, N'Phí đăng ký tài khoản nhà tuyển dụng');
-
--- 2. Modify Promotion_Programs table to add admin_id and position info
-ALTER TABLE Promotion_Programs
-ADD admin_id INT NULL,
-    position_type VARCHAR(20) DEFAULT 'normal' CHECK (position_type IN ('normal', 'featured', 'premium')),
-    quantity INT DEFAULT -1; -- -1 means unlimited
-
--- Add foreign key constraint
-ALTER TABLE Promotion_Programs
-ADD CONSTRAINT fk_promotion_admin FOREIGN KEY (admin_id) REFERENCES Admin(id);
-
--- 3. Modify Featured_Jobs table to add transaction_id
-ALTER TABLE Featured_Jobs
-ADD transaction_id INT NULL;
-
--- Add foreign key constraint
-ALTER TABLE Featured_Jobs
-ADD CONSTRAINT fk_featured_jobs_transaction FOREIGN KEY (transaction_id) REFERENCES Financial_Transactions(id);
-
--- 5. Add post_type to Job_Listings table
-ALTER TABLE Job_Listings
-ADD post_type VARCHAR(20) DEFAULT 'normal' CHECK (post_type IN ('normal', 'featured', 'premium')),
-    payment_expiry DATETIME NULL;
-
--- 6. Create indexes for better performance
-CREATE INDEX idx_post_pricing_code ON Post_Pricing(position_code);
-CREATE INDEX idx_job_listings_post_type ON Job_Listings(post_type, payment_expiry);
-CREATE INDEX idx_financial_transactions_type ON Financial_Transactions(transaction_type, status);
-
--- Sample Data Insert
-SET IDENTITY_INSERT Posts ON;
-INSERT INTO Posts (id, user_id, user_type, parent_id, post_type, title, content, status, view_count, like_count, comment_count, created_at, updated_at, deleted_at)
-VALUES 
-(4, 1, N'recruiter', NULL, N'post', N'Tuyển dụng Developer tại FPT Software', N'Chúng tôi đang tìm kiếm những developer tài năng...', N'active', 0, 0, 0, '2025-05-25 23:18:38.147', '2025-05-25 23:18:38.147', NULL),
-(7, 1, N'recruiter', NULL, N'post', N'Tuyển dụng Developer tại FPT Software', N'Chúng tôi đang tìm kiếm những developer tài năng...', N'active', 0, 0, 0, '2025-05-25 23:20:43.017', '2025-05-25 23:20:43.017', NULL);
-SET IDENTITY_INSERT Posts OFF;
-
 -- Create Indexes for performance optimization
 CREATE INDEX idx_skill_name ON CV_Skills(skill_name);
-CREATE INDEX idx_job_listings_recruiter_id ON Job_Listings(recruiter_id);
-CREATE INDEX idx_applications_job_listing_id ON Applications(job_listing_id);
 CREATE INDEX idx_applications_job_seeker_id ON Applications(job_seeker_id);
 CREATE INDEX idx_posts_user ON Posts(user_id, user_type);
 CREATE INDEX idx_posts_parent ON Posts(parent_id);
@@ -424,8 +384,17 @@ CREATE INDEX idx_posts_status ON Posts(status);
 CREATE INDEX idx_posts_created_at ON Posts(created_at DESC);
 CREATE INDEX idx_saved_jobs_job_seeker_post ON Saved_Jobs(job_seeker_id, post_id);
 CREATE INDEX idx_saved_jobs_recruiter_post ON Saved_Jobs(recruiter_id, post_id);
+CREATE INDEX idx_post_pricing_code ON Post_Pricing(position_code);
+CREATE INDEX idx_financial_transactions_type ON Financial_Transactions(transaction_type, status);
 
 
+-- Insert sample pricing data
+INSERT INTO Post_Pricing (position_name, position_code, price, duration_days, description) 
+VALUES 
+(N'Bài viết thường', 'normal', 100000, 30, N'Hiển thị trong danh sách tìm kiếm'),
+(N'Bài viết nổi bật', 'featured', 300000, 30, N'Hiển thị ở vị trí nổi bật'),
+(N'Bài viết Premium', 'premium', 500000, 30, N'Hiển thị ở trang chủ và đầu danh sách'),
+(N'Phí đăng ký', 'registration', 50000, 0, N'Phí đăng ký tài khoản nhà tuyển dụng');
 
 -- Insert data into Admin table
 INSERT INTO Admin (username, password, email, full_name, phone, date_of_birth, gender, address, profile_picture)
@@ -486,27 +455,8 @@ VALUES
 ('Homepage Banner', 1000.00, 7, 'Banner advertisement on homepage', 1),
 ('CV Access Package', 200.00, 30, 'Access to premium CV database', 1);
 
--- Insert data into Job_Listings table
-INSERT INTO Job_Listings (recruiter_id, title, description, requirements, location, salary_min, salary_max, 
-                         job_type, experience_level, is_featured, status, application_deadline, expires_at)
-VALUES
-(1, 'Senior Java Developer', 'We are looking for an experienced Java developer to join our team working on enterprise solutions.', 
- '3+ years Java experience, Spring Framework, Microservices', 'Hanoi', 2000.00, 3000.00, 'full_time', 'Senior', 1, 'active', '2023-12-31', '2023-12-31'),
- 
-(1, 'React Native Developer', 'Join our mobile development team to build cross-platform applications.', 
- '2+ years React Native, JavaScript, Redux', 'Hanoi, Remote', 1500.00, 2500.00, 'full_time', 'Mid-level', 0, 'active', '2023-11-30', '2023-11-30'),
- 
-(2, 'Product Manager', 'Lead product development for our gaming platform.', 
- '5+ years product management, Agile methodology', 'HCMC', 2500.00, 4000.00, 'full_time', 'Senior', 1, 'active', '2023-12-15', '2023-12-15'),
- 
-(3, 'E-commerce Specialist', 'Manage online sales and marketing campaigns for our platform.', 
- '2+ years e-commerce, digital marketing', 'HCMC', 1000.00, 1500.00, 'full_time', 'Entry-level', 0, 'active', '2023-11-20', '2023-11-20'),
- 
-(2, 'DevOps Engineer', 'Implement and maintain CI/CD pipelines for our cloud infrastructure.', 
- '3+ years DevOps, AWS, Kubernetes', 'HCMC, Remote', 1800.00, 3000.00, 'full_time', 'Mid-level', 0, 'active', '2023-12-10', '2023-12-10');
-
 -- Insert data into Applications table
-INSERT INTO Applications (job_listing_id, job_seeker_id, cv_file, cover_letter, status)
+INSERT INTO Applications (post_id, job_seeker_id, cv_file, cover_letter, status)
 VALUES
 (1, 1, 'nguyen_dev_cv.pdf', 'Dear Hiring Manager, I am excited to apply for the Senior Java Developer position...', 'reviewed'),
 (3, 3, 'hoang_ba_cv.pdf', 'Dear VNG Team, With my 5 years of experience in data science...', 'interviewed'),
@@ -515,7 +465,7 @@ VALUES
 (4, 2, 'linh_designer_cv.pdf', 'Dear Tiki Team, I am interested in combining my design skills...', 'reviewed');
 
 -- Insert data into Recruitment_Stages table
-INSERT INTO Recruitment_Stages (job_listing_id, stage_name, order_num, description, expected_duration)
+INSERT INTO Recruitment_Stages (post_id, stage_name, order_num, description, expected_duration)
 VALUES
 (1, 'CV Screening', 1, 'Initial CV review by HR', 3),
 (1, 'Technical Test', 2, 'Online coding assessment', 5),
@@ -544,7 +494,7 @@ VALUES
 (1, 'income', 'cv_service', 200.00, 'Premium CV access package', 'completed', 'Bank Transfer');
 
 -- Insert data into Featured_Jobs table
-INSERT INTO Featured_Jobs (job_listing_id, promotion_id, start_date, end_date)
+INSERT INTO Featured_Jobs (post_id, promotion_id, start_date, end_date)
 VALUES
 (1, 2, '2023-10-01', '2023-10-31'),
 (3, 2, '2023-10-01', '2023-10-31');
@@ -592,7 +542,7 @@ VALUES
 (1, 4, '{"personal_info": {...}, "experience": [...], "skills": [...]}', 'Nguyen Van D - Simplified CV', 0);
 
 -- Insert data into Notifications table
-INSERT INTO Notifications (user_id, user_type, type, content, is_read)
+INSERT INTO Notifications (user_id, user_type, title, content, is_read)
 VALUES
 (1, 'job_seeker', 'application_status', 'Your application for Senior Java Developer at FPT Software has been reviewed', 1),
 (3, 'job_seeker', 'application_status', 'Your application for Product Manager at VNG Corporation has been moved to interview stage', 0),
@@ -605,15 +555,6 @@ VALUES
 ('revenue', 1, '2023-10-01', '2023-10-31', '{"total_income": 1500.00, "transactions": 4}'),
 ('job_application_stats', 1, '2023-10-01', '2023-10-15', '{"total_applications": 125, "average_per_job": 25}'),
 ('employer_list', 2, '2023-09-01', '2023-09-30', '{"active_employers": 42, "new_employers": 5}');
-
--- Insert data into Email table
-INSERT INTO Email (sender_id, sender_type, recipient_id, recipient_type, subject, body, is_read, attachments)
-VALUES
-(1, 'recruiter', 1, 'job_seeker', 'Interview Invitation', N'Dear Nguyen, We would like to invite you for an interview...', 1, NULL),
-(1, 'job_seeker', 1, 'recruiter', 'Follow-up on Application', N'Dear Mr. Nguyen, I would like to follow up on my application...', 0, 'follow_up.pdf'),
-(1, 'admin', 1, 'recruiter', 'Account Verification', N'Your account has been successfully verified', 1, NULL);
-
-
 
 
 INSERT INTO Job_Seeker_CVs (job_seeker_id, cv_template_id, cv_content, title, is_default)
@@ -644,3 +585,11 @@ VALUES
 }', 
 'Nguyen Van D - Java Developer CV', 
 1);
+
+-- Sample Data Insert
+SET IDENTITY_INSERT Posts ON;
+INSERT INTO Posts (id, user_id, user_type, parent_id, post_type, title, content, status, view_count, like_count, comment_count, created_at, updated_at, deleted_at)
+VALUES 
+(4, 1, N'recruiter', NULL, N'post', N'Tuyển dụng Developer tại FPT Software', N'Chúng tôi đang tìm kiếm những developer tài năng...', N'active', 0, 0, 0, '2025-05-25 23:18:38.147', '2025-05-25 23:18:38.147', NULL),
+(7, 1, N'recruiter', NULL, N'post', N'Tuyển dụng Developer tại FPT Software', N'Chúng tôi đang tìm kiếm những developer tài năng...', N'active', 0, 0, 0, '2025-05-25 23:20:43.017', '2025-05-25 23:20:43.017', NULL);
+SET IDENTITY_INSERT Posts OFF;

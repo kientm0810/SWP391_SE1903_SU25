@@ -199,5 +199,14 @@ public class NotificationDAO extends DBContext {
         notification.setCreated_at(res.getDate("created_at"));
         return notification;
     }
+    
+    
+    public static void main(String[] args) {
+        NotificationDAO dao = new NotificationDAO();
+        Vector<Notification> list = dao.getNotice(5, 5, "recruiter");
+        for (Notification notification : list) {
+            System.out.println(notification.getId());
+        }
+    }
 
 }

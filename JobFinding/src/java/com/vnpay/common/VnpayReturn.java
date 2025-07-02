@@ -3,6 +3,7 @@ package com.vnpay.common;
 import daos.FinancialTransactionDAO;
 import daos.RecruiterDAO;
 import daos.JobListingDAO;
+import daos.NotificationDAO;
 import models.FinancialTransaction;
 import utils.JavaMail;
 import java.io.IOException;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import models.Notification;
 import utils.Constants;
 import utils.MailUtil;
 
@@ -131,10 +133,17 @@ public class VnpayReturn extends HttpServlet {
                 // Send confirmation email
                 String recruiterEmail = recruiterDAO.getRecruiterEmail(transaction.getRecruiterId());
                 log("email: " + recruiterEmail);
-                if (recruiterEmail != null) {
-                    log("send email:" + MailUtil.sendEmail(recruiterEmail, Constants.TITLEXACTHUC, Constants.XACTHUC));
-                }
+//                if (recruiterEmail != null) {
+//                    log("send email:" + MailUtil.sendEmail(recruiterEmail, Constants.TITLEXACTHUC, Constants.XACTHUC));
+//                }
                 
+                // Create notice
+                Notification notice = new Notification(transaction.getRecruiterId(),
+                        "recruiter", "Tài khoản đã được xác thực", "", "Tài khoản của bạn đã được xác thực", false);
+                // link đến hóa đơn thanh toán thành công
+                
+                NotificationDAO dao = new NotificationDAO();
+                dao.insertNotice(notice);
                 
                 session.setAttribute("paymentSuccess", "Registration successful! Your account is now verified.");
                 response.sendRedirect("login.jsp");

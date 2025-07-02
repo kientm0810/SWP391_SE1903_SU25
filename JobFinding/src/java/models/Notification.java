@@ -23,6 +23,15 @@ public class Notification {
     public Notification() {
     }
 
+    public Notification(int user_id, String type, String title, String redirect_url, String content, boolean is_read) {
+        this.user_id = user_id;
+        this.type = type;
+        this.title = title;
+        this.redirect_url = redirect_url;
+        this.content = content;
+        this.is_read = is_read;
+    }
+
     public Notification(int id, int recruiter_id, String type, String title, String redirect_url, String content, boolean is_read, Date created_at) {
         this.id = id;
         this.user_id = recruiter_id;

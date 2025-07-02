@@ -97,15 +97,15 @@ public class HomeController extends HttpServlet {
             // request.getRequestDispatcher("/home.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("error.jsp");
-            return;
+//            response.sendRedirect("error.jsp");
+//            return;
         }
 
         HttpSession session = request.getSession(true);
 
         String role = (String) session.getAttribute("role");
-        if (Constants.RECRUITER_ROLE.equals(role)) {
-            processRecruiter(request, response);
+        if (role != null && !role.equals("admin")) {
+            processQuerry(request, response);
             return;
         }
         // Job seeker sẽ dùng cùng trang home với khách, không dùng dashboard riêng
@@ -114,21 +114,22 @@ public class HomeController extends HttpServlet {
         request.getRequestDispatcher("home.jsp").forward(request, response);
     }
 
-    private void processRecruiter(HttpServletRequest request, HttpServletResponse response)
+    private void processQuerry(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String service = request.getParameter("service");
         if (service == null) {
             service = "list";
         }
+        service = "list";
 
         if (service.equals("list")){
-            listNoticeRecruiter(request, response);
+            listNotice(request, response);
         } else if (service.equals("")){
             
         }
     }
 
-    private void listNoticeRecruiter(HttpServletRequest request, HttpServletResponse response)
+    private void listNotice(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         HttpSession session = request.getSession(true);
         String role = (String) session.getAttribute("role");
@@ -140,18 +141,10 @@ public class HomeController extends HttpServlet {
         Vector<Notification> unread = dao.getUnreadNotice(id, topk, role);
         request.setAttribute("notice", list);
         request.setAttribute("unread", unread);
-
-//        String sql = "SELECT " + (topk == -1 ? "*" : "TOP (" + topk + ")")
-//                + "  FROM [project_SWP391].[dbo].[Notification]\n"
-//                + "  WHERE [recruiter_id] = " + id 
-//                + " ORDER BY created_at DESC";
-//        
-//        log(sql);
         
-                log("" + list.size());
-//                log("" + id);
-//                response.sendRedirect("admin_dashboard.jsp");
-//                return;
+        log("id recruiter:" + id + " " + role);
+        log("" + list.size());
+                
         request.getRequestDispatcher("home.jsp").forward(request, response);
     }
     

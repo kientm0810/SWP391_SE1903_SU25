@@ -82,9 +82,9 @@ public class NotificationController extends HttpServlet {
         }
         
         if (type.equals("all")){
-            list = dao.getNotice(id, topk);
+            list = dao.getNotice(id, topk, role);
         } else if (type.equals("unread")){
-            list = dao.getUnreadNotice(id, topk);
+            list = dao.getUnreadNotice(id, topk, role);
         }
         
         request.setAttribute("notice", list);
@@ -96,6 +96,7 @@ public class NotificationController extends HttpServlet {
     private void detailNotice(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         HttpSession session = request.getSession(true);
+        String role = (String) session.getAttribute("role");
         int id = Integer.parseInt(request.getParameter("id"));
         int recId = (int) session.getAttribute("userId");
         
@@ -116,9 +117,9 @@ public class NotificationController extends HttpServlet {
         }
         
         if (type.equals("all")){
-            list = dao.getNotice(recId, topk);
+            list = dao.getNotice(recId, topk, role);
         } else if (type.equals("unread")){
-            list = dao.getUnreadNotice(recId, topk);
+            list = dao.getUnreadNotice(recId, topk, role);
         }
 
         dao.readSpecificNotification(id);
@@ -135,11 +136,11 @@ public class NotificationController extends HttpServlet {
     private void deleteAllNotice(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         HttpSession session = request.getSession(true);
-        
+        String role = (String) session.getAttribute("role");
         int id = (int) session.getAttribute("userId");
         
         NotificationDAO dao = new NotificationDAO();
-        dao.deleteAll(id);
+        dao.deleteAll(id, role);
         
         response.sendRedirect("notification");
     }
@@ -147,11 +148,11 @@ public class NotificationController extends HttpServlet {
     private void deleteAllNoticeReaded(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         HttpSession session = request.getSession(true);
-        
+        String role = (String) session.getAttribute("role");
         int id = (int) session.getAttribute("userId");
         
         NotificationDAO dao = new NotificationDAO();
-        dao.deleteAllReaded(id);
+        dao.deleteAllReaded(id, role);
         
         response.sendRedirect("notification");
     }
