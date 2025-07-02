@@ -197,13 +197,21 @@
         <div class="main-content">
             <div class="page-header">
                 <h1>Quản lý chương trình khuyến mãi</h1>
-<!--                <div class="header-actions">
+                <div class="header-actions">
                     <a href="AdminController?target=program&service=add" class="btn btn-primary">
                         <i class="fas fa-plus"></i>
                         Thêm chương trình mới
                     </a>
-                </div>-->
+                </div>
             </div>
+            
+            <!-- Hiển thị thông báo thành công -->
+            <c:if test="${not empty successMessage}">
+                <div style="background: #e8f5e8; border: 1px solid #4caf50; color: #2e7d32; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <i class="fas fa-check-circle"></i>
+                    ${successMessage}
+                </div>
+            </c:if>
             
             <!-- Tổng quan thống kê -->
             <div class="page-stats">
@@ -215,9 +223,14 @@
                     </div>
                     <div class="overall-stat">
                         <div class="overall-stat-value">
-                            <fmt:formatNumber value="${totalRevenue}" pattern="#,###" /> VNĐ
+                            <fmt:formatNumber value="${totalMonthlyRevenue}" pattern="#,###" /> VNĐ
                         </div>
-                        <div class="overall-stat-label">Tổng doanh thu</div>
+                        <div class="overall-stat-label">
+                            Doanh thu tháng này
+                            <br><small style="opacity: 0.8;">
+                                (<fmt:formatNumber value="${totalAllTimeRevenue}" pattern="#,###" /> VNĐ tổng cộng)
+                            </small>
+                        </div>
                     </div>
                     <div class="overall-stat">
                         <div class="overall-stat-value">${totalActiveRecruiters}</div>
@@ -248,14 +261,31 @@
                                 <span class="stat-value">${postCounts[program.id]}</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-label">Doanh thu:</span>
+                                <span class="stat-label">Doanh thu tháng này:</span>
                                 <span class="stat-value">
-                                    <fmt:formatNumber value="${revenues[program.id]}" pattern="#,###" /> VNĐ
+                                    <fmt:formatNumber value="${monthlyRevenues[program.id]}" pattern="#,###" /> VNĐ
                                 </span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-label">Loại:</span>
-                                <span class="stat-value">${program.positionTypeDisplay}</span>
+                                <span class="stat-label">Tổng doanh thu:</span>
+                                <span class="stat-value">
+                                    <fmt:formatNumber value="${allTimeRevenues[program.id]}" pattern="#,###" /> VNĐ
+                                </span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Số lượng còn lại:</span>
+                                <span class="stat-value">
+                                    <c:choose>
+                                        <c:when test="${program.quantity == -1}">
+                                            <span style="color: #4caf50;">Không giới hạn</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span style="color: ${program.quantity > 10 ? '#4caf50' : '#ff9800'};">
+                                                ${program.quantity}
+                                            </span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </span>
                             </div>
                             <div class="stat-item">
                                 <span class="stat-label">Trạng thái:</span>
@@ -273,12 +303,12 @@
                         </div>
                         
                         <div class="promotion-actions">
-                            <a href="AdminController?target=program&service=viewPosts&programId=${program.id}" 
+                            <a href="AdminPromotionController?target=program&service=viewPosts&programId=${program.id}" 
                                class="btn-view-posts">
                                 <i class="fas fa-list"></i>
                                 Xem bài đăng
                             </a>
-                            <a href="AdminController?target=program&service=edit&id=${program.id}" 
+                            <a href="AdminPromotionController?target=program&service=update&id=${program.id}" 
                                class="btn-edit">
                                 <i class="fas fa-edit"></i>
                                 Chỉnh sửa

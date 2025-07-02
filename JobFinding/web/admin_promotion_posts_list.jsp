@@ -321,20 +321,25 @@
                     </div>
                     <div class="program-info-item">
                         <div class="program-info-value">${totalPosts}</div>
-                        <div class="program-info-label">Tổng bài đăng</div>
+                        <div class="program-info-label">Tổng bài đăng duy nhất</div>
                     </div>
                     <div class="program-info-item">
                         <div class="program-info-value">
-                            <fmt:formatNumber value="${totalRevenue}" pattern="#,###" /> VNĐ
+                            <fmt:formatNumber value="${monthlyRevenue}" pattern="#,###" /> VNĐ
                         </div>
-                        <div class="program-info-label">Tổng doanh thu</div>
+                        <div class="program-info-label">
+                            Doanh thu tháng này
+                            <br><small style="opacity: 0.8;">
+                                (<fmt:formatNumber value="${allTimeRevenue}" pattern="#,###" /> VNĐ tổng cộng)
+                            </small>
+                        </div>
                     </div>
                 </div>
             </div>
             
             <!-- Search Form -->
             <div class="search-filter-section">
-                <form action="AdminController" method="get">
+                <form action="AdminPromotionController" method="get">
                     <input type="hidden" name="target" value="program">
                     <input type="hidden" name="service" value="viewPosts">
                     <input type="hidden" name="programId" value="${promotionProgram.id}">
@@ -351,7 +356,7 @@
                             Tìm kiếm
                         </button>
                         
-                        <a href="AdminController?target=program&service=viewPosts&programId=${promotionProgram.id}" class="btn btn-secondary">
+                        <a href="AdminPromotionController?service=viewPosts&programId=${promotionProgram.id}" class="btn btn-secondary">
                             <i class="fas fa-redo"></i>
                             Reset
                         </a>

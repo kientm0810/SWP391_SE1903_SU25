@@ -8,8 +8,6 @@ import context.DBContext;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import context.DBContext;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import models.PromotionProgram;
@@ -19,22 +17,6 @@ import models.PromotionProgram;
  * @author andin
  */
 public class PromotionProgramDAO extends DBContext {
-
-    public int findProgramIDBy(String type) {
-        String sql = "SELECT [id] FROM [project_SWP391].[dbo].[Promotion_Programs] WHERE [position_type] = ?";
-
-        try {
-            PreparedStatement stmt = connection.prepareStatement(sql);
-            stmt.setString(1, type);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()){
-                return rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
     
     // Lấy tất cả promotion programs
     public List<PromotionProgram> getAllPromotionPrograms() {
@@ -103,7 +85,7 @@ public class PromotionProgramDAO extends DBContext {
     // Cập nhật promotion program
     public boolean updatePromotionProgram(PromotionProgram program) {
         String sql = "UPDATE Promotion_Programs SET name = ?, cost = ?, duration_days = ?, "
-                + "description = ?, is_active = ?, updated_at = GETDATE(), position_type = ?, quantity = ? "
+                + "description = ?, is_active = ?, updated_at = GETDATE(), quantity = ? "
                 + "WHERE id = ?";
         
         try {
@@ -113,9 +95,8 @@ public class PromotionProgramDAO extends DBContext {
             stmt.setInt(3, program.getDurationDays());
             stmt.setString(4, program.getDescription());
             stmt.setBoolean(5, program.isActive());
-            stmt.setString(6, program.getPositionType());
-            stmt.setInt(7, program.getQuantity());
-            stmt.setInt(8, program.getId());
+            stmt.setInt(6, program.getQuantity());
+            stmt.setInt(7, program.getId());
             
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -182,8 +163,37 @@ public class PromotionProgramDAO extends DBContext {
         return null;
     }
     
-    public static void main(String[] args) {
-        PromotionProgramDAO dao = new PromotionProgramDAO();
-        System.out.println(dao.findProgramIDBy("normal"));
+    public int findProgramIDBy(String type) {
+        String sql = "SELECT [id] FROM [project_SWP391].[dbo].[Promotion_Programs] WHERE [position_type] = ?";
+
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setString(1, type);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()){
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    // Helper method để đếm recruiters đang hoạt động
+    public int countActiveRecruiters() {
+        String sql = "SELECT COUNT(*) FROM Recruiter WHERE is_active = 1";
+        
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return 0;
     }
 }

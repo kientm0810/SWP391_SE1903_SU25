@@ -144,8 +144,31 @@ public class FeaturedJobDAO extends DBContext {
         return 0;
     }
 
-    // Lấy tổng doanh thu từ promotion program
+    // Lấy tổng doanh thu từ promotion program theo tháng hiện tại
     public double getTotalRevenueByPromotionId(int promotionId) {
+        String sql = "SELECT SUM(ft.amount) FROM Featured_Jobs fj "
+                + "INNER JOIN Financial_Transactions ft ON fj.transaction_id = ft.id "
+                + "WHERE fj.promotion_id = ? AND ft.status = 'completed' "
+                + "AND YEAR(ft.transaction_date) = YEAR(GETDATE()) "
+                + "AND MONTH(ft.transaction_date) = MONTH(GETDATE())";
+
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, promotionId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getDouble(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0.0;
+    }
+    
+    // Lấy tổng doanh thu từ promotion program tất cả thời gian
+    public double getTotalAllTimeRevenueByPromotionId(int promotionId) {
         String sql = "SELECT SUM(ft.amount) FROM Featured_Jobs fj "
                 + "INNER JOIN Financial_Transactions ft ON fj.transaction_id = ft.id "
                 + "WHERE fj.promotion_id = ? AND ft.status = 'completed'";
