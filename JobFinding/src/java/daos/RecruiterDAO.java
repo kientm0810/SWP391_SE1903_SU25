@@ -558,5 +558,38 @@ public class RecruiterDAO extends DBContext {
         return result;
     }
 
+    public Recruiter getRecruiterById(int recruiterId) throws SQLException {
+        // Implementation exists
+    }
+
+    public String getRecruiterEmail(int recruiterId) throws SQLException {
+        String sql = "SELECT email FROM Recruiters WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, recruiterId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("email");
+                }
+            }
+        }
+        return null;
+    }
+
+    public boolean getVerificationStatus(int recruiterId) throws SQLException {
+        String sql = "SELECT is_verified FROM Recruiters WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, recruiterId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBoolean("is_verified");
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean updateRecruiterVerification(int recruiterId, boolean isVerified) throws SQLException {
+        // Implementation exists
+    }
 
 }

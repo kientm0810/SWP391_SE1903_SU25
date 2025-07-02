@@ -4,16 +4,17 @@
  */
 package utils;
 
-import java.util.Properties;
+import io.github.cdimascio.dotenv.Dotenv;
 
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import java.util.Properties;
+import jakarta.mail.Authenticator;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 
 /**
  *
@@ -68,6 +69,43 @@ public final class JavaMail {
         } catch (MessagingException e) {
             e.getStackTrace();
             return false;
+        }
+    }
+
+    public static void sendEmail(String to, String subject, String body) {
+        Dotenv dotenv = Dotenv.load();
+        final String from = dotenv.get("EMAIL_USERNAME");
+        final String password = dotenv.get("EMAIL_PASSWORD");
+
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+
+        Authenticator auth = new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(from, password);
+            }
+        };
+
+        Session session = Session.getInstance(props, auth);
+
+        MimeMessage msg = new MimeMessage(session);
+
+        try {
+            msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
+            msg.setFrom(new InternetAddress(from));
+            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to, false));
+            msg.setSubject(subject, "UTF-8");
+            msg.setContent(body, "text/html; charset=UTF-8");
+
+            Transport.send(msg);
+            System.out.println("Email sent successfully!");
+        } catch (MessagingException e) {
+            System.err.println("Failed to send email: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

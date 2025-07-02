@@ -17,6 +17,7 @@
             </head>
 
             <body>
+                <%@ include file="header.jsp" %>
                 <div class="container py-5">
                     <!-- Success/Error Messages -->
                     <c:if test="${not empty sessionScope.successMessage}">
