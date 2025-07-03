@@ -584,7 +584,7 @@ public class PostsDAO {
         }
         return posts;
     }
-
+    
     // Lấy tổng số posts của 1 user
     public int getTotalPostsByUserId(int userId) {
         String query = "SELECT COUNT(*) FROM Posts WHERE user_id = ? AND deleted_at IS NULL";
@@ -727,5 +727,115 @@ public class PostsDAO {
             e.printStackTrace();
         }
         return posts;
+    }
+    
+    public List<Posts> getPostsByPageWithSearchCheckStillActive(int page, int pageSize, String keyword, String jobType, String location) {
+        List<Posts> posts = new ArrayList<>();
+        StringBuilder query = new StringBuilder("SELECT * FROM Posts z WHERE "
+                + "(SELECT COUNT(*) from Posts p join Featured_Jobs pj on p.id = pj.post_id where z.id = p.id and pj.end_date > GETDATE()) > 0;");
+        List<Object> params = new ArrayList<>();
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            query.append(" AND (title LIKE ? OR company_name LIKE ?)");
+            params.add("%" + keyword.trim() + "%");
+            params.add("%" + keyword.trim() + "%");
+        }
+
+        if (jobType != null && !jobType.trim().isEmpty()) {
+            query.append(" AND job_type = ?");
+            params.add(jobType.trim());
+        }
+
+        if (location != null && !location.trim().isEmpty()) {
+            query.append(" AND location = ?");
+            params.add(location.trim());
+        }
+
+        query.append(" ORDER BY created_at DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+        params.add((page - 1) * pageSize);
+        params.add(pageSize);
+
+        try {
+            ps = conn.prepareStatement(query.toString());
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Posts post = new Posts();
+                post.setId(rs.getInt("id"));
+                post.setUserId(rs.getInt("user_id"));
+                post.setUserType(rs.getString("user_type"));
+                post.setParentId(rs.getInt("parent_id"));
+                post.setPostType(rs.getString("post_type"));
+                post.setTitle(rs.getString("title"));
+                post.setStatus(rs.getString("status"));
+                post.setViewCount(rs.getInt("view_count"));
+                post.setLikeCount(rs.getInt("like_count"));
+                post.setCommentCount(rs.getInt("comment_count"));
+                post.setCreatedAt(rs.getTimestamp("created_at"));
+                post.setUpdatedAt(rs.getTimestamp("updated_at"));
+                post.setDeletedAt(rs.getTimestamp("deleted_at"));
+                post.setExperience(rs.getString("experience"));
+                post.setDeadline(rs.getDate("deadline"));
+                post.setWorkingTime(rs.getString("working_time"));
+                post.setJobDescription(rs.getString("job_description"));
+                post.setRequirements(rs.getString("requirements"));
+                post.setBenefits(rs.getString("benefits"));
+                post.setContactAddress(rs.getString("contact_address"));
+                post.setApplicationMethod(rs.getString("application_method"));
+                post.setCompanyName(rs.getString("company_name"));
+                post.setCompanyLogo(rs.getString("company_logo"));
+                post.setSalary(rs.getString("salary"));
+                post.setLocation(rs.getString("location"));
+                post.setJobType(rs.getString("job_type"));
+                post.setRank(rs.getString("rank"));
+                post.setIndustry(rs.getString("industry"));
+                post.setContactPerson(rs.getString("contact_person"));
+                post.setCompanySize(rs.getString("company_size"));
+                post.setCompanyWebsite(rs.getString("company_website"));
+                post.setCompanyDescription(rs.getString("company_description"));
+                post.setKeywords(rs.getString("keywords"));
+                posts.add(post);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return posts;
+    }
+    
+    public boolean checkStillActive(int id) {
+        List<Posts> posts = new ArrayList<>();
+        StringBuilder query = new StringBuilder("(SELECT COUNT(*) from Posts p join Featured_Jobs pj on p.id = pj.post_id where ? = p.id and pj.end_date > GETDATE());");
+
+        try {
+            ps = conn.prepareStatement(query.toString());
+            ps.setInt(1, id);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+               return rs.getInt(1) > 0; 
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    public boolean isTheirPost(int id, int recID) {
+        List<Posts> posts = new ArrayList<>();
+        StringBuilder query = new StringBuilder("(SELECT * from Posts where id = ? and user_id = ?");
+
+        try {
+            ps = conn.prepareStatement(query.toString());
+            ps.setInt(1, id);
+            ps.setInt(2, recID);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+               return true; 
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

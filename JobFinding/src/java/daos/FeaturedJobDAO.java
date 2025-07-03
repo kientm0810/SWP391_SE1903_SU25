@@ -94,6 +94,42 @@ public class FeaturedJobDAO extends DBContext {
 
         return featuredPosts;
     }
+    
+    // Cải tiến: Lấy danh sách posts theo promotion program ID
+    public List<Posts> listPostBaseOnFeatureStillActive(int promotionId) {
+        PostsDAO postDao = new PostsDAO();
+        List<Posts> featuredPosts = new ArrayList<>();
+
+        String sql = "SELECT DISTINCT fj.post_id, fj.start_date, fj.end_date, fj.transaction_id "
+                + "FROM Featured_Jobs fj "
+                + "INNER JOIN Posts p ON fj.post_id = p.id "
+                + "WHERE fj.promotion_id = ? and fj.end_date > GETDATE()"
+                + "ORDER BY fj.end_date DESC";
+
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, promotionId);
+            ResultSet rs = stmt.executeQuery();
+
+            Set<Integer> visitedIds = new HashSet<>();
+
+            while (rs.next()) {
+                int postId = rs.getInt("post_id");
+
+                if (!visitedIds.contains(postId)) {
+                    Posts post = postDao.getPostById(postId);
+                    if (post != null) {
+                        featuredPosts.add(post);
+                        visitedIds.add(postId);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return featuredPosts;
+    }
 
     // Lấy thông tin chi tiết featured job
     public List<FeaturedJob> getFeaturedJobsByPromotionId(int promotionId) {

@@ -98,7 +98,7 @@ public class PostController extends HttpServlet {
                     // recruiter xem tất cả bài post
                     int totalPosts = postsDAO.getTotalPostsWithSearch(keyword, jobType, location);
                     int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
-                    request.setAttribute("posts", postsDAO.getPostsByPageWithSearch(page, pageSize, keyword, jobType, location));
+                    request.setAttribute("posts", postsDAO.getPostsByPageWithSearchCheckStillActive(page, pageSize, keyword, jobType, location));
                     request.setAttribute("currentPage", page);
                     request.setAttribute("totalPages", totalPages);
                     request.setAttribute("pageSize", pageSize);
@@ -110,7 +110,7 @@ public class PostController extends HttpServlet {
                 // user thường hoặc chưa đăng nhập: chỉ xem tất cả bài post
                 int totalPosts = postsDAO.getTotalPostsWithSearch(keyword, jobType, location);
                 int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
-                request.setAttribute("posts", postsDAO.getPostsByPageWithSearch(page, pageSize, keyword, jobType, location));
+                request.setAttribute("posts", postsDAO.getPostsByPageWithSearchCheckStillActive(page, pageSize, keyword, jobType, location));
                 request.setAttribute("currentPage", page);
                 request.setAttribute("totalPages", totalPages);
                 request.setAttribute("pageSize", pageSize);
@@ -127,6 +127,17 @@ public class PostController extends HttpServlet {
             // View single post
             int id = Integer.parseInt(request.getParameter("id"));
             Posts post = postsDAO.getPostById(id);
+            
+            HttpSession session = request.getSession(true);
+            Integer userId = (Integer) session.getAttribute("userId");
+            String userType = (String) session.getAttribute("userType");
+            log("active: " + postsDAO.checkStillActive(id) + " " + id);
+            if (!postsDAO.checkStillActive(id) && (userType == null || (!userType.equals("recruiter")
+                    || !postsDAO.isTheirPost(id, userId)))){
+                response.sendRedirect("home");
+                return;
+            }
+            
             if (post != null) {
                 postsDAO.incrementViewCount(id); // tang so luot xem
                 request.setAttribute("post", post);

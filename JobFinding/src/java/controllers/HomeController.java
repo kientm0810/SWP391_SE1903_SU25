@@ -107,8 +107,9 @@ public class HomeController extends HttpServlet {
         }
         
         try {
+            int premium = 4; // check here
             FeaturedJobDAO fjDao = new FeaturedJobDAO();
-            List<Posts> premiumPost = fjDao.listPostBaseOnFeature(4);
+            List<Posts> premiumPost = fjDao.listPostBaseOnFeatureStillActive(premium);
             
             request.setAttribute("premiumPost", premiumPost);
         } catch (Exception e) {
@@ -116,7 +117,6 @@ public class HomeController extends HttpServlet {
         }
 
         HttpSession session = request.getSession(true);
-
         String role = (String) session.getAttribute("role");
         if (role != null && !role.equals("admin")) {
             processQuerry(request, response);
@@ -155,6 +155,7 @@ public class HomeController extends HttpServlet {
         Vector<Notification> unread = dao.getUnreadNotice(id, topk, role);
         request.setAttribute("notice", list);
         request.setAttribute("unread", unread);
+        request.setAttribute("rr", unread.size());
         
         log("id recruiter:" + id + " " + role);
         log("" + list.size());

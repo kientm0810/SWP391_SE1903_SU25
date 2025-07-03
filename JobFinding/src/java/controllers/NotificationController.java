@@ -87,6 +87,8 @@ public class NotificationController extends HttpServlet {
             list = dao.getUnreadNotice(id, topk, role);
         }
         
+        request.setAttribute("rr", dao.getUnreadNotice(id, topk, role).size());
+        
         request.setAttribute("notice", list);
         request.setAttribute("type", "all");
         
@@ -129,6 +131,7 @@ public class NotificationController extends HttpServlet {
         request.setAttribute("specific", p);
         request.setAttribute("notice", list);
         request.setAttribute("type", type);
+        request.setAttribute("rr", dao.getUnreadNotice(recId, topk, role).size());
         
         request.getRequestDispatcher("notification.jsp").forward(request, response);
     }

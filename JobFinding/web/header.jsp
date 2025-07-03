@@ -1,4 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
 
     <header class="header-area">
         <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
@@ -78,10 +80,17 @@
                             <c:when test="${not empty sessionScope.user}">
                                 <c:if test="${sessionScope.role != 'admin'}">
                                     <div class="dropdown" data-bs-auto-close="outside">
-                                        <button class="btn btn-light dropdown-toggle" type="button" id="notiDropdown"
-                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                        <button type="button" class="btn btn-light position-relative dropdown-toggle" id="notiDropdown"
+                                                data-bs-toggle="dropdown" aria-expanded="false">
                                             <i class="fas fa-bell"></i>
+                                            <c:if test="${rr gt 0}">
+                                                <span class="badge rounded-pill bg-danger" 
+                                                      style="position: absolute; bottom: 40px; right: 22px; font-size: 10px; min-width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;">
+                                                    ${rr}
+                                                </span>
+                                            </c:if>
                                         </button>
+
 
                                         <ul class="dropdown-menu dropdown-menu-end notifications"
                                             aria-labelledby="notiDropdown">

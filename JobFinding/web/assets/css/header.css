@@ -128,3 +128,25 @@
     background-color: #f0f8ff; /* màu nền nhạt hơn để nổi bật */
     font-weight: 600;
 }
+
+.notification-button {
+    position: relative;
+}
+
+/*.notification-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background-color: red;
+    color: red;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 5px;
+    border-radius: 50%;
+    line-height: 1;
+    min-width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}*/
