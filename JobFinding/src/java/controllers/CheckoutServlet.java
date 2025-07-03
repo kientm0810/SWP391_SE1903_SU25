@@ -2,6 +2,7 @@ package controllers;
 
 import daos.PostPricingDAO;
 import daos.FinancialTransactionDAO;
+import daos.PostsDAO;
 import daos.PromotionProgramDAO;
 import daos.RecruiterDAO;
 import models.PostPricing;
@@ -13,6 +14,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import models.Posts;
+import models.PromotionProgram;
 
 @WebServlet("/checkout")
 public class CheckoutServlet extends HttpServlet {
@@ -127,7 +130,24 @@ public class CheckoutServlet extends HttpServlet {
             
             // Maybe never reach there
             if (pricing == null) {
-                request.setAttribute("error", "Invalid position code");
+                request.setAttribute("error", "Invalid position code!");
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+                return;
+            }
+            
+            // check xem jobId co phai cua dung recruiterID chua
+            PostsDAO postDao = new PostsDAO();
+            Posts post = postDao.getPostById(jobId);
+            if (post.getUserId() != recruiterId){
+                request.setAttribute("error", "Not your post!");
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+                return;
+            }
+            
+            PromotionProgramDAO programDao = new PromotionProgramDAO();
+            PromotionProgram program = programDao.getPromotionProgramById(programDao.findProgramIDBy(positionCode));
+            if (program.getQuantity() == 0){
+                request.setAttribute("error", "Run out of program!");
                 request.getRequestDispatcher("error.jsp").forward(request, response);
                 return;
             }
@@ -154,7 +174,7 @@ public class CheckoutServlet extends HttpServlet {
                 session.setAttribute("positionCode", positionCode);
                 session.setAttribute("durationDays", pricing.getDurationDays());
                 // set promotionID cho de insert
-                PromotionProgramDAO programDao = new PromotionProgramDAO();
+//                PromotionProgramDAO programDao = new PromotionProgramDAO();
                 session.setAttribute("programID", programDao.findProgramIDBy(positionCode));
                 
                 // 

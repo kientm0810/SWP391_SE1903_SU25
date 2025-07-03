@@ -84,21 +84,21 @@ public class PromotionProgramDAO extends DBContext {
     
     // Cập nhật promotion program
     public boolean updatePromotionProgram(PromotionProgram program) {
-        String sql = "UPDATE Promotion_Programs SET name = ?, cost = ?, duration_days = ?, "
-                + "description = ?, is_active = ?, updated_at = GETDATE(), quantity = ? "
+        String sql = "UPDATE Promotion_Programs SET cost = ?, duration_days = ?, "
+                + "updated_at = GETDATE(), quantity = ? "
                 + "WHERE id = ?";
         
         try {
             PreparedStatement stmt = connection.prepareStatement(sql);
-            stmt.setString(1, program.getName());
-            stmt.setDouble(2, program.getCost());
-            stmt.setInt(3, program.getDurationDays());
-            stmt.setString(4, program.getDescription());
-            stmt.setBoolean(5, program.isActive());
-            stmt.setInt(6, program.getQuantity());
-            stmt.setInt(7, program.getId());
+            stmt.setDouble(1, program.getCost());
+            stmt.setInt(2, program.getDurationDays());
+            stmt.setInt(3, program.getQuantity());
+            stmt.setInt(4, program.getId());
+         
+            PostPricingDAO dao = new PostPricingDAO();
+            boolean flag = dao.updatePostPricings(program.getPositionType(), program.getCost(), program.getDurationDays());
             
-            return stmt.executeUpdate() > 0;
+            return flag && stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }

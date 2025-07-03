@@ -6,6 +6,7 @@ import daos.RecruiterDAO;
 import daos.JobListingDAO;
 import daos.NotificationDAO;
 import daos.PostsDAO;
+import daos.PromotionProgramDAO;
 import models.FinancialTransaction;
 import utils.JavaMail;
 import java.io.IOException;
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import models.Notification;
+import models.PromotionProgram;
 import utils.Constants;
 import utils.MailUtil;
 
@@ -206,6 +208,13 @@ public class VnpayReturn extends HttpServlet {
 
                 NotificationDAO dao = new NotificationDAO();
                 dao.insertNotice(notice);
+                
+                // giam so luong program
+                PromotionProgramDAO programDao = new PromotionProgramDAO();
+                PromotionProgram program = programDao.getPromotionProgramById(programID);
+                int x = program.getQuantity() - 1 < 0 ? 0 : program.getQuantity() - 1;
+                program.setQuantity(x);
+                programDao.updatePromotionProgram(program);
 
                 // Clean session
                 session.removeAttribute("jobId");

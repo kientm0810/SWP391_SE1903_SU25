@@ -253,7 +253,7 @@
                     </div>
                     
                     <div class="form-actions">
-                        <button type="submit" class="btn-save">
+                        <button type="submit" class="btn-save" name="submit" value="submit">
                             <i class="fas fa-save"></i>
                             Lưu thay đổi
                         </button>

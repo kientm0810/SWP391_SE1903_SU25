@@ -197,12 +197,12 @@
         <div class="main-content">
             <div class="page-header">
                 <h1>Quản lý chương trình khuyến mãi</h1>
-                <div class="header-actions">
+<!--                <div class="header-actions">
                     <a href="AdminController?target=program&service=add" class="btn btn-primary">
                         <i class="fas fa-plus"></i>
                         Thêm chương trình mới
                     </a>
-                </div>
+                </div>-->
             </div>
             
             <!-- Hiển thị thông báo thành công -->

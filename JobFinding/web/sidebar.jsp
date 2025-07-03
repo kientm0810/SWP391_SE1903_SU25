@@ -47,7 +47,7 @@
         </c:if>
         
         <c:if test="${sessionScope.adminRole == 'manager' || sessionScope.adminRole == 'admin'}">
-            <a href="AdminController?target=program" class="menu-item ${param.target == 'program' ? 'active' : ''}">
+            <a href="AdminPromotionController?target=program" class="menu-item ${param.target == 'program' ? 'active' : ''}">
                 <i class="fas fa-bullseye"></i>
                 <span>Program</span>
             </a>

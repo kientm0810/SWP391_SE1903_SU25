@@ -92,21 +92,30 @@ public class AdminPromotionController extends HttpServlet {
         Map<Integer, Double> monthlyRevenues = new HashMap<>();
         Map<Integer, Double> allTimeRevenues = new HashMap<>();
 
+        double totalMonthlyRevenue = 0;
+        double totalAllTimeRevenue = 0;
+        
         // Tính toán thống kê cho từng program
         for (PromotionProgram program : promotionPrograms) {
             int postCount = featuredJobDAO.countUniquePostsByPromotionId(program.getId());
             double monthlyRevenue = featuredJobDAO.getTotalRevenueByPromotionId(program.getId());
             double allTimeRevenue = featuredJobDAO.getTotalAllTimeRevenueByPromotionId(program.getId());
             
+            totalMonthlyRevenue += monthlyRevenue;
+            totalAllTimeRevenue += allTimeRevenue;
+            
             postCounts.put(program.getId(), postCount);
             monthlyRevenues.put(program.getId(), monthlyRevenue);
             allTimeRevenues.put(program.getId(), allTimeRevenue);
         }
 
+        log("month: " + totalMonthlyRevenue);
+        log("all: " + totalAllTimeRevenue);
+        
         // Tính tổng quan
         int totalActivePosts = postsDAO.getTotalPosts();
-        double totalMonthlyRevenue = monthlyRevenues.values().stream().mapToDouble(Double::doubleValue).sum();
-        double totalAllTimeRevenue = allTimeRevenues.values().stream().mapToDouble(Double::doubleValue).sum();
+//        double totalMonthlyRevenue = monthlyRevenues.values().stream().mapToDouble(Double::doubleValue).sum();
+//        double totalAllTimeRevenue = allTimeRevenues.values().stream().mapToDouble(Double::doubleValue).sum();
         int totalActiveRecruiters = programDAO.countActiveRecruiters();
 
         // Set attributes
@@ -240,45 +249,61 @@ public class AdminPromotionController extends HttpServlet {
 
     private void updatePromotionProgram(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String idStr = request.getParameter("id");
-        String name = request.getParameter("name");
-        String costStr = request.getParameter("cost");
-        String durationDaysStr = request.getParameter("durationDays");
-        String description = request.getParameter("description");
-        String positionType = request.getParameter("positionType");
-        String quantityStr = request.getParameter("quantity");
-        String isActiveStr = request.getParameter("isActive");
-
-        try {
-            int id = Integer.parseInt(idStr);
-            double cost = Double.parseDouble(costStr);
-            int durationDays = Integer.parseInt(durationDaysStr);
-            int quantity = Integer.parseInt(quantityStr);
-            boolean isActive = Boolean.parseBoolean(isActiveStr);
-
-            PromotionProgram program = new PromotionProgram();
-            program.setId(id);
-            program.setName(name);
-            program.setCost(cost);
-            program.setDurationDays(durationDays);
-            program.setDescription(description);
-            program.setPositionType(positionType);
-            program.setQuantity(quantity);
-            program.setActive(isActive);
-
-            PromotionProgramDAO programDAO = new PromotionProgramDAO();
-            boolean success = programDAO.updatePromotionProgram(program);
-
-            if (success) {
-                request.setAttribute("successMessage", "Cập nhật chương trình thành công!");
-            } else {
-                request.setAttribute("errorMessage", "Có lỗi xảy ra khi cập nhật chương trình.");
-            }
-        } catch (NumberFormatException e) {
-            request.setAttribute("errorMessage", "Dữ liệu không hợp lệ.");
+        String submit = request.getParameter("submit");
+        if (submit == null){
+            submit = "";
         }
+        
+        String idStr = request.getParameter("id");
+        int id = Integer.parseInt(idStr);
+        
+        if (submit.equals("submit")){
+//            String idStr = request.getParameter("id");
+            String name = request.getParameter("name");
+            String costStr = request.getParameter("cost");
+            String durationDaysStr = request.getParameter("durationDays");
+            String description = request.getParameter("description");
+            String positionType = request.getParameter("positionType");
+            String quantityStr = request.getParameter("quantity");
+            String isActiveStr = request.getParameter("isActive");
 
-        response.sendRedirect("AdminPromotionController?target=program");
+            try {
+//                int id = Integer.parseInt(idStr);
+                double cost = Double.parseDouble(costStr);
+                int durationDays = Integer.parseInt(durationDaysStr);
+                int quantity = Integer.parseInt(quantityStr);
+                boolean isActive = Boolean.parseBoolean(isActiveStr);
+
+                PromotionProgramDAO programDAO = new PromotionProgramDAO();
+                
+                PromotionProgram program = programDAO.getPromotionProgramById(id);
+//                program.setId(id);
+//                program.setName(name);
+                program.setCost(cost);
+                program.setDurationDays(durationDays);
+//                program.setDescription(description);
+//                program.setPositionType(positionType);
+                program.setQuantity(quantity);
+//                program.setActive(isActive);
+
+//                PromotionProgramDAO programDAO = new PromotionProgramDAO();
+                boolean success = programDAO.updatePromotionProgram(program);
+
+                if (success) {
+                    request.setAttribute("successMessage", "Cập nhật chương trình thành công!");
+                } else {
+                    request.setAttribute("errorMessage", "Có lỗi xảy ra khi cập nhật chương trình.");
+                }
+            } catch (NumberFormatException e) {
+                request.setAttribute("errorMessage", "Dữ liệu không hợp lệ.");
+            }
+
+            response.sendRedirect("AdminPromotionController?target=program");
+        } else {
+            PromotionProgramDAO dao = new PromotionProgramDAO();
+            request.setAttribute("program", dao.getPromotionProgramById(id));
+            request.getRequestDispatcher("admin_edit_promotion_program.jsp").forward(request, response);
+        }
     }
 
     private void deletePromotionProgram(HttpServletRequest request, HttpServletResponse response)
