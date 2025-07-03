@@ -151,6 +151,15 @@
                                             <i class="far fa-heart"></i> Lưu tin
                                         </button>
                                     </form>
+                                        
+                                    <form action="checkout" method="post"
+                                        style="display:inline;">
+                                      <input type="hidden" name="jobId" value="${post.id}" />
+                                      <input type="hidden" name="action" value="showPricing" />
+                                      <button type="submit" class="btn btn-outline-primary save-job ms-auto">
+                                          <i class="far fa-heart"></i> Đăng tin
+                                      </button>
+                                    </form>
                                 </div>
 
 

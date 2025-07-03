@@ -14,6 +14,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import com.google.gson.Gson;
+import models.RevenueData;
+import models.RevenueStats;
 
 /**
  *
@@ -64,9 +66,9 @@ public class ReportsController extends HttpServlet {
         ReportsDAO reportsDAO = new ReportsDAO();
         
         // Lấy dữ liệu doanh thu
-        List<ReportsDAO.RevenueData> totalRevenue = reportsDAO.getTotalRevenueByMonth();
-        List<ReportsDAO.RevenueData> promotionRevenue = reportsDAO.getPromotionRevenueByMonth();
-        ReportsDAO.RevenueStats stats = reportsDAO.getOverallStats();
+        List<RevenueData> totalRevenue = reportsDAO.getTotalRevenueByMonth();
+        List<RevenueData> promotionRevenue = reportsDAO.getPromotionRevenueByMonth();
+        RevenueStats stats = reportsDAO.getOverallStats();
         
         // Chuyển đổi dữ liệu thành JSON cho JavaScript
         Gson gson = new Gson();
@@ -92,10 +94,10 @@ public class ReportsController extends HttpServlet {
         Gson gson = new Gson();
         
         if ("total".equals(type)) {
-            List<ReportsDAO.RevenueData> data = reportsDAO.getTotalRevenueByMonth();
+            List<RevenueData> data = reportsDAO.getTotalRevenueByMonth();
             response.getWriter().write(gson.toJson(data));
         } else if ("promotion".equals(type)) {
-            List<ReportsDAO.RevenueData> data = reportsDAO.getPromotionRevenueByMonth();
+            List<RevenueData> data = reportsDAO.getPromotionRevenueByMonth();
             response.getWriter().write(gson.toJson(data));
         } else {
             response.getWriter().write("[]");

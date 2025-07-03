@@ -52,7 +52,7 @@
                 <span>Program</span>
             </a>
 
-            <a href="reports.jsp" class="menu-item ${pageContext.request.servletPath == '/reports.jsp' ? 'active' : ''}">
+            <a href="ReportsController?target=report&action=dashboard" class="menu-item ${param.target == 'report' ? 'active' : ''}">
                 <i class="fas fa-chart-bar"></i>
                 <span>Reports</span>
             </a>

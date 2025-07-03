@@ -212,7 +212,7 @@ public class VnpayReturn extends HttpServlet {
                 // giam so luong program
                 PromotionProgramDAO programDao = new PromotionProgramDAO();
                 PromotionProgram program = programDao.getPromotionProgramById(programID);
-                int x = program.getQuantity() - 1 < 0 ? 0 : program.getQuantity() - 1;
+                int x = program.getQuantity() == -1 ? -1 : (program.getQuantity() - 1 < 0 ? 0 : program.getQuantity() - 1);
                 program.setQuantity(x);
                 programDao.updatePromotionProgram(program);
 

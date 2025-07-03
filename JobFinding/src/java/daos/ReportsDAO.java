@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import models.RevenueData;
+import models.RevenueStats;
 
 /**
  *
@@ -132,31 +133,31 @@ public class ReportsDAO extends DBContext {
     }
     
     // Inner classes for data models
-    public static class RevenueData {
-        private String month;
-        private double revenue;
-        
-        public RevenueData(String month, double revenue) {
-            this.month = month;
-            this.revenue = revenue;
-        }
-        
-        public String getMonth() { return month; }
-        public double getRevenue() { return revenue; }
-    }
-    
-    public static class RevenueStats {
-        private double monthlyRevenue;
-        private double totalRevenue;
-        private int transactionCount;
-        
-        public double getMonthlyRevenue() { return monthlyRevenue; }
-        public void setMonthlyRevenue(double monthlyRevenue) { this.monthlyRevenue = monthlyRevenue; }
-        
-        public double getTotalRevenue() { return totalRevenue; }
-        public void setTotalRevenue(double totalRevenue) { this.totalRevenue = totalRevenue; }
-        
-        public int getTransactionCount() { return transactionCount; }
-        public void setTransactionCount(int transactionCount) { this.transactionCount = transactionCount; }
-    }
+//    public static class RevenueData {
+//        private String month;
+//        private double revenue;
+//        
+//        public RevenueData(String month, double revenue) {
+//            this.month = month;
+//            this.revenue = revenue;
+//        }
+//        
+//        public String getMonth() { return month; }
+//        public double getRevenue() { return revenue; }
+//    }
+//    
+//    public static class RevenueStats {
+//        private double monthlyRevenue;
+//        private double totalRevenue;
+//        private int transactionCount;
+//        
+//        public double getMonthlyRevenue() { return monthlyRevenue; }
+//        public void setMonthlyRevenue(double monthlyRevenue) { this.monthlyRevenue = monthlyRevenue; }
+//        
+//        public double getTotalRevenue() { return totalRevenue; }
+//        public void setTotalRevenue(double totalRevenue) { this.totalRevenue = totalRevenue; }
+//        
+//        public int getTransactionCount() { return transactionCount; }
+//        public void setTransactionCount(int transactionCount) { this.transactionCount = transactionCount; }
+//    }
 }

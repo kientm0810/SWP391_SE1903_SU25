@@ -147,12 +147,12 @@
         <div class="main-content">
             <div class="page-header">
                 <h1>Báo cáo doanh thu</h1>
-                <div class="header-actions">
+<!--                <div class="header-actions">
                     <button onclick="refreshAllCharts()" class="btn btn-primary">
                         <i class="fas fa-sync-alt"></i>
                         Cập nhật dữ liệu
                     </button>
-                </div>
+                </div>-->
             </div>
             
             <!-- Tổng quan thống kê -->
@@ -193,12 +193,12 @@
                             <div class="chart-title">Tổng doanh thu theo tháng</div>
                             <div class="chart-subtitle">Doanh thu từ tất cả các giao dịch đã hoàn thành (12 tháng gần nhất)</div>
                         </div>
-                        <div class="chart-controls">
+<!--                        <div class="chart-controls">
                             <button onclick="refreshChart('total')" class="btn-refresh">
                                 <i class="fas fa-sync-alt"></i>
                                 Cập nhật
                             </button>
-                        </div>
+                        </div>-->
                     </div>
                     <div class="chart-canvas">
                         <canvas id="totalRevenueChart"></canvas>
@@ -216,12 +216,12 @@
                             <div class="chart-title">Doanh thu từ chương trình khuyến mãi</div>
                             <div class="chart-subtitle">Doanh thu từ việc đăng ký các gói promotion (12 tháng gần nhất)</div>
                         </div>
-                        <div class="chart-controls">
+<!--                        <div class="chart-controls">
                             <button onclick="refreshChart('promotion')" class="btn-refresh">
                                 <i class="fas fa-sync-alt"></i>
                                 Cập nhật
                             </button>
-                        </div>
+                        </div>-->
                     </div>
                     <div class="chart-canvas">
                         <canvas id="promotionRevenueChart"></canvas>
