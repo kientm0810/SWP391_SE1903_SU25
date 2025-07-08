@@ -1,17 +1,18 @@
 package controllers;
 
-import daos.PostPricingDAO;
-import daos.FinancialTransactionDAO;
-import daos.RecruiterDAO;
-import models.PostPricing;
-import models.FinancialTransaction;
 import java.io.IOException;
+
+import daos.FinancialTransactionDAO;
+import daos.PostPricingDAO;
+import daos.RecruiterDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import models.FinancialTransaction;
+import models.PostPricing;
 
 @WebServlet("/checkout")
 public class CheckoutServlet extends HttpServlet {
@@ -51,9 +52,15 @@ public class CheckoutServlet extends HttpServlet {
         }
         
         // Check if already verified
-        if ("verified".equals(recruiterDAO.getVerificationStatus(recruiterId))) {
-            response.sendRedirect("recruiter_dashboard.jsp");
-            return;
+        try {
+            boolean isVerified = recruiterDAO.getVerificationStatus(recruiterId);
+            if (isVerified) {
+                response.sendRedirect("recruiter_dashboard.jsp");
+                return;
+            }
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+            // Continue with checkout process if check fails
         }
         
         // Get registration pricing

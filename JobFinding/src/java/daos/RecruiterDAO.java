@@ -8,11 +8,13 @@ package daos;
  *
  * @author thaison
  */
-import context.DBContext;
-import java.sql.*;
-import models.Recruiter;
-import context.DBContext;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Vector;
+
+import context.DBContext;
+import models.Recruiter;
 
 public class RecruiterDAO extends DBContext {
 
@@ -558,5 +560,52 @@ public class RecruiterDAO extends DBContext {
         return result;
     }
 
+    public Recruiter getRecruiterById(int recruiterId) throws SQLException {
+        String sql = "SELECT * FROM [project_SWP391].[dbo].[Recruiter] WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, recruiterId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToRecruiter(rs);
+                }
+            }
+        }
+        return null;
+    }
+
+    public String getRecruiterEmail(int recruiterId) throws SQLException {
+        String sql = "SELECT email FROM Recruiters WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, recruiterId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("email");
+                }
+            }
+        }
+        return null;
+    }
+
+    public boolean getVerificationStatus(int recruiterId) throws SQLException {
+        String sql = "SELECT is_verified FROM Recruiters WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, recruiterId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBoolean("is_verified");
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean updateRecruiterVerification(int recruiterId, boolean isVerified) throws SQLException {
+        String sql = "UPDATE [project_SWP391].[dbo].[Recruiter] SET is_verified = ? WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setBoolean(1, isVerified);
+            ps.setInt(2, recruiterId);
+            return ps.executeUpdate() > 0;
+        }
+    }
 
 }

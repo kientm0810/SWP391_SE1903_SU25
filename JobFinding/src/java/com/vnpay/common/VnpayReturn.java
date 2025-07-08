@@ -1,24 +1,25 @@
 package com.vnpay.common;
 
-import daos.FinancialTransactionDAO;
-import daos.RecruiterDAO;
-import daos.JobListingDAO;
-import models.FinancialTransaction;
-import utils.JavaMail;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+
+import daos.FinancialTransactionDAO;
+import daos.JobListingDAO;
+import daos.RecruiterDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.sql.Timestamp;
-import java.util.Calendar;
+import models.FinancialTransaction;
+import utils.JavaMail;
 
 public class VnpayReturn extends HttpServlet {
     
@@ -116,28 +117,34 @@ public class VnpayReturn extends HttpServlet {
         String transactionIdStr = orderId.substring(4); // Remove "REG_" prefix
         int transactionId = Integer.parseInt(transactionIdStr);
         
-        FinancialTransaction transaction = transactionDAO.getTransactionById(transactionId);
-        if (transaction != null) {
-            transaction.setTransactionCode(paymentCode);
-            transaction.setStatus(transSuccess ? "completed" : "failed");
-            transactionDAO.updateTransaction(transaction);
-            
-            if (transSuccess) {
-                // Update recruiter verification status
-                recruiterDAO.updateVerificationStatus(transaction.getRecruiterId(), "verified");
+        try {
+            FinancialTransaction transaction = transactionDAO.getTransactionById(transactionId);
+            if (transaction != null) {
+                transaction.setTransactionCode(paymentCode);
+                transaction.setStatus(transSuccess ? "completed" : "failed");
+                transactionDAO.updateTransaction(transaction);
                 
-                // Send confirmation email
-                String recruiterEmail = recruiterDAO.getRecruiterEmail(transaction.getRecruiterId());
-                if (recruiterEmail != null) {
-                    JavaMail.sendNotification(recruiterEmail);
+                if (transSuccess) {
+                    // Update recruiter verification status
+                    recruiterDAO.updateVerificationStatus(transaction.getRecruiterId(), "verified");
+                    
+                    // Send confirmation email
+                    String recruiterEmail = recruiterDAO.getRecruiterEmail(transaction.getRecruiterId());
+                    if (recruiterEmail != null) {
+                        JavaMail.sendNotification(recruiterEmail);
+                    }
+                    
+                    session.setAttribute("paymentSuccess", "Registration successful! Your account is now verified.");
+                    response.sendRedirect("recruiter_dashboard.jsp");
+                } else {
+                    session.setAttribute("paymentError", "Registration payment failed. Please try again.");
+                    response.sendRedirect("checkout?action=registration");
                 }
-                
-                session.setAttribute("paymentSuccess", "Registration successful! Your account is now verified.");
-                response.sendRedirect("recruiter_dashboard.jsp");
-            } else {
-                session.setAttribute("paymentError", "Registration payment failed. Please try again.");
-                response.sendRedirect("checkout?action=registration");
             }
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+            session.setAttribute("paymentError", "Database error occurred. Please contact support.");
+            response.sendRedirect("checkout?action=registration");
         }
     }
     
