@@ -1,9 +1,12 @@
 package daos;
 
-import context.DBContext;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+
+import context.DBContext;
 import models.Admin;
 import models.JobSeeker;
 import models.Recruiter;
@@ -184,7 +187,7 @@ public class UserDAO extends DBContext {
         String sql = "INSERT INTO Recruiter (username, password, email, full_name, phone, date_of_birth, gender, address, " +
                      "profile_picture, company_name, company_description, logo, website, company_address, company_size, " +
                      "industry, tax_code, verification_status, created_at, updated_at, is_active) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', GETDATE(), GETDATE(), 1)";
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'verified', GETDATE(), GETDATE(), 1)";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, recruiter.getUsername());
@@ -257,46 +260,140 @@ public class UserDAO extends DBContext {
         return null;
     }
 
-    public boolean updatePassword(int userId, String newPassword) {
-        // First, determine the user type
-        String query = "SELECT 'admin' as user_type FROM Admin WHERE id = ? " +
-                      "UNION SELECT 'recruiter' as user_type FROM Recruiter WHERE id = ? " +
-                      "UNION SELECT 'job_seeker' as user_type FROM Job_Seekers WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setInt(1, userId);
+    public boolean updatePassword(int userId, String newPassword, String userType) {
+        String tableName;
+        switch (userType) {
+            case "admin":
+                tableName = "Admin";
+                break;
+            case "recruiter":
+                tableName = "Recruiter";
+                break;
+            case "job_seeker":
+                tableName = "Job_Seekers";
+                break;
+            default:
+                return false;
+        }
+
+        String sql = "UPDATE " + tableName + " SET password = ? WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, newPassword);
             ps.setInt(2, userId);
-            ps.setInt(3, userId);
-            ResultSet rs = ps.executeQuery();
-            
-            if (rs.next()) {
-                String userType = rs.getString("user_type");
-                String tableName;
-                switch (userType) {
-                    case "admin":
-                        tableName = "Admin";
-                        break;
-                    case "recruiter":
-                        tableName = "Recruiter";
-                        break;
-                    case "job_seeker":
-                        tableName = "Job_Seekers";
-                        break;
-                    default:
-                        return false;
-                }
-                
-                // Update the password
-                String updateQuery = "UPDATE " + tableName + " SET password = ?, updated_at = GETDATE() WHERE id = ?";
-                try (PreparedStatement updatePs = connection.prepareStatement(updateQuery)) {
-                    updatePs.setString(1, newPassword);
-                    updatePs.setInt(2, userId);
-                    return updatePs.executeUpdate() > 0;
-                }
-            }
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public boolean userExistsByEmail(String email) {
+        return getUserInfoByEmail(email) != null;
+    }
+
+    public boolean storePasswordResetToken(String email, String token) {
+        Object[] userInfo = getUserInfoByEmail(email);
+        if (userInfo == null) {
+            return false;
+        }
+        String userType = (String) userInfo[1];
+        int userId = (int) userInfo[0];
+
+        String tableName = getTableNameByUserType(userType);
+        if (tableName == null) {
+            return false;
+        }
+
+        String sql = "UPDATE " + tableName + " SET reset_token = ?, reset_token_expiry = DATEADD(hour, 1, GETDATE()) WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, token);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean isResetTokenValid(String token) {
+        String sql = "SELECT id FROM Admin WHERE reset_token = ? AND reset_token_expiry > GETDATE() "
+                + "UNION SELECT id FROM Recruiter WHERE reset_token = ? AND reset_token_expiry > GETDATE() "
+                + "UNION SELECT id FROM Job_Seekers WHERE reset_token = ? AND reset_token_expiry > GETDATE()";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, token);
+            ps.setString(2, token);
+            ps.setString(3, token);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updatePasswordByToken(String token, String newPassword) {
+        String userType = getUserTypeByToken(token);
+        if (userType == null) {
+            return false;
+        }
+        String tableName = getTableNameByUserType(userType);
+
+        String sql = "UPDATE " + tableName + " SET password = ? WHERE reset_token = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, newPassword);
+            ps.setString(2, token);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void invalidateResetToken(String token) {
+         String userType = getUserTypeByToken(token);
+        if (userType == null) {
+            return;
+        }
+        String tableName = getTableNameByUserType(userType);
+
+        String sql = "UPDATE " + tableName + " SET reset_token = NULL, reset_token_expiry = NULL WHERE reset_token = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, token);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private String getUserTypeByToken(String token) {
+        String sql = "SELECT 'admin' as user_type FROM Admin WHERE reset_token = ? "
+                + "UNION SELECT 'recruiter' as user_type FROM Recruiter WHERE reset_token = ? "
+                + "UNION SELECT 'job_seeker' as user_type FROM Job_Seekers WHERE reset_token = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, token);
+            ps.setString(2, token);
+            ps.setString(3, token);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString("user_type");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    private String getTableNameByUserType(String userType) {
+        switch (userType) {
+            case "admin":
+                return "Admin";
+            case "recruiter":
+                return "Recruiter";
+            case "job_seeker":
+                return "Job_Seekers";
+            default:
+                return null;
+        }
     }
 
     public Admin getAdminDetails(int adminId) {

@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpSession;
 import models.Admin;
 import models.JobSeeker;
 import models.Recruiter;
+import utils.PasswordUtils;
 
 @WebServlet(name = "LoginController", urlPatterns = {"/login"})
 public class LoginController extends HttpServlet {
@@ -57,7 +58,7 @@ public class LoginController extends HttpServlet {
 
         try {
             HttpSession session = request.getSession();
-            Object user = authenticateUser(username, password, role);
+            Object user = authenticateUser(username, PasswordUtils.hashPassword(password), role);
 
             if (user != null) {
                 handleSuccessfulLogin(user, role, session, response);

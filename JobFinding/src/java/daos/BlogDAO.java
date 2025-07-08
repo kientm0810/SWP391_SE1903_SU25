@@ -4,12 +4,13 @@
  */
 package daos;
 
-import context.DBContext;
-import models.Blog;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
+
+import context.DBContext;
+import models.Blog;
 
 /**
  *
@@ -197,4 +198,17 @@ public class BlogDAO extends DBContext{
         return blogs;
     }
 
+    public Vector<Blog> getLatestBlogs(int limit) {
+        Vector<Blog> blogs = new Vector<>();
+        String sql = "SELECT TOP " + limit + " * FROM [project_SWP391].[dbo].[Blog] ORDER BY created_at DESC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                blogs.add(mapResultSetToBlog(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return blogs;
+    }
 }

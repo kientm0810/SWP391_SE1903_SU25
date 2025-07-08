@@ -59,21 +59,40 @@
 <body>
     <div class="card">
         <h4 class="text-center mb-4">🔐 Đặt lại mật khẩu</h4>
-        <form action="reset-password" method="post">
-            <div class="mb-3">
-                <input type="email" name="email" class="form-control" placeholder="Nhập email của bạn" required>
-            </div>
-            <button type="submit" class="btn btn-green w-100 mb-2">Gửi mật khẩu mới</button>
 
-            <a href="login.jsp" class="btn btn-secondary w-100">Quay về đăng nhập</a>
+        <c:if test="${not empty message}">
+            <div class="alert alert-success" role="alert">${message}</div>
+        </c:if>
+        <c:if test="${not empty error}">
+            <div class="alert alert-danger" role="alert">${error}</div>
+        </c:if>
 
-            <c:if test="${not empty message}">
-                <div class="alert alert-success mt-3" role="alert">${message}</div>
-            </c:if>
-            <c:if test="${not empty error}">
-                <div class="alert alert-danger mt-3" role="alert">${error}</div>
-            </c:if>
-        </form>
+        <c:choose>
+            <c:when test="${not empty token}">
+                <!-- Form to set a new password -->
+                <form action="reset-password" method="post">
+                    <input type="hidden" name="token" value="${token}">
+                    <div class="mb-3">
+                        <input type="password" name="newPassword" class="form-control" placeholder="Mật khẩu mới" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="password" name="confirmPassword" class="form-control" placeholder="Xác nhận mật khẩu" required>
+                    </div>
+                    <button type="submit" class="btn btn-green w-100 mb-2">Đặt lại mật khẩu</button>
+                    <a href="login.jsp" class="btn btn-secondary w-100">Hủy</a>
+                </form>
+            </c:when>
+            <c:otherwise>
+                <!-- Form to request a password reset link -->
+                <form action="reset-password" method="post">
+                    <div class="mb-3">
+                        <input type="email" name="email" class="form-control" placeholder="Nhập email của bạn" required>
+                    </div>
+                    <button type="submit" class="btn btn-green w-100 mb-2">Gửi liên kết đặt lại</button>
+                    <a href="login.jsp" class="btn btn-secondary w-100">Quay về đăng nhập</a>
+                </form>
+            </c:otherwise>
+        </c:choose>
     </div>
 </body>
 </html>

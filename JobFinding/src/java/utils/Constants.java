@@ -119,9 +119,9 @@ public final class Constants {
     // Email Configuration
     public static final String SMTP_HOST = "smtp.gmail.com";
     public static final int SMTP_PORT = 587;
-    public static final String EMAIL_FROM = "noreply@jobfinding.com";
-    public static final String EMAIL_USERNAME = "fcareinsurance@gmail.com";
-    public static final String EMAIL_PASSWWORD = "cifxowsnfwdnywed";
+    public static final String EMAIL_FROM = "longrpk200313@gmail.com";
+    public static final String EMAIL_USERNAME = "longrpk200313@gmail.com";
+    public static final String EMAIL_PASSWWORD = "gphi fyvo kxdf pgfr";
     
     // Security Constants
     public static final int PASSWORD_MIN_LENGTH = 8;
