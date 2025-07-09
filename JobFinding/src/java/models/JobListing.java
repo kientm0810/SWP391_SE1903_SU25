@@ -23,6 +23,7 @@ public class JobListing {
     private String jobType;
     private Timestamp createdAt;
     private String status;
+    private String companyName;
 
     public JobListing() {}
 
@@ -127,5 +128,9 @@ public class JobListing {
         } else {
             return diffInDays + " ngày trước";
         }
+    }
+
+    public String getCompanyName() {
+        return companyName;
     }
 }

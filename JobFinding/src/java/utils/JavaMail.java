@@ -70,4 +70,42 @@ public final class JavaMail {
             return false;
         }
     }
+
+    public static boolean sendMail(String to, String subject, String body) {
+        final String from = Constants.EMAIL_FROM;
+        final String host = Constants.SMTP_HOST;
+        final int port = Constants.SMTP_PORT;
+        final String username = Constants.EMAIL_USERNAME;
+        final String password = Constants.EMAIL_PASSWWORD;
+
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", port);
+
+        Session session = Session.getInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        });
+
+        try {
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(from));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+            message.setSubject(subject);
+            if (body != null && (body.trim().startsWith("<html") || body.trim().startsWith("<HTML"))) {
+                message.setContent(body, "text/html; charset=UTF-8");
+            } else {
+                message.setText(body);
+            }
+            Transport.send(message);
+            return true;
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

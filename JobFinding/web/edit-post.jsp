@@ -9,6 +9,21 @@
                 <title>Chỉnh sửa tin tuyển dụng</title>
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
                 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+                <script
+                    src="https://cdn.tiny.cloud/1/ainjahbwyamlr1ureczw2mbfmr73mgpn7f6ceaaxu1h8ccv8/tinymce/7/tinymce.min.js"
+                    referrerpolicy="origin"></script>
+                <link rel="stylesheet" href="assets/css/stylePosts.css">
+                <style>
+                    .form-container {
+                        max-width: 800px;
+                        margin: 0 auto;
+                    }
+
+                    .tox-tinymce {
+                        min-height: 400px;
+                    }
+                </style>
+                <!-- Thay TinyMCE bằng CKEditor 5 -->
                 <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
             </head>
 
@@ -18,7 +33,8 @@
                 <div class="container mt-4">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/home">Home</a></li>
+                            <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/post">Danh sách
+                                    tin</a></li>
                             <li class="breadcrumb-item"><a
                                     href="${pageContext.request.contextPath}/post/view?id=${post.id}">${post.title}</a>
                             </li>
@@ -169,55 +185,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Thông tin bổ sung -->
-                                    <div class="mb-4">
-                                        <h4>Thông tin bổ sung</h4>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="rank" class="form-label">Cấp bậc</label>
-                                                <input type="text" class="form-control" id="rank" name="rank"
-                                                    maxlength="100" value="${post.rank}">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="industry" class="form-label">Ngành nghề</label>
-                                                <input type="text" class="form-control" id="industry" name="industry"
-                                                    maxlength="100" value="${post.industry}">
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="contactPerson" class="form-label">Người liên hệ</label>
-                                                <input type="text" class="form-control" id="contactPerson"
-                                                    name="contactPerson" maxlength="100" value="${post.contactPerson}">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="companySize" class="form-label">Quy mô công ty</label>
-                                                <input type="text" class="form-control" id="companySize"
-                                                    name="companySize" maxlength="100" value="${post.companySize}">
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="companyWebsite" class="form-label">Website công ty</label>
-                                                <input type="text" class="form-control" id="companyWebsite"
-                                                    name="companyWebsite" maxlength="255"
-                                                    value="${post.companyWebsite}">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="keywords" class="form-label">Từ khóa</label>
-                                                <input type="text" class="form-control" id="keywords" name="keywords"
-                                                    maxlength="255" value="${post.keywords}"
-                                                    placeholder="Nhập các từ khóa, cách nhau bởi dấu phẩy">
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="companyDescription" class="form-label">Mô tả công ty</label>
-                                            <textarea class="form-control" id="companyDescription"
-                                                name="companyDescription" rows="3"
-                                                maxlength="1000">${post.companyDescription}</textarea>
-                                        </div>
-                                    </div>
-
                                     <div class="d-flex justify-content-between">
                                         <a href="${pageContext.request.contextPath}/post/view?id=${post.id}"
                                             class="btn btn-secondary">
@@ -234,26 +201,11 @@
                     </div>
                 </div>
 
-
-                <!--API CKEditor-->
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-                <script src="tinymce/tinymce.min.js"></script>
                 <script>
-                    // Khởi tạo TinyMCE cho các textarea cần rich text
-                    tinymce.init({
-                        selector: '#jobDescription, #requirements, #benefits',
-                        height: 300,
-                        menubar: false,
-                        plugins: [
-                            'advlist autolink lists link image charmap print preview anchor',
-                            'searchreplace visualblocks code fullscreen',
-                            'insertdatetime media table paste code help wordcount'
-                        ],
-                        toolbar: 'undo redo | formatselect | bold italic backcolor | \
-                        alignleft aligncenter alignright alignjustify | \
-                        bullist numlist outdent indent | removeformat | help',
-                        branding: false
-                    });
+                    ClassicEditor.create(document.querySelector('#jobDescription'));
+                    ClassicEditor.create(document.querySelector('#requirements'));
+                    ClassicEditor.create(document.querySelector('#benefits'));
 
                     // Logo preview function
                     function previewLogo(event) {
@@ -262,22 +214,6 @@
                         const file = event.target.files[0];
 
                         if (file) {
-                            // Check if file is an image
-                            if (!file.type.match('image.*')) {
-                                alert('Vui lòng chọn file hình ảnh (jpg, jpeg, png, gif)');
-                                event.target.value = ''; // Clear the file input
-                                preview.style.display = 'none';
-                                return;
-                            }
-
-                            // Check file size (max 5MB)
-                            if (file.size > 5 * 1024 * 1024) {
-                                alert('Kích thước file không được vượt quá 5MB');
-                                event.target.value = ''; // Clear the file input
-                                preview.style.display = 'none';
-                                return;
-                            }
-
                             const reader = new FileReader();
                             reader.onload = function (e) {
                                 previewImage.src = e.target.result;
@@ -309,21 +245,6 @@
                         const formData = new FormData(form);
                         let isValid = true;
 
-                        // Validate file upload if a new file is selected
-                        const fileInput = document.getElementById('companyLogo');
-                        if (fileInput.files.length > 0) {
-                            const file = fileInput.files[0];
-                            if (!file.type.match('image.*')) {
-                                alert('Vui lòng chọn file hình ảnh (jpg, jpeg, png, gif)');
-                                fileInput.value = '';
-                                isValid = false;
-                            } else if (file.size > 5 * 1024 * 1024) {
-                                alert('Kích thước file không được vượt quá 5MB');
-                                fileInput.value = '';
-                                isValid = false;
-                            }
-                        }
-
                         // Check required fields
                         const requiredFields = [
                             'title', 'companyName', 'salary', 'location', 'jobType',
@@ -348,9 +269,6 @@
                             return;
                         }
 
-                        // Đồng bộ nội dung TinyMCE vào textarea trước khi submit
-                        tinymce.triggerSave();
-
                         // Submit form using fetch API
                         fetch(form.action, {
                             method: 'POST',
@@ -360,7 +278,7 @@
                             .then(data => {
                                 if (data.success) {
                                     alert('Cập nhật tin thành công!');
-                                    window.location.href = '${pageContext.request.contextPath}/post';
+                                    window.location.href = '${pageContext.request.contextPath}/post/view?id=${post.id}';
                                 } else {
                                     alert(data.message || 'Có lỗi xảy ra khi cập nhật tin. Vui lòng thử lại.');
                                 }

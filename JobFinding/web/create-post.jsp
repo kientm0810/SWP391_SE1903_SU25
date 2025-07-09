@@ -236,7 +236,7 @@
                 // Khởi tạo TinyMCE cho các textarea cần rich text
                 tinymce.init({
                     selector: '#jobDescription, #requirements, #benefits',
-                    height: 300,
+                    height: 500,
                     menubar: false,
                     plugins: [
                         'advlist autolink lists link image charmap print preview anchor',

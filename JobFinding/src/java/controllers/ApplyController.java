@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 import models.Application;
 import models.JobListing;
 import models.JobSeeker;
@@ -41,16 +42,22 @@ public class ApplyController extends HttpServlet {
                 return;
             }
             int postId = Integer.parseInt(request.getParameter("id"));
-            String cvFile = request.getParameter("cvFile");
+            Part cvPart = request.getPart("cvFile");
+            String fileName = cvPart.getSubmittedFileName();
+            String ext = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
+            long fileSize = cvPart.getSize();
+            if (!(ext.equals("pdf") || ext.equals("doc") || ext.equals("docx")) || fileSize > 5 * 1024 * 1024) {
+                request.setAttribute("errorMsg", "Chỉ hỗ trợ file .doc, .docx, .pdf và kích thước dưới 5MB!");
+                request.getRequestDispatcher("apply-job.jsp?id=" + postId).forward(request, response);
+                return;
+            }
             String coverLetter = request.getParameter("coverLetter");
 
             // 1. Lưu vào bảng Applications
             Application app = new Application();
-            app.setJobseeker(jobSeeker);
-            JobListing job = new JobListing();
-            job.setId(postId);
-            app.setJob(job);
-            app.setCvFile(cvFile);
+            app.setJobSeekerId(jobSeeker.getId());
+            app.setJobListingId(postId);
+            app.setCvFile(fileName);
             app.setCoverLetter(coverLetter);
             app.setStatus("new");
             int applicationId = applicationDAO.insertApplication(app);

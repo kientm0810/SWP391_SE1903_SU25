@@ -8,7 +8,7 @@
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Việc làm đã ứng tuyển | JobFinding</title>
+                <title>Danh sách hồ sơ đã ứng tuyển</title>
 
                 <!-- CSS -->
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -17,211 +17,56 @@
             </head>
 
             <body>
-                <div class="container py-5">
-                    <h1 class="mb-4">Việc làm đã ứng tuyển</h1>
-
-                    <!-- Filters -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <form action="applications" method="GET" class="row g-3">
-                                <div class="col-md-4">
-                                    <select name="status" class="form-select">
-                                        <option value="">Tất cả trạng thái</option>
-                                        <option value="new" ${param.status=='new' ? 'selected' : '' }>Mới</option>
-                                        <option value="reviewed" ${param.status=='reviewed' ? 'selected' : '' }>Đã xem
-                                        </option>
-                                        <option value="interviewed" ${param.status=='interviewed' ? 'selected' : '' }>Đã
-                                            phỏng vấn</option>
-                                        <option value="rejected" ${param.status=='rejected' ? 'selected' : '' }>Từ chối
-                                        </option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <input type="text" name="keyword" class="form-control"
-                                        placeholder="Tìm theo tên công việc..." value="${param.keyword}">
-                                </div>
-                                <div class="col-md-4">
-                                    <button type="submit" class="btn btn-primary w-100">
-                                        <i class="fas fa-filter me-2"></i>Lọc
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- Applications List -->
-                    <div class="card">
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th scope="col">Công việc</th>
-                                            <th scope="col">Công ty</th>
-                                            <th scope="col">Ngày ứng tuyển</th>
-                                            <th scope="col">Trạng thái</th>
-                                            <th scope="col">CV đã nộp</th>
-                                            <th scope="col">Thao tác</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <c:choose>
-                                            <c:when test="${not empty applications}">
-                                                <c:forEach items="${applications}" var="app">
-                                                    <tr>
-                                                        <td>
-                                                            <a href="job_detail.jsp?id=${app.jobId}"
-                                                                class="text-decoration-none">
-                                                                <h6 class="mb-1">${app.jobTitle}</h6>
-                                                                <small class="text-muted">
-                                                                    <i
-                                                                        class="fas fa-map-marker-alt me-1"></i>${app.location}
-                                                                </small>
-                                                            </a>
-                                                        </td>
-                                                        <td>
-                                                            <div class="d-flex align-items-center">
-                                                                <img src="${app.companyLogo}" class="rounded-3 me-2"
-                                                                    width="32" height="32" alt="${app.companyName}">
-                                                                <div>
-                                                                    <h6 class="mb-0">${app.companyName}</h6>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <fmt:formatDate value="${app.appliedAt}"
-                                                                pattern="dd/MM/yyyy" />
-                                                        </td>
-                                                        <td>
-                                                            <span
-                                                                class="badge bg-${app.statusColor}">${app.status}</span>
-                                                        </td>
-                                                        <td>
-                                                            <a href="preview_cv.jsp?id=${app.cvId}"
-                                                                class="text-decoration-none">
-                                                                <i class="fas fa-file-alt me-1"></i>${app.cvName}
-                                                            </a>
-                                                        </td>
-                                                        <td>
-                                                            <div class="btn-group">
-                                                                <a href="job_detail.jsp?id=${app.jobId}"
-                                                                    class="btn btn-sm btn-outline-primary">
-                                                                    <i class="fas fa-eye"></i>
-                                                                </a>
-                                                                <button type="button"
-                                                                    class="btn btn-sm btn-outline-danger withdraw-app"
-                                                                    data-app-id="${app.id}" ${app.canWithdraw ? ''
-                                                                    : 'disabled' }>
-                                                                    <i class="fas fa-times"></i>
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                </c:forEach>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <tr>
-                                                    <td colspan="6" class="text-center py-5">
-                                                  
-                                                        <h5>Chưa có ứng tuyển nào</h5>
-                                                        <p class="text-muted">Bạn chưa ứng tuyển vào vị trí nào</p>
-                                                     
-                                                    </td>
-                                                </tr>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Pagination -->
-                    <c:if test="${totalPages > 1}">
-                        <nav aria-label="Applications pagination" class="mt-4">
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                    <a class="page-link" href="?page=${currentPage - 1}" tabindex="-1">
-                                        <i class="fas fa-chevron-left"></i>
-                                    </a>
-                                </li>
-                                <c:forEach begin="1" end="${totalPages}" var="i">
-                                    <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                        <a class="page-link" href="?page=${i}">${i}</a>
-                                    </li>
-                                </c:forEach>
-                                <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                    <a class="page-link" href="?page=${currentPage + 1}">
-                                        <i class="fas fa-chevron-right"></i>
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
+                <jsp:include page="header.jsp" />
+                <div class="container mt-4">
+                    <h2 class="mb-4">Hồ sơ đã ứng tuyển</h2>
+                    <c:if test="${not empty success}">
+                        <div class="alert alert-success">Ứng tuyển thành công!</div>
                     </c:if>
-                </div>
-
-                <!-- Withdraw Confirmation Modal -->
-                <div class="modal fade" id="withdrawModal" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Xác nhận hủy ứng tuyển</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <p>Bạn có chắc chắn muốn hủy ứng tuyển này không?</p>
-                                <p class="text-danger"><small>Hành động này không thể hoàn tác.</small></p>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                                <button type="button" class="btn btn-danger" id="confirmWithdraw">Xác nhận</button>
-                            </div>
-                        </div>
-                    </div>
+                    <c:if test="${empty applications}">
+                        <div class="alert alert-info">Bạn chưa ứng tuyển công việc nào.</div>
+                    </c:if>
+                    <c:if test="${not empty applications}">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Công việc</th>
+                                    <th>Công ty</th>
+                                    <th>Ngày ứng tuyển</th>
+                                    <th>Trạng thái</th>
+                                    <th>Lịch phỏng vấn</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:forEach var="app" items="${applications}">
+                                    <tr>
+                                        <td>${app.jobTitle}</td>
+                                        <td>${app.companyName}</td>
+                                        <td>${app.appliedAt}</td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${app.status eq 'new'}">Đã nhận</c:when>
+                                                <c:when test="${app.status eq 'reviewed'}">Đang xử lý</c:when>
+                                                <c:when test="${app.status eq 'interviewed'}">Đã phỏng vấn</c:when>
+                                                <c:when test="${app.status eq 'offered'}">Đã nhận offer</c:when>
+                                                <c:when test="${app.status eq 'rejected'}">Đã từ chối</c:when>
+                                                <c:otherwise>${app.status}</c:otherwise>
+                                            </c:choose>
+                                        </td>
+                                        <td><a href="view-application?id=${app.id}"
+                                                class="btn btn-sm btn-outline-info">Xem</a></td>
+                                        <td><a href="view-application.jsp?id=${app.id}"
+                                                class="btn btn-sm btn-outline-primary">Chi tiết</a></td>
+                                    </tr>
+                                </c:forEach>
+                            </tbody>
+                        </table>
+                    </c:if>
                 </div>
 
                 <!-- Scripts -->
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-                <script>
-                    document.addEventListener('DOMContentLoaded', function () {
-                        const withdrawModal = new bootstrap.Modal(document.getElementById('withdrawModal'));
-                        let applicationToWithdraw = null;
-
-                        // Withdraw application
-                        document.querySelectorAll('.withdraw-app').forEach(button => {
-                            button.addEventListener('click', function () {
-                                applicationToWithdraw = this.dataset.appId;
-                                withdrawModal.show();
-                            });
-                        });
-
-                        document.getElementById('confirmWithdraw').addEventListener('click', function () {
-                            if (applicationToWithdraw) {
-                                fetch('withdraw_application', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/x-www-form-urlencoded',
-                                    },
-                                    body: `applicationId=${applicationToWithdraw}`
-                                })
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        if (data.success) {
-                                            location.reload();
-                                        } else {
-                                            throw new Error(data.message);
-                                        }
-                                    })
-                                    .catch(error => {
-                                        console.error('Error:', error);
-                                        alert('Có lỗi xảy ra. Vui lòng thử lại!');
-                                    });
-                            }
-                            withdrawModal.hide();
-                        });
-                    });
-                </script>
             </body>
 
             </html>

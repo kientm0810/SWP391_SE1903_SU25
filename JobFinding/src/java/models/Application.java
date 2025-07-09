@@ -1,80 +1,105 @@
 package models;
-
-import java.sql.Timestamp;
+import java.time.LocalDateTime; // Quan trọng: Sử dụng java.time cho ngày tháng hiện đại
 
 public class Application {
-    private int applicationId;
-    private JobListing job;
-    private JobSeeker jobseeker;
-    private String status;
-    private Timestamp createdAt;
+    private int id;
+    private int jobListingId;
+    private int jobSeekerId;
     private String cvFile;
     private String coverLetter;
-    
+    private String status;
+    private LocalDateTime appliedAt;
+    private LocalDateTime updatedAt;
+
     public Application() {
     }
-    
-    public Application(int applicationId, JobListing job, JobSeeker jobseeker, String status, Timestamp createdAt) {
-        this.applicationId = applicationId;
-        this.job = job;
-        this.jobseeker = jobseeker;
+
+    public Application(int id, int jobListingId, int jobSeekerId, String cvFile, String coverLetter, String status, LocalDateTime appliedAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.jobListingId = jobListingId;
+        this.jobSeekerId = jobSeekerId;
+        this.cvFile = cvFile;
+        this.coverLetter = coverLetter;
         this.status = status;
-        this.createdAt = createdAt;
+        this.appliedAt = appliedAt;
+        this.updatedAt = updatedAt;
     }
+
     
-    public int getApplicationId() {
-        return applicationId;
+
+    // Getters
+    public int getId() {
+        return id;
     }
-    
-    public void setApplicationId(int applicationId) {
-        this.applicationId = applicationId;
+
+    public int getJobListingId() {
+        return jobListingId;
     }
-    
-    public JobListing getJob() {
-        return job;
+
+    public int getJobSeekerId() {
+        return jobSeekerId;
     }
-    
-    public void setJob(JobListing job) {
-        this.job = job;
-    }
-    
-    public JobSeeker getJobseeker() {
-        return jobseeker;
-    }
-    
-    public void setJobseeker(JobSeeker jobseeker) {
-        this.jobseeker = jobseeker;
-    }
-    
-    public String getStatus() {
-        return status;
-    }
-    
-    public void setStatus(String status) {
-        this.status = status;
-    }
-    
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-    
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
-    
+
     public String getCvFile() {
         return cvFile;
     }
-    
-    public void setCvFile(String cvFile) {
-        this.cvFile = cvFile;
-    }
-    
+
     public String getCoverLetter() {
         return coverLetter;
     }
-    
+
+    public String getStatus() {
+        return status;
+    }
+
+    public LocalDateTime getAppliedAt() {
+        return appliedAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    // Setters
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setJobListingId(int jobListingId) {
+        this.jobListingId = jobListingId;
+    }
+
+    public void setJobSeekerId(int jobSeekerId) {
+        this.jobSeekerId = jobSeekerId;
+    }
+
+    public void setCvFile(String cvFile) {
+        this.cvFile = cvFile;
+    }
+
     public void setCoverLetter(String coverLetter) {
         this.coverLetter = coverLetter;
     }
-} 
+
+    public void setStatus(String status) {
+        // Tùy chọn: Thêm kiểm tra validation ở đây nếu muốn giới hạn các giá trị
+        if (status != null && (status.equals("new") || status.equals("reviewed") ||
+                               status.equals("interviewed") || status.equals("offered") ||
+                               status.equals("rejected"))) {
+            this.status = status;
+        } else {
+            // Xử lý lỗi hoặc ném ngoại lệ nếu giá trị không hợp lệ
+            throw new IllegalArgumentException("Invalid status value: " + status);
+        }
+    }
+
+    public void setAppliedAt(LocalDateTime appliedAt) {
+        this.appliedAt = appliedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+   
+}
