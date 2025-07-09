@@ -1,7 +1,14 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<<<<<<< HEAD
     <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
         <!DOCTYPE html>
         <html lang="vi">
+=======
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<!DOCTYPE html>
+<html lang="vi">
+>>>>>>> 88ff8a51c9b264a79c1b7fbd08f09a2f1f33a622
 
         <head>
             <meta charset="UTF-8">
@@ -73,6 +80,7 @@
                     transition: color 0.2s;
                 }
 
+<<<<<<< HEAD
                 .apply-popup .close-btn:hover {
                     color: #00b14f;
                 }
@@ -119,6 +127,65 @@
                     color: #00b14f;
                     font-size: 1.3rem;
                 }
+=======
+            .apply-cv-select {
+                border: 2px solid #00b14f;
+                border-radius: 12px;
+                background: #f6fff9;
+                padding: 18px 20px 18px 20px;
+                margin-bottom: 18px;
+                position: relative;
+            }
+
+            .apply-cv-select .apply-radio {
+                position: absolute;
+                left: 18px;
+                top: -18px;
+                background: #fff;
+                border-radius: 50%;
+                border: 2.5px solid #00b14f;
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .apply-cv-select .fa-check-circle {
+                color: #00b14f;
+                font-size: 1.3rem;
+            }
+
+            .apply-cv-select .fa-file-alt {
+                color: #00b14f;
+                font-size: 2.2rem;
+                margin-bottom: 8px;
+            }
+
+            .apply-cv-select select.form-select {
+                border: 1.5px solid #00b14f;
+                border-radius: 8px;
+                margin-top: 8px;
+                margin-bottom: 8px;
+                padding: 8px 12px;
+            }
+
+            .apply-cv-select select.form-select:focus {
+                border-color: #00b14f;
+                box-shadow: 0 0 0 0.2rem rgba(0, 177, 79, .15);
+            }
+
+            .apply-cv-select .create-cv-link {
+                color: #00b14f;
+                text-decoration: none;
+                font-weight: 500;
+            }
+
+            .apply-cv-select .create-cv-link:hover {
+                color: #00913d;
+                text-decoration: underline;
+            }
+>>>>>>> 88ff8a51c9b264a79c1b7fbd08f09a2f1f33a622
 
                 .apply-cv-upload .fa-upload {
                     color: #00b14f;
@@ -192,6 +259,7 @@
                     color: #888;
                 }
 
+<<<<<<< HEAD
                 .apply-info {
                     color: #00b14f;
                     font-size: 1rem;
@@ -304,5 +372,79 @@
                 });
             </script>
         </body>
+=======
+            .apply-popup textarea.form-control {
+                min-height: 80px;
+            }
+
+            .no-cv-message {
+                text-align: center;
+                padding: 20px;
+                background: #fff3cd;
+                border: 1px solid #ffeaa7;
+                border-radius: 8px;
+                margin-bottom: 18px;
+            }
+
+            .no-cv-message .alert-icon {
+                color: #856404;
+                font-size: 2rem;
+                margin-bottom: 10px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="apply-overlay">
+            <form class="modal-content p-0 apply-popup" method="POST" action="${pageContext.request.contextPath}/apply">
+                <input type="hidden" name="postId" value="${post.id}">
+
+                <div class="modal-header">
+                    <span class="apply-radio"><i class="fas fa-check-circle"></i></span>
+                    <span class="modal-title"><i class="fas fa-paper-plane" style="color:#00b14f;"></i> Ứng tuyển
+                        <span class="job-title">
+                            <c:out value="${post.title}" />
+                        </span>
+                    </span>
+                </div>
+
+                <div class="modal-body p-4">
+                    <c:choose>
+                        <c:when test="${not empty cvList}">
+                            <div class="apply-cv-select">
+                                <label for="cvId" class="form-label fw-bold">Chọn CV để ứng tuyển <span class="apply-required">*</span></label>
+                                <select class="form-select" id="cvId" name="cvId" required>
+                                    <c:forEach items="${cvList}" var="cv">
+                                        <option value="${cv.id}">${cv.jobPosition} - ${cv.fullName}</option>
+                                    </c:forEach>
+                                </select>
+                                <div class="text-center mt-3">
+                                    hoặc <a href="${pageContext.request.contextPath}/create_cv.jsp" target="_blank" class="create-cv-link">Tạo CV mới</a>
+                                </div>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="no-cv-message">
+                                <div class="alert-icon"><i class="fas fa-file-excel"></i></div>
+                                <h5 class="fw-bold">Bạn chưa có CV nào</h5>
+                                <p class="mb-0">Vui lòng tạo một CV để ứng tuyển.</p>
+                                <a href="${pageContext.request.contextPath}/create_cv.jsp" target="_blank" class="btn btn-primary mt-3">
+                                    <i class="fas fa-plus me-2"></i>Tạo CV mới
+                                </a>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+
+                <div class="modal-footer">
+                     <c:if test="${not empty cvList}">
+                        <button type="submit" class="btn btn-success">Nộp hồ sơ ứng tuyển</button>
+                     </c:if>
+                </div>
+            </form>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+>>>>>>> 88ff8a51c9b264a79c1b7fbd08f09a2f1f33a622
 
         </html>
