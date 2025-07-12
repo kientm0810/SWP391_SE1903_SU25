@@ -26,6 +26,14 @@
                                 <i class="fas fa-briefcase"></i> Jobs
                             </a>
                         </li>
+                        <!-- Applications Menu for logged in users -->
+                        <c:if test="${not empty sessionScope.user and (sessionScope.role == 'job-seeker' or sessionScope.role == 'recruiter')}">
+                            <li class="nav-item">
+                                <a class="nav-link" href="applications">
+                                    <i class="fas fa-file-text"></i> Applications
+                                </a>
+                            </li>
+                        </c:if>
                         <li class="nav-item">
                             <a class="nav-link" href="blog.jsp">
                                 <i class="fas fa-blog"></i> Blog

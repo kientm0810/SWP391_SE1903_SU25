@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -91,17 +92,16 @@
                 font-weight: 700;
             }
 
-            .apply-cv-upload {
-                border: 2px dashed #00b14f;
+            .apply-cv-select {
+                border: 2px solid #00b14f;
                 border-radius: 12px;
                 background: #f6fff9;
-                padding: 18px 12px 12px 12px;
-                text-align: center;
+                padding: 18px 20px 18px 20px;
                 margin-bottom: 18px;
                 position: relative;
             }
 
-            .apply-cv-upload .apply-radio {
+            .apply-cv-select .apply-radio {
                 position: absolute;
                 left: 18px;
                 top: -18px;
@@ -115,31 +115,39 @@
                 justify-content: center;
             }
 
-            .apply-cv-upload .fa-check-circle {
+            .apply-cv-select .fa-check-circle {
                 color: #00b14f;
                 font-size: 1.3rem;
             }
 
-            .apply-cv-upload .fa-upload {
+            .apply-cv-select .fa-file-alt {
                 color: #00b14f;
                 font-size: 2.2rem;
                 margin-bottom: 8px;
             }
 
-            .apply-cv-upload .btn {
-                background: #e8f8f0;
-                color: #00b14f;
+            .apply-cv-select select.form-select {
                 border: 1.5px solid #00b14f;
-                font-weight: 600;
-                border-radius: 6px;
+                border-radius: 8px;
                 margin-top: 8px;
-                margin-bottom: 4px;
-                padding: 6px 18px;
+                margin-bottom: 8px;
+                padding: 8px 12px;
             }
 
-            .apply-cv-upload .btn:hover {
-                background: #00b14f;
-                color: #fff;
+            .apply-cv-select select.form-select:focus {
+                border-color: #00b14f;
+                box-shadow: 0 0 0 0.2rem rgba(0, 177, 79, .15);
+            }
+
+            .apply-cv-select .create-cv-link {
+                color: #00b14f;
+                text-decoration: none;
+                font-weight: 500;
+            }
+
+            .apply-cv-select .create-cv-link:hover {
+                color: #00913d;
+                text-decoration: underline;
             }
 
             .apply-popup .form-label {
@@ -214,68 +222,72 @@
             .apply-popup textarea.form-control {
                 min-height: 80px;
             }
+
+            .no-cv-message {
+                text-align: center;
+                padding: 20px;
+                background: #fff3cd;
+                border: 1px solid #ffeaa7;
+                border-radius: 8px;
+                margin-bottom: 18px;
+            }
+
+            .no-cv-message .alert-icon {
+                color: #856404;
+                font-size: 2rem;
+                margin-bottom: 10px;
+            }
         </style>
     </head>
 
     <body>
         <div class="apply-overlay">
-            <div class="modal-content p-0 apply-popup">
+            <form class="modal-content p-0 apply-popup" method="POST" action="${pageContext.request.contextPath}/apply">
+                <input type="hidden" name="postId" value="${post.id}">
+
                 <div class="modal-header">
                     <span class="apply-radio"><i class="fas fa-check-circle"></i></span>
                     <span class="modal-title"><i class="fas fa-paper-plane" style="color:#00b14f;"></i> Ứng tuyển
                         <span class="job-title">
-                            <c:out value="${jobTitle != null ? jobTitle : 'Công việc'}" />
-                        </span></span>
-                    <button class="close-btn" onclick="window.history.back()"><i class="fas fa-times"></i></button>
+                            <c:out value="${post.title}" />
+                        </span>
+                    </span>
                 </div>
-                <form action="${pageContext.request.contextPath}/apply" method="post" enctype="multipart/form-data"
-                      id="applyForm">
-                    <div class="modal-body p-4">
-                        <!-- Chọn CV -->
-                        <div class="apply-cv-upload mb-3">
-                            <span class="apply-radio"><i class="fas fa-check-circle"></i></span>
-                            <i class="fas fa-upload"></i>
-                            <div><b>Tải lên CV từ máy tính, chọn hoặc kéo thả</b></div>
-                            <input type="file" class="form-control mt-2" name="cvFile" accept=".pdf,.doc,.docx"
-                                   required style="display:inline-block;max-width:220px;margin:auto;">
-                            <button type="button" class="btn btn-outline-success btn-sm"
-                                    onclick="document.querySelector('[name='cvFile']').click();">Chọn CV</button>
-                            <div class="apply-note">Hỗ trợ định dạng .doc, .docx, .pdf có kích thước dưới 5MB</div>
-                        </div>
-                        <div class="apply-info">Vui lòng nhập đầy đủ thông tin chi tiết:</div>
-                        <div class="apply-info-red">(*) Thông tin bắt buộc.</div>
-                        <!-- Thông tin cá nhân -->
-                        <div class="mb-3">
-                            <label class="form-label">Họ và tên <span class="apply-required">*</span></label>
-                            <input type="text" class="form-control" name="fullName" required
-                                   placeholder="Họ tên hiển thị với NTD">
-                        </div>
-                        <div class="row g-2 mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Email <span class="apply-required">*</span></label>
-                                <input type="email" class="form-control" name="email" required
-                                       placeholder="Email hiển thị với NTD">
+
+                <div class="modal-body p-4">
+                    <c:choose>
+                        <c:when test="${not empty cvList}">
+                            <div class="apply-cv-select">
+                                <label for="cvId" class="form-label fw-bold">Chọn CV để ứng tuyển <span class="apply-required">*</span></label>
+                                <select class="form-select" id="cvId" name="cvId" required>
+                                    <c:forEach items="${cvList}" var="cv">
+                                        <option value="${cv.id}">${cv.jobPosition} - ${cv.fullName}</option>
+                                    </c:forEach>
+                                </select>
+                                <div class="text-center mt-3">
+                                    hoặc <a href="${pageContext.request.contextPath}/create_cv.jsp" target="_blank" class="create-cv-link">Tạo CV mới</a>
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Số điện thoại <span
-                                        class="apply-required">*</span></label>
-                                <input type="text" class="form-control" name="phone" required
-                                       placeholder="Số điện thoại hiển thị với NTD">
+                        </c:when>
+                        <c:otherwise>
+                            <div class="no-cv-message">
+                                <div class="alert-icon"><i class="fas fa-file-excel"></i></div>
+                                <h5 class="fw-bold">Bạn chưa có CV nào</h5>
+                                <p class="mb-0">Vui lòng tạo một CV để ứng tuyển.</p>
+                                <a href="${pageContext.request.contextPath}/create_cv.jsp" target="_blank" class="btn btn-primary mt-3">
+                                    <i class="fas fa-plus me-2"></i>Tạo CV mới
+                                </a>
                             </div>
-                        </div>
-                        <!-- Thư giới thiệu -->
-                        <div class="mb-3">
-                            <label class="form-label"><i class="fas fa-leaf apply-leaf"></i>Thư giới thiệu:</label>
-                            <textarea class="form-control" name="coverLetter" rows="3"
-                                      placeholder="Một thư giới thiệu ngắn gọn, chỉn chu sẽ giúp bạn trở nên chuyên nghiệp và gây ấn tượng hơn với nhà tuyển dụng."></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" onclick="window.history.back()">Hủy</button>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+
+                <div class="modal-footer">
+                     <c:if test="${not empty cvList}">
                         <button type="submit" class="btn btn-success">Nộp hồ sơ ứng tuyển</button>
-                    </div>
-                </form>
-            </div>
+                     </c:if>
+                </div>
+            </form>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </body>

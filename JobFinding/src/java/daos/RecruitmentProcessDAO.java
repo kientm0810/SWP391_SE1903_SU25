@@ -1,9 +1,13 @@
 package daos;
 
-import java.sql.*;
-import java.util.*;
-import models.RecruitmentProcess;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 import context.DBContext;
+import models.RecruitmentProcess;
 
 public class RecruitmentProcessDAO extends DBContext {
     

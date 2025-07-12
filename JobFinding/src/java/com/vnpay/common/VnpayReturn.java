@@ -77,28 +77,7 @@ public class VnpayReturn extends HttpServlet {
         try {
             if (orderId.startsWith("REG_")) {
                 handleRegistrationPayment(orderId, paymentCode, responseCode, transSuccess, session, request, response);
-            } else if (orderId.startsWith("FEAT_")) {
-                handleHomepageFeaturePayment(orderId, paymentCode, responseCode, transSuccess, session, request, response);
-            } else {
-                handleGeneralPayment(orderId, paymentCode, responseCode, transSuccess, request, response);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", "Error processing payment: " + e.getMessage());
-            request.getRequestDispatcher("payment_error.jsp").forward(request, response);
-        }
-    }
-    
-    private void processPaymentResult(String orderId, String paymentCode, String responseCode, 
-            boolean transSuccess, HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
-        
-        HttpSession session = request.getSession();
-        
-        try {
-            if (orderId.startsWith("REG_")) {
-                handleRegistrationPayment(orderId, paymentCode, responseCode, transSuccess, session, request, response);
-            } else if (orderId.startsWith("NORMAL_") || orderId.startsWith("FEAT_") || orderId.startsWith("PREM_")) {
+            } else if (orderId.startsWith("NORMAL_") || orderId.startsWith("PREM_")) {
                 handleJobPostPayment(orderId, paymentCode, responseCode, transSuccess, session, request, response);
             } else {
                 handleGeneralPayment(orderId, paymentCode, responseCode, transSuccess, request, response);
