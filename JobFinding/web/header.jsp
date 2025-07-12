@@ -148,7 +148,7 @@
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                         
-                                        <c:if test="${sessionScope.role == 'job_seeker'}">
+                                        <c:if test="${sessionScope.role == 'job-seeker'}">
                                             <li><a class="dropdown-item" href="profile"><i class="fas fa-user"></i> My Profile</a></li>
                                             <li><a class="dropdown-item" href="list_cv"><i class="fas fa-file-alt"></i> My CVs</a></li>
                                             <li><a class="dropdown-item" href="saved-jobs"><i class="fas fa-heart"></i> Saved Jobs</a></li>
