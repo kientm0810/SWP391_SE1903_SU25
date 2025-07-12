@@ -1,7 +1,6 @@
 package controllers;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.SQLException;
 
 import daos.ApplicationDAO;
@@ -25,47 +24,76 @@ public class UpdateApplicationStatusController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        PrintWriter out = response.getWriter();
-
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null || !"recruiter".equals(session.getAttribute("role"))) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            out.print("{\"success\": false, \"error\": \"Unauthorized: Please sign in as recruiter.\"}");
-            out.flush();
+            response.sendRedirect("login.jsp");
             return;
         }
+        
         Recruiter recruiter = (Recruiter) session.getAttribute("user");
-
+        
+        // Get form parameters
         String applicationIdStr = request.getParameter("applicationId");
         String status = request.getParameter("status");
-
-        if (applicationIdStr == null || applicationIdStr.trim().isEmpty() || status == null || status.trim().isEmpty()) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            out.print("{\"success\": false, \"error\": \"Missing parameters.\"}");
-            out.flush();
+        String action = request.getParameter("action");
+        
+        // Simple validation
+        if (applicationIdStr == null || applicationIdStr.trim().isEmpty()) {
+            session.setAttribute("error", "Không tìm thấy ID ứng tuyển.");
+            response.sendRedirect("recruiter-applications");
             return;
         }
-
+        
+        if (status == null || status.trim().isEmpty()) {
+            session.setAttribute("error", "Vui lòng chọn trạng thái.");
+            response.sendRedirect("recruiter-applications");
+            return;
+        }
+        
+        // Validate status values
+        String[] validStatuses = {"new", "reviewed", "interviewed", "offered", "rejected"};
+        boolean isValidStatus = false;
+        for (String validStatus : validStatuses) {
+            if (validStatus.equals(status.trim())) {
+                isValidStatus = true;
+                break;
+            }
+        }
+        
+        if (!isValidStatus) {
+            session.setAttribute("error", "Trạng thái không hợp lệ.");
+            response.sendRedirect("recruiter-applications");
+            return;
+        }
+        
         try {
             int applicationId = Integer.parseInt(applicationIdStr.trim());
             boolean updated = applicationDAO.updateApplicationStatus(applicationId, status.trim(), recruiter.getId());
+            
             if (updated) {
-                out.print("{\"success\": true}");
+                // Create status display mapping
+                String statusDisplay = "";
+                switch (status.trim()) {
+                    case "new": statusDisplay = "Mới"; break;
+                    case "reviewed": statusDisplay = "Đã xem"; break;
+                    case "interviewed": statusDisplay = "Phỏng vấn"; break;
+                    case "offered": statusDisplay = "Mời nhận việc"; break;
+                    case "rejected": statusDisplay = "Từ chối"; break;
+                    default: statusDisplay = status;
+                }
+                
+                session.setAttribute("success", "Đã cập nhật trạng thái thành \"" + statusDisplay + "\" thành công!");
             } else {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                out.print("{\"success\": false, \"error\": \"Application not found or you don't have permission.\"}");
+                session.setAttribute("error", "Không thể cập nhật trạng thái. Ứng tuyển không tồn tại hoặc bạn không có quyền.");
             }
         } catch (NumberFormatException e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            out.print("{\"success\": false, \"error\": \"Invalid applicationId format.\"}");
+            session.setAttribute("error", "ID ứng tuyển không hợp lệ.");
         } catch (SQLException e) {
             e.printStackTrace();
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.print("{\"success\": false, \"error\": \"Database error. Please try again later.\"}");
-        } finally {
-            out.flush();
+            session.setAttribute("error", "Có lỗi xảy ra khi cập nhật. Vui lòng thử lại.");
         }
+        
+        // Redirect back to applications page
+        response.sendRedirect("recruiter-applications");
     }
 } 

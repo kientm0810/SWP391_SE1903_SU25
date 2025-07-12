@@ -357,6 +357,23 @@
             </form>
         </div>
 
+        <!-- Success/Error Messages -->
+        <c:if test="${not empty sessionScope.success}">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>${sessionScope.success}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <c:remove var="success" scope="session" />
+        </c:if>
+        
+        <c:if test="${not empty sessionScope.error}">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>${sessionScope.error}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <c:remove var="error" scope="session" />
+        </c:if>
+
         <!-- Applications List -->
         <c:choose>
             <c:when test="${not empty applications}">
@@ -380,7 +397,14 @@
 
                         <div class="application-status">
                             <span class="status-badge status-${fn:toLowerCase(app.status)}" data-app-id="${app.applicationId}">
-                                ${app.status}
+                                <c:choose>
+                                    <c:when test="${fn:toLowerCase(app.status) == 'new'}">Mới</c:when>
+                                    <c:when test="${fn:toLowerCase(app.status) == 'reviewed'}">Đã xem</c:when>
+                                    <c:when test="${fn:toLowerCase(app.status) == 'interviewed'}">Phỏng vấn</c:when>
+                                    <c:when test="${fn:toLowerCase(app.status) == 'offered'}">Mời nhận việc</c:when>
+                                    <c:when test="${fn:toLowerCase(app.status) == 'rejected'}">Từ chối</c:when>
+                                    <c:otherwise>${app.status}</c:otherwise>
+                                </c:choose>
                             </span>
                             
                             <div class="application-actions">
@@ -480,16 +504,21 @@
                     </div>
                     <div class="update-status-section p-3 bg-light rounded">
                         <h6 class="mb-3">Cập nhật trạng thái</h6>
-                        <input type="hidden" id="modal-application-id" />
-                        <select id="statusSelect" class="form-select mb-2">
-                            <option value="new">Mới</option>
-                            <option value="reviewed">Đã xem</option>
-                            <option value="interviewed">Phỏng vấn</option>
-                            <option value="offered">Mời nhận việc</option>
-                            <option value="rejected">Từ chối</option>
-                        </select>
-                        <button id="saveStatusBtn" class="btn btn-primary w-100"><i class="fas fa-save me-1"></i> Lưu</button>
-                        <div id="statusAlert" class="alert alert-success mt-2 d-none" role="alert">Cập nhật trạng thái thành công!</div>
+                        <form id="updateStatusForm" action="update-application-status" method="POST">
+                            <input type="hidden" id="modal-application-id" name="applicationId" />
+                            <input type="hidden" name="action" value="update" />
+                            <select id="statusSelect" name="status" class="form-select mb-2" required>
+                                <option value="">-- Chọn trạng thái --</option>
+                                <option value="new">Mới</option>
+                                <option value="reviewed">Đã xem</option>
+                                <option value="interviewed">Phỏng vấn</option>
+                                <option value="offered">Mời nhận việc</option>
+                                <option value="rejected">Từ chối</option>
+                            </select>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-save me-1"></i> Cập nhật trạng thái
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -511,7 +540,6 @@
             if (!candidateModal) return;
 
             const modalInstance = new bootstrap.Modal(candidateModal);
-            
             const modalFullName = document.getElementById('modal-candidate-name');
             const modalEmail = document.getElementById('modal-candidate-email');
             const modalPhone = document.getElementById('modal-candidate-phone');
@@ -519,27 +547,30 @@
             const modalDownloadCvBtn = document.getElementById('modal-download-cv-btn');
             const modalApplicationIdInput = document.getElementById('modal-application-id');
             const statusSelectModal = document.getElementById('statusSelect');
-            const saveStatusBtn = document.getElementById('saveStatusBtn');
-            const statusAlert = document.getElementById('statusAlert');
+            const updateStatusForm = document.getElementById('updateStatusForm');
 
+            // Handle modal open - populate with candidate data
             document.querySelectorAll('.view-candidate-btn').forEach(button => {
                 button.addEventListener('click', function () {
-                    // Populate modal with data from the button
+                    // Populate modal with candidate info
                     modalFullName.textContent = this.dataset.fullname || 'N/A';
                     modalEmail.textContent = this.dataset.email || 'N/A';
                     modalPhone.textContent = this.dataset.phone || 'N/A';
                     modalAvatar.src = this.dataset.avatar || 'assets/img/icon/user-default.png';
-                    modalApplicationIdInput.value = this.dataset.applicationId || '';
-                    const currentStatus = this.dataset.currentStatus || 'reviewed';
-                    statusSelectModal.value = currentStatus;
                     
-                    // Use prebuilt URL directly from data attribute
+                    // Set application ID for form submission
+                    modalApplicationIdInput.value = this.dataset.applicationId || '';
+                    
+                    // Set current status as selected
+                    const currentStatus = this.dataset.currentStatus || '';
+                    statusSelectModal.value = currentStatus.toLowerCase();
+                    
+                    // Handle CV download
                     const cvUrl = this.dataset.cvUrl;
-                    if (cvUrl && cvUrl !== 'null') {
+                    if (cvUrl && cvUrl !== 'null' && cvUrl !== '') {
                         modalDownloadCvBtn.href = cvUrl;
                         modalDownloadCvBtn.style.display = 'inline-block';
                     } else {
-                        modalDownloadCvBtn.href = '#';
                         modalDownloadCvBtn.style.display = 'none';
                     }
                     
@@ -547,42 +578,29 @@
                 });
             });
 
-            saveStatusBtn.addEventListener('click', async function () {
-                const applicationId = modalApplicationIdInput.value;
-                const newStatus = statusSelectModal.value;
+            // Handle form submission with confirmation
+            updateStatusForm.addEventListener('submit', function(e) {
+                e.preventDefault();
                 
-                const selectedOption = statusSelectModal.options[statusSelectModal.selectedIndex];
-                const statusText = selectedOption ? selectedOption.textContent.trim() : newStatus;
-
+                const applicationId = modalApplicationIdInput.value;
+                const selectedStatus = statusSelectModal.value;
+                const selectedText = statusSelectModal.options[statusSelectModal.selectedIndex].text;
+                
+                // Simple validation
                 if (!applicationId) {
                     alert('Lỗi: Không tìm thấy ID ứng tuyển.');
                     return;
                 }
-
-                if (!confirm(`Bạn có chắc muốn cập nhật trạng thái thành "${statusText}"?`)) return;
-
-                try {
-                    const res = await fetch('update-application-status', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: `applicationId=${applicationId}&status=${newStatus}`
-                    });
-                    const data = await res.json();
-                    if (data.success) {
-                        // update badge text and class
-                        const badge = document.querySelector(`.status-badge[data-app-id="${applicationId}"]`);
-                        if (badge) {
-                            badge.textContent = statusText;
-                            badge.className = `status-badge status-${newStatus}`;
-                        }
-                        statusAlert.classList.remove('d-none');
-                        setTimeout(()=>statusAlert.classList.add('d-none'),2000);
-                    } else {
-                        alert(data.error || 'Cập nhật thất bại');
-                    }
-                } catch(err) {
-                    console.error(err);
-                    alert('Có lỗi xảy ra, vui lòng thử lại');
+                
+                if (!selectedStatus) {
+                    alert('Vui lòng chọn trạng thái.');
+                    return;
+                }
+                
+                // Show confirmation dialog
+                if (confirm(`Bạn có chắc muốn cập nhật trạng thái thành "${selectedText}"?`)) {
+                    // Submit the form normally - this will cause a page reload
+                    this.submit();
                 }
             });
         });

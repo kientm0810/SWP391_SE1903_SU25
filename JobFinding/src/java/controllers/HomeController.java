@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
+import daos.BannerDAO;
+import daos.BlogDAO;
 import daos.JobDAO;
 import daos.PostsDAO;
 import daos.RecruiterNotificationDAO;
@@ -19,7 +21,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import models.JobListing;
 import models.JobTypeCount;
-import models.Posts;
 import models.RecruiterNotification;
 import utils.Constants;
 
@@ -32,11 +33,15 @@ public class HomeController extends HttpServlet {
 
     private PostsDAO postsDAO;
     private JobDAO jobDAO;
+    private BannerDAO bannerDAO;
+    private BlogDAO blogDAO;
 
     @Override
     public void init() throws ServletException {
         postsDAO = new PostsDAO();
         jobDAO = new JobDAO();
+        bannerDAO = new BannerDAO();
+        blogDAO = new BlogDAO();
     }
 
     /**
@@ -53,48 +58,20 @@ public class HomeController extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
 
         try {
-            // Get page number from request parameter
-            int page = 1;
-            int pageSize = 6;
-            
-            try {
-                String pageStr = request.getParameter("page");
-                if (pageStr != null && !pageStr.isEmpty()) {
-                    page = Integer.parseInt(pageStr);
-                }
-            } catch (NumberFormatException e) {
-                page = 1;
-            }
-            
-            // Get search parameters
-            String keyword = request.getParameter("keyword");
-            String jobType = request.getParameter("jobType");
-            String location = request.getParameter("location");
-            
-            // Get total posts and calculate total pages
-            int totalPosts = postsDAO.getTotalPostsWithSearch(keyword, jobType, location);
-            int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
-            
-            // Get posts for current page with search
-            List<Posts> recentPosts = postsDAO.getPostsByPageWithSearch(page, pageSize, keyword, jobType, location);
-            
             // Latest job listings for homepage (guest view)
             List<JobListing> latestJobs = jobDAO.getLatestJobListings(10);
             request.setAttribute("latestJobs", latestJobs);
+
+            // Banners for top sections (first two by position)
+            request.setAttribute("banners", bannerDAO.getTopBanners(2));
+
+            // Latest published blogs for "Our recent news" section
+            request.setAttribute("blogList", blogDAO.getLatestBlogs(2));
             
             // Top job categories (job types) for displaying in Browse Top Categories
             List<JobTypeCount> jobCategories = jobDAO.getJobTypeCounts(8);
             request.setAttribute("jobCategories", jobCategories);
             
-            // Set attributes for JSP
-            request.setAttribute("recentPosts", recentPosts);
-            request.setAttribute("currentPage", page);
-            request.setAttribute("totalPages", totalPages);
-            request.setAttribute("keyword", keyword);
-            request.setAttribute("jobType", jobType);
-            request.setAttribute("location", location);
-            
-            // request.getRequestDispatcher("/home.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
             response.sendRedirect("error.jsp");
