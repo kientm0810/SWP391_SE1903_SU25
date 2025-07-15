@@ -242,6 +242,97 @@
                         margin-bottom: 24px;
                     }
 
+                    /* Job Recommendation Styles */
+                    .job-recommendation-card {
+                        border: 1px solid #e0e0e0;
+                        border-radius: 12px;
+                        padding: 20px;
+                        margin: 8px;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        background: white;
+                    }
+
+                    .job-recommendation-card:hover {
+                        border-color: #28a745;
+                        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.15);
+                        transform: translateY(-2px);
+                    }
+
+                    .company-logo {
+                        width: 50px;
+                        height: 50px;
+                        object-fit: contain;
+                        border-radius: 8px;
+                        margin-right: 12px;
+                        border: 1px solid #e0e0e0;
+                    }
+
+                    .job-title {
+                        font-weight: 600;
+                        color: #2c3e50;
+                        margin-bottom: 4px;
+                        display: -webkit-box;
+                        -webkit-line-clamp: 2;
+                        -webkit-box-orient: vertical;
+                        overflow: hidden;
+                    }
+
+                    .company-name {
+                        color: #28a745;
+                        font-weight: 500;
+                        margin-bottom: 12px;
+                        font-size: 0.9rem;
+                    }
+
+                    .job-meta {
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 12px;
+                        margin-bottom: 12px;
+                    }
+
+                    .meta-item {
+                        font-size: 0.85rem;
+                        color: #6c757d;
+                        display: flex;
+                        align-items: center;
+                        gap: 4px;
+                    }
+
+                    .meta-item i {
+                        width: 12px;
+                        color: #28a745;
+                    }
+
+                    .job-description {
+                        color: #495057;
+                        font-size: 0.9rem;
+                        line-height: 1.5;
+                        margin-bottom: 12px;
+                    }
+
+                    .job-card-footer {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-top: auto;
+                    }
+
+                    .job-type-badge {
+                        background: linear-gradient(45deg, #28a745, #20c997);
+                        color: white;
+                        padding: 4px 12px;
+                        border-radius: 15px;
+                        font-size: 0.75rem;
+                        font-weight: 500;
+                    }
+
+                    .deadline {
+                        color: #dc3545;
+                        font-size: 0.75rem;
+                    }
+
                     @media (max-width: 768px) {
                         .application-card {
                             flex-direction: column;
@@ -263,6 +354,16 @@
 
                         .filter-section .row > * {
                             margin-bottom: 12px;
+                        }
+
+                        .job-recommendation-card {
+                            margin: 4px;
+                            padding: 16px;
+                        }
+
+                        .job-meta {
+                            flex-direction: column;
+                            gap: 8px;
                         }
                     }
                 </style>
@@ -410,6 +511,74 @@
                     </c:if>
                 </div>
 
+                <!-- Job Recommendations Section -->
+                <c:if test="${not empty recommendedJobs}">
+                    <div class="card mt-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-lightbulb me-2"></i>
+                                Việc làm gợi ý dành cho bạn
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="row g-0">
+                                <c:forEach items="${recommendedJobs}" var="job" varStatus="status">
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="job-recommendation-card h-100" onclick="viewJobDetail(${job.id})">
+                                            <div class="job-card-header">
+                                                <div class="d-flex align-items-start">
+                                                    <c:if test="${not empty job.companyLogo}">
+                                                        <img src="${job.companyLogo}" alt="${job.companyName}" class="company-logo">
+                                                    </c:if>
+                                                    <div class="flex-grow-1">
+                                                        <h6 class="job-title">${job.title}</h6>
+                                                        <p class="company-name">${job.companyName}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="job-card-body">
+                                                <div class="job-meta">
+                                                    <c:if test="${not empty job.location}">
+                                                        <span class="meta-item">
+                                                            <i class="fas fa-map-marker-alt"></i> ${job.location}
+                                                        </span>
+                                                    </c:if>
+                                                    <c:if test="${not empty job.salary}">
+                                                        <span class="meta-item">
+                                                            <i class="fas fa-dollar-sign"></i> ${job.salary}
+                                                        </span>
+                                                    </c:if>
+                                                    <c:if test="${not empty job.experience}">
+                                                        <span class="meta-item">
+                                                            <i class="fas fa-briefcase"></i> ${job.experience}
+                                                        </span>
+                                                    </c:if>
+                                                </div>
+                                                <c:if test="${not empty job.jobDescription}">
+                                                    <p class="job-description">
+                                                        ${fn:substring(job.jobDescription, 0, 120)}
+                                                        <c:if test="${fn:length(job.jobDescription) > 120}">...</c:if>
+                                                    </p>
+                                                </c:if>
+                                                <div class="job-card-footer">
+                                                    <span class="job-type-badge">${job.jobType}</span>
+                                                    <c:if test="${not empty job.deadline}">
+                                                        <small class="deadline">
+                                                            <i class="fas fa-clock"></i> 
+                                                            Hạn: <fmt:formatDate value="${job.deadline}" pattern="dd/MM/yyyy" />
+                                                        </small>
+                                                    </c:if>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                            </div>
+                        </div>
+                    </div>
+                </c:if>
+            </div>
+
                 <!-- Withdraw Confirmation Modal -->
                 <div class="modal fade" id="withdrawModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog">
@@ -434,6 +603,10 @@
                 <!-- Scripts -->
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
                 <script>
+                    function viewJobDetail(jobId) {
+                        window.open('view-post?id=' + jobId, '_blank');
+                    }
+
                     document.addEventListener('DOMContentLoaded', function () {
                         const withdrawModal = new bootstrap.Modal(document.getElementById('withdrawModal'));
                         let applicationToWithdraw = null;

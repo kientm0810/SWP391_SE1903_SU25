@@ -1,19 +1,28 @@
 package controllers;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import daos.AwardDAO;
 import daos.CVTemplateDAO;
+import daos.CertificateDAO;
+import daos.EducationDAO;
+import daos.ExperienceDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import models.Award;
 import models.CVTemplate;
+import models.Certificate;
+import models.Education;
+import models.Experience;
 import models.JobSeeker;
 
 @WebServlet(name = "ProfileController", urlPatterns = {"/profile"})
@@ -22,67 +31,67 @@ public class ProfileController extends HttpServlet {
     private static final int PAGE_SIZE = 5; // Number of CVs per page
     
     private CVTemplateDAO cvDAO;
+    private ExperienceDAO experienceDAO;
+    private CertificateDAO certificateDAO;
+    private EducationDAO educationDAO;
+    private AwardDAO awardDAO;
     
     @Override
     public void init() throws ServletException {
         cvDAO = new CVTemplateDAO();
+        experienceDAO = new ExperienceDAO();
+        certificateDAO = new CertificateDAO();
+        educationDAO = new EducationDAO();
+        awardDAO = new AwardDAO();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        // Check if user is logged in and is a job seeker
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null || !"job-seeker".equals(session.getAttribute("role"))) {
             response.sendRedirect("login");
             return;
         }
-
+        
         JobSeeker jobSeeker = (JobSeeker) session.getAttribute("user");
         
         try {
-            // Get pagination parameters
-            String pageParam = request.getParameter("page");
+            // Calculate pagination (remove getTotalCVCount)
+            List<CVTemplate> cvTemplates = cvDAO.getCVsByJobSeeker(jobSeeker.getId());
+            int totalCVs = cvTemplates.size();
             int currentPage = 1;
-            if (pageParam != null && !pageParam.isEmpty()) {
-                try {
-                    currentPage = Integer.parseInt(pageParam);
-                    if (currentPage < 1) currentPage = 1;
-                } catch (NumberFormatException e) {
-                    currentPage = 1;
-                }
-            }
-
-            // Get search parameter
-            String searchTerm = request.getParameter("search");
+            int totalPages = 1;
+            int startIndex = 0;
+            int endIndex = totalCVs;
             
-            // Get all CVs for the job seeker
-            List<CVTemplate> allCVs = cvDAO.getCVsByJobSeeker(jobSeeker.getId(), searchTerm);
-            
-            // Calculate pagination
-            int totalCVs = allCVs.size();
-            int totalPages = (int) Math.ceil((double) totalCVs / PAGE_SIZE);
-            int startIndex = (currentPage - 1) * PAGE_SIZE;
-            int endIndex = Math.min(startIndex + PAGE_SIZE, totalCVs);
-            
-            // Get CVs for current page
-            List<CVTemplate> pageCVs = allCVs.subList(startIndex, endIndex);
+            // Get profile sections data
+            List<Experience> experiences = experienceDAO.getExperiencesByJobSeeker(jobSeeker.getId());
+            List<Certificate> certificates = certificateDAO.getCertificatesByJobSeeker(jobSeeker.getId());
+            List<Education> educations = educationDAO.getEducationsByJobSeeker(jobSeeker.getId());
+            List<Award> awards = awardDAO.getAwardsByJobSeeker(jobSeeker.getId());
             
             // Set attributes for JSP
-            request.setAttribute("cvList", pageCVs);
+            request.setAttribute("cvTemplates", cvTemplates);
+            request.setAttribute("experiences", experiences);
+            request.setAttribute("certificates", certificates);
+            request.setAttribute("educations", educations);
+            request.setAttribute("awards", awards);
+            
+            // Pagination attributes
             request.setAttribute("currentPage", currentPage);
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("totalCVs", totalCVs);
-            request.setAttribute("searchTerm", searchTerm);
+            request.setAttribute("startIndex", startIndex + 1);
+            request.setAttribute("endIndex", endIndex);
             
-            // Forward to profile page
             request.getRequestDispatcher("profile.jsp").forward(request, response);
             
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error loading profile for jobSeeker: " + jobSeeker.getId(), e);
-            request.setAttribute("error", "Unable to load profile. Please try again.");
-            request.getRequestDispatcher("error.jsp").forward(request, response);
+            LOGGER.log(Level.SEVERE, "Error loading profile data", e);
+            request.setAttribute("errorMessage", "Lỗi hệ thống khi tải thông tin hồ sơ!");
+            request.getRequestDispatcher("profile.jsp").forward(request, response);
         }
     }
 
@@ -90,12 +99,39 @@ public class ProfileController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        // Handle CV deletion
         String action = request.getParameter("action");
-        if ("delete".equals(action)) {
-            handleDeleteCV(request, response);
-        } else {
-            response.sendRedirect("profile");
+        
+        switch (action != null ? action : "") {
+            case "delete":
+                handleDeleteCV(request, response);
+                break;
+            case "deleteExperience":
+                handleDeleteExperience(request, response);
+                break;
+            case "deleteCertificate":
+                handleDeleteCertificate(request, response);
+                break;
+            case "deleteEducation":
+                handleDeleteEducation(request, response);
+                break;
+            case "deleteAward":
+                handleDeleteAward(request, response);
+                break;
+            case "addExperience":
+                handleAddExperience(request, response);
+                break;
+            case "addCertificate":
+                handleAddCertificate(request, response);
+                break;
+            case "addEducation":
+                handleAddEducation(request, response);
+                break;
+            case "addAward":
+                handleAddAward(request, response);
+                break;
+            default:
+                response.sendRedirect("profile");
+                break;
         }
     }
     
@@ -111,16 +147,22 @@ public class ProfileController extends HttpServlet {
         JobSeeker jobSeeker = (JobSeeker) session.getAttribute("user");
         
         try {
-            String cvIdParam = request.getParameter("cvId");
-            if (cvIdParam != null && !cvIdParam.isEmpty()) {
-                int cvId = Integer.parseInt(cvIdParam);
+            String cvIdStr = request.getParameter("cvId");
+            if (cvIdStr != null && !cvIdStr.trim().isEmpty()) {
+                int cvId = Integer.parseInt(cvIdStr);
                 
-                boolean deleted = cvDAO.deleteCV(cvId, jobSeeker.getId());
-                
-                if (deleted) {
-                    session.setAttribute("successMessage", "CV đã được xóa thành công!");
+                // Verify that the CV belongs to the current user
+                CVTemplate cv = cvDAO.getCVById(cvId, jobSeeker.getId());
+                if (cv != null && cv.getJobSeekerId() == jobSeeker.getId()) {
+                    boolean deleted = cvDAO.deleteCV(cvId, jobSeeker.getId());
+                    
+                    if (deleted) {
+                        session.setAttribute("successMessage", "CV đã được xóa thành công!");
+                    } else {
+                        session.setAttribute("errorMessage", "Không thể xóa CV. Vui lòng thử lại!");
+                    }
                 } else {
-                    session.setAttribute("errorMessage", "Không thể xóa CV. Vui lòng thử lại!");
+                    session.setAttribute("errorMessage", "CV không tồn tại hoặc bạn không có quyền xóa!");
                 }
             }
         } catch (NumberFormatException e) {
@@ -129,6 +171,372 @@ public class ProfileController extends HttpServlet {
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error deleting CV", e);
             session.setAttribute("errorMessage", "Lỗi hệ thống khi xóa CV!");
+        }
+        
+        response.sendRedirect("profile");
+    }
+    
+    private void handleDeleteExperience(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null || !"job-seeker".equals(session.getAttribute("role"))) {
+            response.sendRedirect("login");
+            return;
+        }
+
+        JobSeeker jobSeeker = (JobSeeker) session.getAttribute("user");
+        
+        try {
+            String experienceIdStr = request.getParameter("experienceId");
+            if (experienceIdStr != null && !experienceIdStr.trim().isEmpty()) {
+                int experienceId = Integer.parseInt(experienceIdStr);
+                
+                boolean deleted = experienceDAO.deleteExperience(experienceId);
+                
+                if (deleted) {
+                    session.setAttribute("successMessage", "Kinh nghiệm làm việc đã được xóa thành công!");
+                } else {
+                    session.setAttribute("errorMessage", "Không thể xóa kinh nghiệm làm việc. Vui lòng thử lại!");
+                }
+            }
+        } catch (NumberFormatException e) {
+            LOGGER.log(Level.WARNING, "Invalid Experience ID format: " + request.getParameter("experienceId"));
+            session.setAttribute("errorMessage", "ID kinh nghiệm không hợp lệ!");
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error deleting experience", e);
+            session.setAttribute("errorMessage", "Lỗi hệ thống khi xóa kinh nghiệm làm việc!");
+        }
+        
+        response.sendRedirect("profile");
+    }
+    
+    private void handleDeleteCertificate(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null || !"job-seeker".equals(session.getAttribute("role"))) {
+            response.sendRedirect("login");
+            return;
+        }
+
+        JobSeeker jobSeeker = (JobSeeker) session.getAttribute("user");
+        
+        try {
+            String certificateIdStr = request.getParameter("certificateId");
+            if (certificateIdStr != null && !certificateIdStr.trim().isEmpty()) {
+                int certificateId = Integer.parseInt(certificateIdStr);
+                
+                boolean deleted = certificateDAO.deleteCertificate(certificateId);
+                
+                if (deleted) {
+                    session.setAttribute("successMessage", "Chứng chỉ đã được xóa thành công!");
+                } else {
+                    session.setAttribute("errorMessage", "Không thể xóa chứng chỉ. Vui lòng thử lại!");
+                }
+            }
+        } catch (NumberFormatException e) {
+            LOGGER.log(Level.WARNING, "Invalid Certificate ID format: " + request.getParameter("certificateId"));
+            session.setAttribute("errorMessage", "ID chứng chỉ không hợp lệ!");
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error deleting certificate", e);
+            session.setAttribute("errorMessage", "Lỗi hệ thống khi xóa chứng chỉ!");
+        }
+        
+        response.sendRedirect("profile");
+    }
+    
+    private void handleDeleteEducation(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null || !"job-seeker".equals(session.getAttribute("role"))) {
+            response.sendRedirect("login");
+            return;
+        }
+
+        JobSeeker jobSeeker = (JobSeeker) session.getAttribute("user");
+        
+        try {
+            String educationIdStr = request.getParameter("educationId");
+            if (educationIdStr != null && !educationIdStr.trim().isEmpty()) {
+                int educationId = Integer.parseInt(educationIdStr);
+                
+                boolean deleted = educationDAO.deleteEducation(educationId);
+                
+                if (deleted) {
+                    session.setAttribute("successMessage", "Học vấn đã được xóa thành công!");
+                } else {
+                    session.setAttribute("errorMessage", "Không thể xóa học vấn. Vui lòng thử lại!");
+                }
+            }
+        } catch (NumberFormatException e) {
+            LOGGER.log(Level.WARNING, "Invalid Education ID format: " + request.getParameter("educationId"));
+            session.setAttribute("errorMessage", "ID học vấn không hợp lệ!");
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error deleting education", e);
+            session.setAttribute("errorMessage", "Lỗi hệ thống khi xóa học vấn!");
+        }
+        
+        response.sendRedirect("profile");
+    }
+    
+    private void handleDeleteAward(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null || !"job-seeker".equals(session.getAttribute("role"))) {
+            response.sendRedirect("login");
+            return;
+        }
+
+        JobSeeker jobSeeker = (JobSeeker) session.getAttribute("user");
+        
+        try {
+            String awardIdStr = request.getParameter("awardId");
+            if (awardIdStr != null && !awardIdStr.trim().isEmpty()) {
+                int awardId = Integer.parseInt(awardIdStr);
+                
+                boolean deleted = awardDAO.deleteAward(awardId);
+                
+                if (deleted) {
+                    session.setAttribute("successMessage", "Giải thưởng đã được xóa thành công!");
+                } else {
+                    session.setAttribute("errorMessage", "Không thể xóa giải thưởng. Vui lòng thử lại!");
+                }
+            }
+        } catch (NumberFormatException e) {
+            LOGGER.log(Level.WARNING, "Invalid Award ID format: " + request.getParameter("awardId"));
+            session.setAttribute("errorMessage", "ID giải thưởng không hợp lệ!");
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error deleting award", e);
+            session.setAttribute("errorMessage", "Lỗi hệ thống khi xóa giải thưởng!");
+        }
+        
+        response.sendRedirect("profile");
+    }
+    
+    private void handleAddExperience(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null || !"job-seeker".equals(session.getAttribute("role"))) {
+            response.sendRedirect("login");
+            return;
+        }
+
+        JobSeeker jobSeeker = (JobSeeker) session.getAttribute("user");
+        
+        try {
+            String position = request.getParameter("position");
+            String company = request.getParameter("company");
+            String startDateStr = request.getParameter("startDate");
+            String endDateStr = request.getParameter("endDate");
+            String skillsUsed = request.getParameter("skillsUsed");
+            String achievements = request.getParameter("achievements");
+            boolean isCurrent = "true".equals(request.getParameter("isCurrent"));
+            
+            if (position == null || company == null || startDateStr == null || 
+                position.trim().isEmpty() || company.trim().isEmpty()) {
+                session.setAttribute("errorMessage", "Vui lòng điền đầy đủ thông tin bắt buộc!");
+                response.sendRedirect("profile");
+                return;
+            }
+            
+            Experience experience = new Experience();
+            experience.setJobSeekerId(jobSeeker.getId());
+            experience.setPosition(position.trim());
+            experience.setCompanyName(company.trim());
+            experience.setStartDate(Date.valueOf(startDateStr));
+            
+            if (!isCurrent && endDateStr != null && !endDateStr.trim().isEmpty()) {
+                experience.setEndDate(Date.valueOf(endDateStr));
+            }
+            
+            experience.setSkillsUsed(skillsUsed != null ? skillsUsed.trim() : "");
+            experience.setAchievements(achievements != null ? achievements.trim() : "");
+            experience.setCurrent(isCurrent);
+            
+            boolean added = experienceDAO.addExperience(experience);
+            
+            if (added) {
+                session.setAttribute("successMessage", "Kinh nghiệm làm việc đã được thêm thành công!");
+            } else {
+                session.setAttribute("errorMessage", "Không thể thêm kinh nghiệm làm việc. Vui lòng thử lại!");
+            }
+            
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error adding experience", e);
+            session.setAttribute("errorMessage", "Lỗi hệ thống khi thêm kinh nghiệm làm việc!");
+        }
+        
+        response.sendRedirect("profile");
+    }
+    
+    private void handleAddCertificate(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null || !"job-seeker".equals(session.getAttribute("role"))) {
+            response.sendRedirect("login");
+            return;
+        }
+
+        JobSeeker jobSeeker = (JobSeeker) session.getAttribute("user");
+        
+        try {
+            String name = request.getParameter("name");
+            String organization = request.getParameter("organization");
+            String issueDateStr = request.getParameter("issueDate");
+            String expiryDateStr = request.getParameter("expiryDate");
+            String credentialId = request.getParameter("credentialId");
+            String credentialUrl = request.getParameter("credentialUrl");
+            boolean noExpiry = "true".equals(request.getParameter("noExpiry"));
+            
+            if (name == null || organization == null || issueDateStr == null || 
+                name.trim().isEmpty() || organization.trim().isEmpty()) {
+                session.setAttribute("errorMessage", "Vui lòng điền đầy đủ thông tin bắt buộc!");
+                response.sendRedirect("profile");
+                return;
+            }
+            
+            Certificate certificate = new Certificate();
+            certificate.setJobSeekerId(jobSeeker.getId());
+            certificate.setCertificateName(name.trim());
+            certificate.setIssuingOrganization(organization.trim());
+            certificate.setIssueDate(Date.valueOf(issueDateStr));
+            
+            if (!noExpiry && expiryDateStr != null && !expiryDateStr.trim().isEmpty()) {
+                certificate.setExpiryDate(Date.valueOf(expiryDateStr));
+            }
+            
+            certificate.setCredentialId(credentialId != null ? credentialId.trim() : "");
+            certificate.setCredentialUrl(credentialUrl != null ? credentialUrl.trim() : "");
+            certificate.setImagePath(""); // Handle file upload separately if needed
+            
+            boolean added = certificateDAO.addCertificate(certificate);
+            
+            if (added) {
+                session.setAttribute("successMessage", "Chứng chỉ đã được thêm thành công!");
+            } else {
+                session.setAttribute("errorMessage", "Không thể thêm chứng chỉ. Vui lòng thử lại!");
+            }
+            
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error adding certificate", e);
+            session.setAttribute("errorMessage", "Lỗi hệ thống khi thêm chứng chỉ!");
+        }
+        
+        response.sendRedirect("profile");
+    }
+    
+    private void handleAddEducation(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null || !"job-seeker".equals(session.getAttribute("role"))) {
+            response.sendRedirect("login");
+            return;
+        }
+
+        JobSeeker jobSeeker = (JobSeeker) session.getAttribute("user");
+        
+        try {
+            String degree = request.getParameter("degree");
+            String fieldOfStudy = request.getParameter("fieldOfStudy");
+            String institution = request.getParameter("institution");
+            String startDateStr = request.getParameter("startDate");
+            String endDateStr = request.getParameter("endDate");
+            String gpaStr = request.getParameter("gpa");
+            String activities = request.getParameter("activities");
+            boolean isCurrent = "true".equals(request.getParameter("isCurrent"));
+            
+            if (degree == null || fieldOfStudy == null || institution == null || startDateStr == null ||
+                degree.trim().isEmpty() || fieldOfStudy.trim().isEmpty() || institution.trim().isEmpty()) {
+                session.setAttribute("errorMessage", "Vui lòng điền đầy đủ thông tin bắt buộc!");
+                response.sendRedirect("profile");
+                return;
+            }
+            
+            Education education = new Education();
+            education.setJobSeekerId(jobSeeker.getId());
+            education.setDegree(degree.trim());
+            education.setFieldOfStudy(fieldOfStudy.trim());
+            education.setInstitutionName(institution.trim());
+            education.setStartDate(Date.valueOf(startDateStr));
+            
+            if (!isCurrent && endDateStr != null && !endDateStr.trim().isEmpty()) {
+                education.setEndDate(Date.valueOf(endDateStr));
+            }
+            
+            if (gpaStr != null && !gpaStr.trim().isEmpty()) {
+                education.setGpa(new java.math.BigDecimal(gpaStr));
+            }
+            
+            education.setActivities(activities != null ? activities.trim() : "");
+            education.setCurrent(isCurrent);
+            
+            boolean added = educationDAO.addEducation(education);
+            
+            if (added) {
+                session.setAttribute("successMessage", "Học vấn đã được thêm thành công!");
+            } else {
+                session.setAttribute("errorMessage", "Không thể thêm học vấn. Vui lòng thử lại!");
+            }
+            
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error adding education", e);
+            session.setAttribute("errorMessage", "Lỗi hệ thống khi thêm học vấn!");
+        }
+        
+        response.sendRedirect("profile");
+    }
+    
+    private void handleAddAward(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null || !"job-seeker".equals(session.getAttribute("role"))) {
+            response.sendRedirect("login");
+            return;
+        }
+
+        JobSeeker jobSeeker = (JobSeeker) session.getAttribute("user");
+        
+        try {
+            String name = request.getParameter("name");
+            String organization = request.getParameter("organization");
+            String awardDateStr = request.getParameter("awardDate");
+            String level = request.getParameter("level");
+            String rank = request.getParameter("rank");
+            String category = request.getParameter("category");
+            String description = request.getParameter("description");
+            
+            if (name == null || organization == null || awardDateStr == null ||
+                name.trim().isEmpty() || organization.trim().isEmpty()) {
+                session.setAttribute("errorMessage", "Vui lòng điền đầy đủ thông tin bắt buộc!");
+                response.sendRedirect("profile");
+                return;
+            }
+            
+            Award award = new Award();
+            award.setJobSeekerId(jobSeeker.getId());
+            award.setAwardName(name.trim());
+            award.setIssuingOrganization(organization.trim());
+            award.setDateReceived(Date.valueOf(awardDateStr));
+            award.setDescription(description != null ? description.trim() : "");
+            
+            boolean added = awardDAO.addAward(award);
+            
+            if (added) {
+                session.setAttribute("successMessage", "Giải thưởng đã được thêm thành công!");
+            } else {
+                session.setAttribute("errorMessage", "Không thể thêm giải thưởng. Vui lòng thử lại!");
+            }
+            
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error adding award", e);
+            session.setAttribute("errorMessage", "Lỗi hệ thống khi thêm giải thưởng!");
         }
         
         response.sendRedirect("profile");

@@ -62,6 +62,10 @@
         <servlet-name>VnpayReturn</servlet-name>
         <servlet-class>com.vnpay.common.VnpayReturn</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AddProfileSectionController</servlet-name>
+        <servlet-class>controllers.AddProfileSectionController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>ajaxServlet</servlet-name>
         <url-pattern>/payment</url-pattern>
@@ -113,6 +117,22 @@
     <servlet-mapping>
         <servlet-name>UploadServlet</servlet-name>
         <url-pattern>/upload</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AddProfileSectionController</servlet-name>
+        <url-pattern>/experience-add</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AddProfileSectionController</servlet-name>
+        <url-pattern>/education-add</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AddProfileSectionController</servlet-name>
+        <url-pattern>/certificate-add</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AddProfileSectionController</servlet-name>
+        <url-pattern>/award-add</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>

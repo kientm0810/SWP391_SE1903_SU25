@@ -396,7 +396,7 @@
                         </div>
 
                         <div class="application-status">
-                            <span class="status-badge status-${fn:toLowerCase(app.status)}" data-app-id="${app.applicationId}">
+                            <span class="status-badge status-${fn:toLowerCase(app.status)}" data-app-id="${app.applicationId}" id="status-badge-${app.applicationId}">
                                 <c:choose>
                                     <c:when test="${fn:toLowerCase(app.status) == 'new'}">Mới</c:when>
                                     <c:when test="${fn:toLowerCase(app.status) == 'reviewed'}">Đã xem</c:when>
@@ -406,7 +406,6 @@
                                     <c:otherwise>${app.status}</c:otherwise>
                                 </c:choose>
                             </span>
-                            
                             <div class="application-actions">
                                 <button type="button" class="btn btn-primary btn-sm view-candidate-btn" 
                                         data-bs-toggle="modal" 
@@ -420,6 +419,18 @@
                                         data-current-status="${app.status}">
                                     <i class="fas fa-eye me-1"></i>Xem Chi Tiết
                                 </button>
+                                <!-- Status update dropdown -->
+                                <select class="form-select form-select-sm mt-2 update-status-select" data-app-id="${app.applicationId}" style="min-width: 140px;">
+                                    <option value="new" ${fn:toLowerCase(app.status) == 'new' ? 'selected' : ''}>Mới</option>
+                                    <option value="reviewed" ${fn:toLowerCase(app.status) == 'reviewed' ? 'selected' : ''}>Đã xem</option>
+                                    <option value="interviewed" ${fn:toLowerCase(app.status) == 'interviewed' ? 'selected' : ''}>Phỏng vấn</option>
+                                    <option value="offered" ${fn:toLowerCase(app.status) == 'offered' ? 'selected' : ''}>Mời nhận việc</option>
+                                    <option value="rejected" ${fn:toLowerCase(app.status) == 'rejected' ? 'selected' : ''}>Từ chối</option>
+                                </select>
+                                <div class="status-update-spinner mt-1" style="display:none;" id="spinner-${app.applicationId}">
+                                    <span class="spinner-border spinner-border-sm text-primary"></span>
+                                </div>
+                                <div class="status-update-error text-danger mt-1" style="display:none;" id="error-${app.applicationId}"></div>
                             </div>
                         </div>
                     </div>
@@ -502,24 +513,7 @@
                             <i class="fas fa-download me-2"></i> Tải CV
                         </a>
                     </div>
-                    <div class="update-status-section p-3 bg-light rounded">
-                        <h6 class="mb-3">Cập nhật trạng thái</h6>
-                        <form id="updateStatusForm" action="update-application-status" method="POST">
-                            <input type="hidden" id="modal-application-id" name="applicationId" />
-                            <input type="hidden" name="action" value="update" />
-                            <select id="statusSelect" name="status" class="form-select mb-2" required>
-                                <option value="">-- Chọn trạng thái --</option>
-                                <option value="new">Mới</option>
-                                <option value="reviewed">Đã xem</option>
-                                <option value="interviewed">Phỏng vấn</option>
-                                <option value="offered">Mời nhận việc</option>
-                                <option value="rejected">Từ chối</option>
-                            </select>
-                            <button type="submit" class="btn btn-primary w-100">
-                                <i class="fas fa-save me-1"></i> Cập nhật trạng thái
-                            </button>
-                        </form>
-                    </div>
+                    <!-- Removed update-status-section and related form/button as per requirements -->
                 </div>
             </div>
         </div>
@@ -545,9 +539,7 @@
             const modalPhone = document.getElementById('modal-candidate-phone');
             const modalAvatar = document.getElementById('modal-candidate-avatar');
             const modalDownloadCvBtn = document.getElementById('modal-download-cv-btn');
-            const modalApplicationIdInput = document.getElementById('modal-application-id');
-            const statusSelectModal = document.getElementById('statusSelect');
-            const updateStatusForm = document.getElementById('updateStatusForm');
+            // Removed statusSelectModal and updateStatusForm logic
 
             // Handle modal open - populate with candidate data
             document.querySelectorAll('.view-candidate-btn').forEach(button => {
@@ -557,14 +549,6 @@
                     modalEmail.textContent = this.dataset.email || 'N/A';
                     modalPhone.textContent = this.dataset.phone || 'N/A';
                     modalAvatar.src = this.dataset.avatar || 'assets/img/icon/user-default.png';
-                    
-                    // Set application ID for form submission
-                    modalApplicationIdInput.value = this.dataset.applicationId || '';
-                    
-                    // Set current status as selected
-                    const currentStatus = this.dataset.currentStatus || '';
-                    statusSelectModal.value = currentStatus.toLowerCase();
-                    
                     // Handle CV download
                     const cvUrl = this.dataset.cvUrl;
                     if (cvUrl && cvUrl !== 'null' && cvUrl !== '') {
@@ -573,35 +557,58 @@
                     } else {
                         modalDownloadCvBtn.style.display = 'none';
                     }
-                    
                     modalInstance.show();
                 });
             });
 
-            // Handle form submission with confirmation
-            updateStatusForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const applicationId = modalApplicationIdInput.value;
-                const selectedStatus = statusSelectModal.value;
-                const selectedText = statusSelectModal.options[statusSelectModal.selectedIndex].text;
-                
-                // Simple validation
-                if (!applicationId) {
-                    alert('Lỗi: Không tìm thấy ID ứng tuyển.');
-                    return;
-                }
-                
-                if (!selectedStatus) {
-                    alert('Vui lòng chọn trạng thái.');
-                    return;
-                }
-                
-                // Show confirmation dialog
-                if (confirm(`Bạn có chắc muốn cập nhật trạng thái thành "${selectedText}"?`)) {
-                    // Submit the form normally - this will cause a page reload
-                    this.submit();
-                }
+            // Status update logic
+            document.querySelectorAll('.update-status-select').forEach(function(select) {
+                select.addEventListener('change', function() {
+                    const appId = this.dataset.appId;
+                    const newStatus = this.value;
+                    const spinner = document.getElementById('spinner-' + appId);
+                    const errorDiv = document.getElementById('error-' + appId);
+                    const badge = document.getElementById('status-badge-' + appId);
+                    spinner.style.display = 'inline-block';
+                    errorDiv.style.display = 'none';
+                    fetch('update-application-status', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            applicationId: appId,
+                            newStatus: newStatus
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        spinner.style.display = 'none';
+                        if (data.success) {
+                            // Update badge text and class
+                            let statusText = '';
+                            let statusClass = '';
+                            switch (newStatus) {
+                                case 'new': statusText = 'Mới'; statusClass = 'status-new'; break;
+                                case 'reviewed': statusText = 'Đã xem'; statusClass = 'status-reviewed'; break;
+                                case 'interviewed': statusText = 'Phỏng vấn'; statusClass = 'status-interviewed'; break;
+                                case 'offered': statusText = 'Mời nhận việc'; statusClass = 'status-offered'; break;
+                                case 'rejected': statusText = 'Từ chối'; statusClass = 'status-rejected'; break;
+                                default: statusText = newStatus; statusClass = '';
+                            }
+                            badge.textContent = statusText;
+                            badge.className = 'status-badge ' + statusClass;
+                        } else {
+                            errorDiv.textContent = data.message || 'Update failed.';
+                            errorDiv.style.display = 'block';
+                        }
+                    })
+                    .catch(err => {
+                        spinner.style.display = 'none';
+                        errorDiv.textContent = 'Network error.';
+                        errorDiv.style.display = 'block';
+                    });
+                });
             });
         });
     </script>

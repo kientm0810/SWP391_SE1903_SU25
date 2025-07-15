@@ -31,18 +31,6 @@ public class ApplicationDAO extends DBContext {
         return 0;
     }
     
-    public boolean updateApplicationStatus(int applicationId, String status, int recruiterId) throws SQLException {
-        String sql = "UPDATE Applications SET status = ? WHERE id = ? AND job_listing_id IN (SELECT id FROM Posts WHERE user_id = ?)";
-        
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, status);
-            ps.setInt(2, applicationId);
-            ps.setInt(3, recruiterId);
-            
-            return ps.executeUpdate() > 0;
-        }
-    }
-    
     public Application getApplicationById(int applicationId, int recruiterId) throws SQLException {
         String sql = "SELECT a.id as app_id, a.status, a.applied_at, a.cv_file, " +
                      "p.id as post_id, p.title, " +
@@ -403,6 +391,17 @@ public class ApplicationDAO extends DBContext {
             ps.setString(1, newStatus);
             ps.setInt(2, applicationId);
             ps.setInt(3, jobSeekerId);
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
+        }
+    }
+
+    public boolean updateApplicationStatusByRecruiter(int applicationId, String newStatus, int recruiterId) throws SQLException {
+        String sql = "UPDATE Applications SET status = ? WHERE id = ? AND job_listing_id IN (SELECT id FROM Posts WHERE user_id = ?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, newStatus);
+            ps.setInt(2, applicationId);
+            ps.setInt(3, recruiterId);
             int affectedRows = ps.executeUpdate();
             return affectedRows > 0;
         }
