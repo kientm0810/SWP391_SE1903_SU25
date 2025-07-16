@@ -276,9 +276,38 @@ public class ApplicationController extends HttpServlet {
             return;
         }
 
+        // DAOs for profile sections
+        daos.ExperienceDAO experienceDAO = new daos.ExperienceDAO();
+        daos.EducationDAO educationDAO = new daos.EducationDAO();
+        daos.CertificateDAO certificateDAO = new daos.CertificateDAO();
+        daos.AwardDAO awardDAO = new daos.AwardDAO();
+        daos.CVTemplateDAO cvTemplateDAO = new daos.CVTemplateDAO();
+
         // Get applications for recruiter with pagination and filters
         List<Application> applications = applicationDAO.getApplicationsByRecruiter(
             recruiter.getId(), page, pageSize, status, keyword, sortBy);
+        
+        // Enrich each application's job seeker with full profile data
+        for (Application app : applications) {
+            JobSeeker js = app.getJobseeker();
+            if (js != null) {
+                try {
+                    js.setExperiences(experienceDAO.getExperiencesByJobSeeker(js.getId()));
+                } catch (Exception e) { js.setExperiences(new java.util.ArrayList<>()); }
+                try {
+                    js.setEducations(educationDAO.getEducationsByJobSeeker(js.getId()));
+                } catch (Exception e) { js.setEducations(new java.util.ArrayList<>()); }
+                try {
+                    js.setCertificates(certificateDAO.getCertificatesByJobSeeker(js.getId()));
+                } catch (Exception e) { js.setCertificates(new java.util.ArrayList<>()); }
+                try {
+                    js.setAwards(awardDAO.getAwardsByJobSeeker(js.getId()));
+                } catch (Exception e) { js.setAwards(new java.util.ArrayList<>()); }
+                try {
+                    js.setCvTemplates(cvTemplateDAO.getCVsByJobSeeker(js.getId()));
+                } catch (Exception e) { js.setCvTemplates(new java.util.ArrayList<>()); }
+            }
+        }
         
         int totalApplications = applicationDAO.countApplicationsByRecruiter(
             recruiter.getId(), status, keyword);

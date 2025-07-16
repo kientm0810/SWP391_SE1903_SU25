@@ -13,6 +13,7 @@ import daos.CertificateDAO;
 import daos.EducationDAO;
 import daos.ExperienceDAO;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,8 +25,12 @@ import models.Certificate;
 import models.Education;
 import models.Experience;
 import models.JobSeeker;
-
 @WebServlet(name = "ProfileController", urlPatterns = {"/profile"})
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024, // 1MB
+    maxFileSize = 1024 * 1024 * 5,    // 5MB
+    maxRequestSize = 1024 * 1024 * 10 // 10MB
+)
 public class ProfileController extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(ProfileController.class.getName());
     private static final int PAGE_SIZE = 5; // Number of CVs per page
@@ -74,6 +79,7 @@ public class ProfileController extends HttpServlet {
             
             // Set attributes for JSP
             request.setAttribute("cvTemplates", cvTemplates);
+            request.setAttribute("cvList", cvTemplates); // Fix: provide cvList for JSP
             request.setAttribute("experiences", experiences);
             request.setAttribute("certificates", certificates);
             request.setAttribute("educations", educations);
@@ -128,6 +134,9 @@ public class ProfileController extends HttpServlet {
                 break;
             case "addAward":
                 handleAddAward(request, response);
+                break;
+            case "editContact":
+                handleEditContact(request, response);
                 break;
             default:
                 response.sendRedirect("profile");
@@ -392,6 +401,7 @@ public class ProfileController extends HttpServlet {
             String credentialId = request.getParameter("credentialId");
             String credentialUrl = request.getParameter("credentialUrl");
             boolean noExpiry = "true".equals(request.getParameter("noExpiry"));
+            String description = request.getParameter("description");
             
             if (name == null || organization == null || issueDateStr == null || 
                 name.trim().isEmpty() || organization.trim().isEmpty()) {
@@ -412,6 +422,7 @@ public class ProfileController extends HttpServlet {
             
             certificate.setCredentialId(credentialId != null ? credentialId.trim() : "");
             certificate.setCredentialUrl(credentialUrl != null ? credentialUrl.trim() : "");
+            certificate.setDescription(description != null ? description.trim() : "");
             certificate.setImagePath(""); // Handle file upload separately if needed
             
             boolean added = certificateDAO.addCertificate(certificate);
@@ -539,6 +550,58 @@ public class ProfileController extends HttpServlet {
             session.setAttribute("errorMessage", "Lỗi hệ thống khi thêm giải thưởng!");
         }
         
+        response.sendRedirect("profile");
+    }
+
+    private void handleEditContact(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null || !"job-seeker".equals(session.getAttribute("role"))) {
+            response.sendRedirect("login");
+            return;
+        }
+
+        JobSeeker jobSeeker = (JobSeeker) session.getAttribute("user");
+        String fullName = request.getParameter("fullName");
+        String email = request.getParameter("email");
+        String phone = request.getParameter("phone");
+        String address = request.getParameter("address");
+
+        try {
+            boolean changed = false;
+            if (fullName != null && !fullName.trim().isEmpty()) {
+                jobSeeker.setFullName(fullName.trim());
+                changed = true;
+            }
+            if (email != null && !email.trim().isEmpty()) {
+                jobSeeker.setEmail(email.trim());
+                changed = true;
+            }
+            if (phone != null) {
+                jobSeeker.setPhone(phone.trim());
+                changed = true;
+            }
+            if (address != null) {
+                jobSeeker.setAddress(address.trim());
+                changed = true;
+            }
+            if (changed) {
+                // Persist changes (assume JobSeekerDAO exists)
+                daos.JobSeekerDAO jobSeekerDAO = new daos.JobSeekerDAO();
+                boolean updated = jobSeekerDAO.updateContactInfo(jobSeeker);
+                if (updated) {
+                    session.setAttribute("user", jobSeeker); // update session
+                    session.setAttribute("successMessage", "Contact information updated successfully!");
+                } else {
+                    session.setAttribute("errorMessage", "Failed to update contact information. Please try again!");
+                }
+            } else {
+                session.setAttribute("errorMessage", "No changes detected in contact information.");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error updating contact info", e);
+            session.setAttribute("errorMessage", "System error while updating contact information!");
+        }
         response.sendRedirect("profile");
     }
 } 

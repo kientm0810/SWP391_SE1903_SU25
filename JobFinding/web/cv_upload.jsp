@@ -21,8 +21,8 @@
             background: #f8f9fa;
         }
         .file-upload-area:hover {
-            border-color: #007bff;
-            background: #f0f8ff;
+            border-color: #28a745;
+            background: #e8f5e9;
         }
         .required-field::after {
             content: " *";
@@ -32,6 +32,18 @@
 </head>
 <body>
     <div class="container py-5">
+        <style>
+            .card-header.bg-green-gradient {
+                background: linear-gradient(135deg, #28a745, #20c997);
+                color: #fff;
+            }
+            .text-green {
+                color: #28a745 !important;
+            }
+            .icon-green {
+                color: #28a745 !important;
+            }
+        </style>
         <c:if test="${not empty sessionScope.successMessage}">
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 <i class="fas fa-check-circle me-2"></i>
@@ -53,10 +65,10 @@
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header bg-green-gradient">
                         <div class="d-flex justify-content-between align-items-center">
                             <h4 class="mb-0">
-                                <i class="fas fa-file-alt text-primary me-2"></i>
+                                <i class="fas fa-file-alt icon-green me-2"></i>
                                 Tạo CV mới
                             </h4>
                             <a href="profile" class="btn btn-outline-secondary btn-sm">
@@ -67,8 +79,8 @@
 
                     <div class="card-body">
                         <form id="cvForm" method="post" action="cv-upload" enctype="multipart/form-data">
-                            <h5 class="text-primary mb-3">
-                                <i class="fas fa-user me-2"></i>Thông tin cá nhân
+                            <h5 class="text-green mb-3">
+                                <i class="fas fa-user icon-green me-2"></i>Thông tin cá nhân
                             </h5>
                             
                             <div class="row mb-3">
@@ -104,8 +116,8 @@
                                        placeholder="Nhập địa chỉ hiện tại">
                             </div>
 
-                            <h5 class="text-primary mb-3 mt-4">
-                                <i class="fas fa-briefcase me-2"></i>Kinh nghiệm & Trình độ
+                            <h5 class="text-green mb-3 mt-4">
+                                <i class="fas fa-briefcase icon-green me-2"></i>Kinh nghiệm & Trình độ
                             </h5>
 
                             <div class="row mb-3">
@@ -148,30 +160,30 @@
                                           placeholder="Mô tả về kinh nghiệm làm việc của bạn..."></textarea>
                             </div>
 
-                            <h5 class="text-primary mb-3 mt-4">
-                                <i class="fas fa-upload me-2"></i>Tải lên file CV (PDF)
+                            <h5 class="text-green mb-3 mt-4">
+                                <i class="fas fa-upload icon-green me-2"></i>Tải lên file CV (PDF)
                             </h5>
 
                             <div class="mb-3">
                                 <div class="file-upload-area" id="fileUploadArea">
-                                    <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
-                                    <p class="mb-2">Kéo thả file PDF vào đây hoặc click để chọn</p>
-                                    <small class="text-muted">Chỉ chấp nhận file PDF, tối đa 10MB</small>
+                                    <i class="fas fa-cloud-upload-alt fa-2x icon-green mb-2"></i>
+                                    <p class="mb-2 text-green">Kéo thả file PDF vào đây hoặc click để chọn</p>
+                                    <small class="text-green">Chỉ chấp nhận file PDF, tối đa 10MB</small>
                                     <input type="file" class="d-none" id="pdfFile" name="pdfFile" 
                                            accept=".pdf" onchange="handleFileSelect(this)">
                                 </div>
                                 <div id="selectedFile" class="mt-2 d-none">
                                     <div class="alert alert-success d-flex align-items-center">
-                                        <i class="fas fa-file-pdf me-2"></i>
-                                        <span id="fileName"></span>
+                                        <i class="fas fa-file-pdf icon-green me-2"></i>
+                                        <span id="fileName" class="text-green"></span>
                                         <button type="button" class="btn-close ms-auto" onclick="removeFile()"></button>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="alert alert-info">
-                                <small>
-                                    <i class="fas fa-info-circle me-2"></i>
+                            <div class="alert alert-info" style="border-left: 5px solid #28a745;">
+                                <small class="text-green">
+                                    <i class="fas fa-info-circle icon-green me-2"></i>
                                     <strong>Lưu ý:</strong> File PDF sẽ được lưu trữ an toàn trên server.
                                 </small>
                             </div>

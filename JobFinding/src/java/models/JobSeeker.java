@@ -39,6 +39,13 @@ public class JobSeeker {
     private Date updatedAt;
     private boolean isActive;
 
+    // Add profile sections for recruiter modal
+    private java.util.List<Experience> experiences;
+    private java.util.List<Education> educations;
+    private java.util.List<Certificate> certificates;
+    private java.util.List<Award> awards;
+    private java.util.List<CVTemplate> cvTemplates;
+
     public JobSeeker() {
     }
 
@@ -308,5 +315,36 @@ public class JobSeeker {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public java.util.List<Experience> getExperiences() {
+        return experiences;
+    }
+    public void setExperiences(java.util.List<Experience> experiences) {
+        this.experiences = experiences;
+    }
+    public java.util.List<Education> getEducations() {
+        return educations;
+    }
+    public void setEducations(java.util.List<Education> educations) {
+        this.educations = educations;
+    }
+    public java.util.List<Certificate> getCertificates() {
+        return certificates;
+    }
+    public void setCertificates(java.util.List<Certificate> certificates) {
+        this.certificates = certificates;
+    }
+    public java.util.List<Award> getAwards() {
+        return awards;
+    }
+    public void setAwards(java.util.List<Award> awards) {
+        this.awards = awards;
+    }
+    public java.util.List<CVTemplate> getCvTemplates() {
+        return cvTemplates;
+    }
+    public void setCvTemplates(java.util.List<CVTemplate> cvTemplates) {
+        this.cvTemplates = cvTemplates;
     }
 }

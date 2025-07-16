@@ -293,8 +293,11 @@
 
                             <!-- Contact Information -->
                             <div class="profile-section">
-                                <div class="section-header">
-                                    <h5><i class="fas fa-address-card me-2"></i>Thông tin liên hệ</h5>
+                                <div class="section-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0"><i class="fas fa-address-card me-2"></i>Thông tin liên hệ</h5>
+                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editContactModal">
+                                        <i class="fas fa-edit me-1"></i>Chỉnh sửa
+                                    </button>
                                 </div>
                                 <div class="section-body">
                                     <div class="mb-3">
@@ -827,7 +830,7 @@
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                                 <form id="deleteExpForm" method="post" action="profile" class="d-inline">
                                     <input type="hidden" name="action" value="deleteExperience">
-                                    <input type="hidden" name="expId" id="deleteExpId">
+                                    <input type="hidden" name="experienceId" id="deleteExpId">
                                     <button type="submit" class="btn btn-danger">
                                         <i class="fas fa-trash me-2"></i>Xóa
                                     </button>
@@ -856,7 +859,7 @@
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                                 <form id="deleteCertForm" method="post" action="profile" class="d-inline">
                                     <input type="hidden" name="action" value="deleteCertificate">
-                                    <input type="hidden" name="certId" id="deleteCertId">
+                                    <input type="hidden" name="certificateId" id="deleteCertId">
                                     <button type="submit" class="btn btn-danger">
                                         <i class="fas fa-trash me-2"></i>Xóa
                                     </button>
@@ -884,7 +887,7 @@
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                                 <form id="deleteEduForm" method="post" action="profile" class="d-inline">
                                     <input type="hidden" name="action" value="deleteEducation">
-                                    <input type="hidden" name="eduId" id="deleteEduId">
+                                    <input type="hidden" name="educationId" id="deleteEduId">
                                     <button type="submit" class="btn btn-danger">
                                         <i class="fas fa-trash me-2"></i>Xóa
                                     </button>
@@ -983,3 +986,41 @@
             </body>
 
             </html>
+<!-- Edit Contact Info Modal -->
+<div class="modal fade" id="editContactModal" tabindex="-1" aria-labelledby="editContactModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="profile">
+        <input type="hidden" name="action" value="editContact" />
+        <div class="modal-header" style="background: linear-gradient(135deg, #28a745, #20c997); color: white;">
+          <h5 class="modal-title" id="editContactModalLabel"><i class="fas fa-address-card me-2"></i>Edit Contact Info</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="fullName" class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="fullName" name="fullName" value="${sessionScope.user.fullName}" required />
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="${sessionScope.user.email}" required />
+          </div>
+          <div class="mb-3">
+            <label for="phone" class="form-label">Phone</label>
+            <input type="text" class="form-control" id="phone" name="phone" value="${sessionScope.user.phone}" />
+          </div>
+          <div class="mb-3">
+            <label for="address" class="form-label">Address</label>
+            <input type="text" class="form-control" id="address" name="address" value="${sessionScope.user.address}" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="background-color: #28a745; border-color: #28a745;">
+            <i class="fas fa-save me-1"></i>Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

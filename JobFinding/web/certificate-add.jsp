@@ -157,12 +157,19 @@
                                 <div class="form-text">Đường dẫn để xác thực chứng chỉ trực tuyến</div>
                             </div>
                             
+                            <div class="mb-3">
+                                <label for="description" class="form-label">
+                                    <i class="fas fa-align-left me-2 text-primary"></i>Mô tả chứng chỉ
+                                </label>
+                                <textarea class="form-control" id="description" name="description" rows="3" placeholder="Mô tả chi tiết về chứng chỉ, nội dung, kỹ năng đạt được..."></textarea>
+                            </div>
+                            
                             <div class="mb-4">
                                 <label for="certificateImage" class="form-label">
                                     <i class="fas fa-image me-2 text-primary"></i>Hình ảnh chứng chỉ
                                 </label>
                                 <input type="file" class="form-control" id="certificateImage" name="certificateImage"
-                                       accept="image/*">
+                                       accept="image/*" required>
                                 <div class="form-text">Tải lên hình ảnh chứng chỉ (JPG, PNG, GIF - tối đa 5MB)</div>
                             </div>
                             

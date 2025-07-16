@@ -604,7 +604,7 @@
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
                 <script>
                     function viewJobDetail(jobId) {
-                        window.open('view-post?id=' + jobId, '_blank');
+                        window.open('./post/view?id=' + jobId, '_blank');
                     }
 
                     document.addEventListener('DOMContentLoaded', function () {

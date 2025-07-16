@@ -409,7 +409,7 @@
                             <div class="application-actions">
                                 <button type="button" class="btn btn-primary btn-sm view-candidate-btn" 
                                         data-bs-toggle="modal" 
-                                        data-bs-target="#candidateModal"
+                                        data-bs-target="#candidateModal-${app.applicationId}"
                                         data-fullname="${app.jobseeker.fullName}"
                                         data-email="${app.jobseeker.email}"
                                         data-phone="${app.jobseeker.phone}"
@@ -485,39 +485,246 @@
     </div>
 
     <!-- Candidate Details Modal -->
-    <div class="modal fade candidate-modal" id="candidateModal" tabindex="-1" aria-labelledby="candidateModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
+    <c:forEach items="${applications}" var="app" varStatus="status">
+    <div class="modal fade candidate-modal" id="candidateModal-${app.applicationId}" tabindex="-1" aria-labelledby="candidateModalLabel-${app.applicationId}" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="candidateModalLabel">
-                        <i class="fas fa-user-circle me-2"></i>Thông tin ứng viên
+                <div class="modal-header" style="background: linear-gradient(90deg, #009966 0%, #00c471 100%); color: white;">
+                    <h5 class="modal-title" id="candidateModalLabel-${app.applicationId}">
+                        <i class="fas fa-user-circle me-2"></i>Thông tin ứng viên: ${app.jobseeker.fullName}
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <div class="d-flex align-items-center mb-4">
-                        <img id="modal-candidate-avatar" src="" class="candidate-avatar-large" alt="Avatar">
-                        <div class="ms-4">
-                            <h4 id="modal-candidate-name" class="mb-1"></h4>
-                            <p class="text-muted mb-1">
-                                <i class="fas fa-envelope me-2"></i><span id="modal-candidate-email"></span>
-                            </p>
-                            <p class="text-muted mb-0">
-                                <i class="fas fa-phone me-2"></i><span id="modal-candidate-phone"></span>
-                            </p>
+                <div class="modal-body p-4">
+                    <div class="row">
+                        <!-- Profile Sidebar -->
+                        <div class="col-lg-4 mb-4 mb-lg-0">
+                            <div class="text-center mb-4">
+                                <img src="${not empty app.jobseeker.profilePicture ? app.jobseeker.profilePicture : 'assets/img/elements/user.png'}" alt="Avatar" class="rounded-circle img-fluid border border-3" style="width: 140px;">
+                                <h4 class="mt-3 mb-1">${app.jobseeker.fullName}</h4>
+                                <p class="text-muted mb-1">${not empty app.jobseeker.desiredJobTitle ? app.jobseeker.desiredJobTitle : 'Ứng viên'}</p>
+                                <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i>${not empty app.jobseeker.address ? app.jobseeker.address : 'Chưa cập nhật'}</p>
+                            </div>
+                            <div class="bg-white rounded-3 shadow-sm p-3 mb-3">
+                                <h6 class="fw-bold mb-3 text-success"><i class="fas fa-address-card me-2"></i>Liên hệ</h6>
+                                <div class="mb-2"><i class="fas fa-envelope me-2 text-success"></i>${app.jobseeker.email}</div>
+                                <div class="mb-2"><i class="fas fa-phone me-2 text-success"></i>${not empty app.jobseeker.phone ? app.jobseeker.phone : 'Chưa cập nhật'}</div>
+                                <div class="mb-2"><i class="fas fa-birthday-cake me-2 text-success"></i>${not empty app.jobseeker.dateOfBirth ? app.jobseeker.dateOfBirth : 'Chưa cập nhật'}</div>
+                                <div class="mb-2"><i class="fas fa-venus-mars me-2 text-success"></i>${not empty app.jobseeker.gender ? app.jobseeker.gender : 'Chưa cập nhật'}</div>
+                                <c:if test="${not empty app.jobseeker.portfolioUrl}">
+                                    <div class="mb-2"><i class="fab fa-linkedin me-2 text-success"></i><a href="${app.jobseeker.portfolioUrl}" target="_blank" class="text-decoration-none">Portfolio/LinkedIn</a></div>
+                                </c:if>
+                            </div>
+                        </div>
+                        <!-- Main Content -->
+                        <div class="col-lg-8">
+                            <!-- Experience Section -->
+                            <div class="profile-section mb-4">
+                                <div class="section-header d-flex align-items-center" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border-radius: 12px 12px 0 0; padding: 16px 24px;">
+                                    <h6 class="mb-0"><i class="fas fa-briefcase me-2"></i>Kinh nghiệm làm việc</h6>
+                                </div>
+                                <div class="section-body p-3 bg-white rounded-bottom">
+                                    <c:choose>
+                                        <c:when test="${empty app.jobseeker.experiences}">
+                                            <div class="text-center text-muted py-3">Chưa có kinh nghiệm làm việc</div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <c:forEach items="${app.jobseeker.experiences}" var="exp">
+                                                <div class="timeline-item mb-3">
+                                                    <div class="item-header d-flex justify-content-between align-items-start">
+                                                        <div>
+                                                            <div class="item-title fw-bold">${exp.position}</div>
+                                                            <div class="item-company text-success">${exp.companyName}</div>
+                                                            <div class="item-meta text-muted small">
+                                                                <i class="fas fa-map-marker-alt me-1"></i>${exp.location}
+                                                                <span class="mx-2">•</span>
+                                                                <i class="fas fa-calendar me-1"></i>
+                                                                <fmt:formatDate value="${exp.startDate}" pattern="MM/yyyy" /> -
+                                                                <c:choose>
+                                                                    <c:when test="${exp.current}"><span class="badge bg-info text-white">Hiện tại</span></c:when>
+                                                                    <c:otherwise><fmt:formatDate value="${exp.endDate}" pattern="MM/yyyy" /></c:otherwise>
+                                                                </c:choose>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <c:if test="${not empty exp.description}">
+                                                        <div class="item-description mt-2">${exp.description}</div>
+                                                    </c:if>
+                                                    <c:if test="${not empty exp.skillsUsed}">
+                                                        <div class="mt-2">
+                                                            <c:forEach items="${fn:split(exp.skillsUsed, ',')}" var="skill">
+                                                                <span class="badge bg-light text-success border me-1">${fn:trim(skill)}</span>
+                                                            </c:forEach>
+                                                        </div>
+                                                    </c:if>
+                                                </div>
+                                            </c:forEach>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+                            </div>
+                            <!-- Education Section -->
+                            <div class="profile-section mb-4">
+                                <div class="section-header d-flex align-items-center" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border-radius: 12px 12px 0 0; padding: 16px 24px;">
+                                    <h6 class="mb-0"><i class="fas fa-graduation-cap me-2"></i>Học vấn</h6>
+                                </div>
+                                <div class="section-body p-3 bg-white rounded-bottom">
+                                    <c:choose>
+                                        <c:when test="${empty app.jobseeker.educations}">
+                                            <div class="text-center text-muted py-3">Chưa có thông tin học vấn</div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <c:forEach items="${app.jobseeker.educations}" var="edu">
+                                                <div class="timeline-item mb-3">
+                                                    <div class="item-header d-flex justify-content-between align-items-start">
+                                                        <div>
+                                                            <div class="item-title fw-bold">${edu.degree} <c:if test="${not empty edu.fieldOfStudy}">- ${edu.fieldOfStudy}</c:if></div>
+                                                            <div class="item-company text-success">${edu.institutionName}</div>
+                                                            <div class="item-meta text-muted small">
+                                                                <c:if test="${not empty edu.location}"><i class="fas fa-map-marker-alt me-1"></i>${edu.location}<span class="mx-2">•</span></c:if>
+                                                                <i class="fas fa-calendar me-1"></i>
+                                                                <fmt:formatDate value="${edu.startDate}" pattern="MM/yyyy" /> -
+                                                                <c:choose>
+                                                                    <c:when test="${edu.current}"><span class="badge bg-info text-white">Đang học</span></c:when>
+                                                                    <c:otherwise><fmt:formatDate value="${edu.endDate}" pattern="MM/yyyy" /></c:otherwise>
+                                                                </c:choose>
+                                                                <c:if test="${not empty edu.gpa}"><span class="mx-2">•</span><span class="badge bg-warning text-dark">GPA: ${edu.gpa}</span></c:if>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <c:if test="${not empty edu.description}">
+                                                        <div class="item-description mt-2">${edu.description}</div>
+                                                    </c:if>
+                                                    <c:if test="${not empty edu.activities}">
+                                                        <div class="item-description mt-2"><strong>Hoạt động:</strong> ${edu.activities}</div>
+                                                    </c:if>
+                                                </div>
+                                            </c:forEach>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+                            </div>
+                            <!-- Certificates Section -->
+                            <div class="profile-section mb-4">
+                                <div class="section-header d-flex align-items-center" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border-radius: 12px 12px 0 0; padding: 16px 24px;">
+                                    <h6 class="mb-0"><i class="fas fa-certificate me-2"></i>Chứng chỉ</h6>
+                                </div>
+                                <div class="section-body p-3 bg-white rounded-bottom">
+                                    <c:choose>
+                                        <c:when test="${empty app.jobseeker.certificates}">
+                                            <div class="text-center text-muted py-3">Chưa có chứng chỉ nào</div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <c:forEach items="${app.jobseeker.certificates}" var="cert">
+                                                <div class="timeline-item mb-3">
+                                                    <div class="item-header d-flex align-items-start">
+                                                        <c:if test="${not empty cert.imagePath}">
+                                                            <img src="${cert.imagePath}" alt="Certificate" class="me-3 rounded-2 border" style="max-width: 60px; height: 40px; object-fit: cover;">
+                                                        </c:if>
+                                                        <div>
+                                                            <div class="item-title fw-bold">${cert.certificateName}</div>
+                                                            <div class="item-company text-success">${cert.issuingOrganization}</div>
+                                                            <div class="item-meta text-muted small">
+                                                                <i class="fas fa-calendar me-1"></i>
+                                                                <fmt:formatDate value="${cert.issueDate}" pattern="MM/yyyy" />
+                                                                <c:if test="${not empty cert.expiryDate}">- <fmt:formatDate value="${cert.expiryDate}" pattern="MM/yyyy" /></c:if>
+                                                                <c:if test="${not empty cert.credentialId}"><span class="mx-2">•</span>ID: ${cert.credentialId}</c:if>
+                                                            </div>
+                                                            <c:if test="${not empty cert.credentialUrl}">
+                                                                <div class="mt-2"><a href="${cert.credentialUrl}" target="_blank" class="text-success text-decoration-underline"><i class="fas fa-external-link-alt me-1"></i>Xem chứng chỉ</a></div>
+                                                            </c:if>
+                                                        </div>
+                                                    </div>
+                                                    <c:if test="${not empty cert.description}">
+                                                        <div class="item-description mt-2">${cert.description}</div>
+                                                    </c:if>
+                                                </div>
+                                            </c:forEach>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+                            </div>
+                            <!-- Awards Section -->
+                            <div class="profile-section mb-4">
+                                <div class="section-header d-flex align-items-center" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border-radius: 12px 12px 0 0; padding: 16px 24px;">
+                                    <h6 class="mb-0"><i class="fas fa-trophy me-2"></i>Giải thưởng</h6>
+                                </div>
+                                <div class="section-body p-3 bg-white rounded-bottom">
+                                    <c:choose>
+                                        <c:when test="${empty app.jobseeker.awards}">
+                                            <div class="text-center text-muted py-3">Chưa có giải thưởng nào</div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <c:forEach items="${app.jobseeker.awards}" var="award">
+                                                <div class="timeline-item mb-3">
+                                                    <div class="item-header d-flex justify-content-between align-items-start">
+                                                        <div>
+                                                            <div class="item-title fw-bold">${award.awardName}</div>
+                                                            <div class="item-company text-success">${award.issuingOrganization}</div>
+                                                            <div class="item-meta text-muted small">
+                                                                <i class="fas fa-calendar me-1"></i>
+                                                                <fmt:formatDate value="${award.dateReceived}" pattern="MM/yyyy" />
+                                                            </div>
+                                                            <c:if test="${not empty award.certificateUrl}">
+                                                                <div class="mt-2"><a href="${award.certificateUrl}" target="_blank" class="text-success text-decoration-underline"><i class="fas fa-external-link-alt me-1"></i>Xem giải thưởng</a></div>
+                                                            </c:if>
+                                                        </div>
+                                                    </div>
+                                                    <c:if test="${not empty award.description}">
+                                                        <div class="item-description mt-2">${award.description}</div>
+                                                    </c:if>
+                                                </div>
+                                            </c:forEach>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+                            </div>
+                            <!-- CVs Section -->
+                            <div class="profile-section mb-2">
+                                <div class="section-header d-flex align-items-center" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border-radius: 12px 12px 0 0; padding: 16px 24px;">
+                                    <h6 class="mb-0"><i class="fas fa-file-alt me-2"></i>CV đã nộp</h6>
+                                </div>
+                                <div class="section-body p-3 bg-white rounded-bottom">
+                                    <c:choose>
+                                        <c:when test="${empty app.jobseeker.cvTemplates}">
+                                            <div class="text-center text-muted py-3">Chưa có CV nào</div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <div class="row">
+                                                <c:forEach items="${app.jobseeker.cvTemplates}" var="cv">
+                                                    <div class="col-md-6 mb-3">
+                                                        <div class="card border">
+                                                            <div class="card-body">
+                                                                <h6 class="card-title mb-1">${cv.jobPosition}</h6>
+                                                                <p class="text-muted mb-1"><i class="fas fa-user me-1"></i>${cv.fullName}</p>
+                                                                <p class="text-muted small mb-2"><i class="fas fa-envelope me-1"></i>${cv.email}</p>
+                                                                <div class="d-flex justify-content-between text-muted small">
+                                                                    <span><i class="fas fa-calendar me-1"></i><fmt:formatDate value="${cv.createdAt}" pattern="dd/MM/yyyy" /></span>
+                                                                    <c:if test="${not empty cv.pdfFilePath}"><span class="text-success"><i class="fas fa-file-pdf me-1"></i>PDF</span></c:if>
+                                                                </div>
+                                                            </div>
+                                                            <div class="card-footer bg-light p-2">
+                                                                <div class="d-flex gap-1">
+                                                                    <c:if test="${not empty cv.pdfFilePath}">
+                                                                        <a href="${cv.pdfFilePath}" target="_blank" class="btn btn-sm btn-outline-success flex-fill"><i class="fas fa-download"></i> Tải xuống</a>
+                                                                    </c:if>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </c:forEach>
+                                            </div>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <hr>
-                    <div class="action-section text-center p-3">
-                        <a id="modal-download-cv-btn" href="#" class="btn btn-success me-2" target="_blank" style="display: none;">
-                            <i class="fas fa-download me-2"></i> Tải CV
-                        </a>
-                    </div>
-                    <!-- Removed update-status-section and related form/button as per requirements -->
                 </div>
             </div>
         </div>
     </div>
+    </c:forEach>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -530,25 +737,30 @@
         }
 
         document.addEventListener("DOMContentLoaded", function () {
-            const candidateModal = document.getElementById('candidateModal');
-            if (!candidateModal) return;
-
-            const modalInstance = new bootstrap.Modal(candidateModal);
-            const modalFullName = document.getElementById('modal-candidate-name');
-            const modalEmail = document.getElementById('modal-candidate-email');
-            const modalPhone = document.getElementById('modal-candidate-phone');
-            const modalAvatar = document.getElementById('modal-candidate-avatar');
-            const modalDownloadCvBtn = document.getElementById('modal-download-cv-btn');
+            // Removed candidateModalInstance and modalInstance logic
+            // Removed modalFullName, modalEmail, modalPhone, modalAvatar, modalDownloadCvBtn logic
             // Removed statusSelectModal and updateStatusForm logic
 
             // Handle modal open - populate with candidate data
             document.querySelectorAll('.view-candidate-btn').forEach(button => {
                 button.addEventListener('click', function () {
+                    const appId = this.dataset.applicationId;
+                    const modal = document.getElementById(`candidateModal-${appId}`);
+                    if (!modal) return;
+
+                    const modalInstance = new bootstrap.Modal(modal);
+                    const modalFullName = document.getElementById(`modal-candidate-name-${appId}`);
+                    const modalEmail = document.getElementById(`modal-candidate-email-${appId}`);
+                    const modalPhone = document.getElementById(`modal-candidate-phone-${appId}`);
+                    const modalAvatar = document.getElementById(`modal-candidate-avatar-${appId}`);
+                    const modalDownloadCvBtn = document.getElementById(`modal-download-cv-btn-${appId}`);
+
                     // Populate modal with candidate info
                     modalFullName.textContent = this.dataset.fullname || 'N/A';
                     modalEmail.textContent = this.dataset.email || 'N/A';
                     modalPhone.textContent = this.dataset.phone || 'N/A';
                     modalAvatar.src = this.dataset.avatar || 'assets/img/icon/user-default.png';
+
                     // Handle CV download
                     const cvUrl = this.dataset.cvUrl;
                     if (cvUrl && cvUrl !== 'null' && cvUrl !== '') {
