@@ -129,4 +129,9 @@
         <error-code>500</error-code>
         <location>/error.jsp</location>
     </error-page>
+
+    <!-- Application Startup Listener -->
+    <listener>
+        <listener-class>listeners.ApplicationStartupListener</listener-class>
+    </listener>
 </web-app>

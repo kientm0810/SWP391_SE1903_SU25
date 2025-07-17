@@ -265,7 +265,7 @@
                                     </c:forEach>
                                 </select>
                                 <div class="text-center mt-3">
-                                    hoặc <a href="${pageContext.request.contextPath}/create_cv.jsp" target="_blank" class="create-cv-link">Tạo CV mới</a>
+                                    hoặc <a href="${pageContext.request.contextPath}/cv_upload.jsp" target="_blank" class="create-cv-link">Tạo CV mới</a>
                                 </div>
                             </div>
                         </c:when>
@@ -274,7 +274,7 @@
                                 <div class="alert-icon"><i class="fas fa-file-excel"></i></div>
                                 <h5 class="fw-bold">Bạn chưa có CV nào</h5>
                                 <p class="mb-0">Vui lòng tạo một CV để ứng tuyển.</p>
-                                <a href="${pageContext.request.contextPath}/create_cv.jsp" target="_blank" class="btn btn-primary mt-3">
+                                <a href="${pageContext.request.contextPath}/cv_upload.jsp" target="_blank" class="btn btn-primary mt-3">
                                     <i class="fas fa-plus me-2"></i>Tạo CV mới
                                 </a>
                             </div>

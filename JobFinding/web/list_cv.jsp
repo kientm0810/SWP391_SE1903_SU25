@@ -29,7 +29,7 @@
         </c:if>
         <div class="d-flex justify-content-between mb-3">
             <div>
-                <a href="create_cv" class="btn btn-primary">Create New CV</a>
+                <a href="cv_upload.jsp" class="btn btn-primary">Create New CV</a>
                 <a href="home" class="btn btn-secondary">Back</a>
             </div>
             <form action="list_cv" method="get" class="search-form">
@@ -63,7 +63,7 @@
         </c:if>
         <c:if test="${empty cvs}">
             <div class="alert alert-info">
-                <p>No CVs found. <a href="create_cv" class="alert-link">Create your first CV now!</a></p>
+                <p>No CVs found. <a href="cv_upload.jsp" class="alert-link">Create your first CV now!</a></p>
             </div>
         </c:if>
     </div>

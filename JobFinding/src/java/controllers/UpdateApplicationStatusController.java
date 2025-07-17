@@ -10,16 +10,20 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import models.Application;
 import models.Recruiter;
+import utils.EmailService;
 
 @WebServlet(name = "UpdateApplicationStatusController", urlPatterns = {"/update-application-status"})
 public class UpdateApplicationStatusController extends HttpServlet {
 
     private ApplicationDAO applicationDAO;
+    private EmailService emailService;
 
     @Override
     public void init() throws ServletException {
         applicationDAO = new ApplicationDAO();
+        emailService = new EmailService();
     }
 
     @Override
@@ -36,6 +40,8 @@ public class UpdateApplicationStatusController extends HttpServlet {
         String applicationIdStr = request.getParameter("applicationId");
         String status = request.getParameter("status");
         String action = request.getParameter("action");
+        String rejectionReason = request.getParameter("rejectionReason");
+        String offerDetails = request.getParameter("offerDetails");
         
         // Simple validation
         if (applicationIdStr == null || applicationIdStr.trim().isEmpty()) {
@@ -62,15 +68,96 @@ public class UpdateApplicationStatusController extends HttpServlet {
         
         if (!isValidStatus) {
             session.setAttribute("error", "Trạng thái không hợp lệ.");
-            response.sendRedirect("recruiter-applications");
+            response.sendRedirect("applications");
+            return;
+        }
+        
+        // Validate required fields for specific statuses
+        if ("rejected".equals(status.trim()) && (rejectionReason == null || rejectionReason.trim().isEmpty())) {
+            session.setAttribute("error", "Vui lòng nhập lý do từ chối.");
+            response.sendRedirect("applications");
+            return;
+        }
+        
+        if ("offered".equals(status.trim()) && (offerDetails == null || offerDetails.trim().isEmpty())) {
+            session.setAttribute("error", "Vui lòng nhập chi tiết đề nghị.");
+            response.sendRedirect("applications");
             return;
         }
         
         try {
             int applicationId = Integer.parseInt(applicationIdStr.trim());
+            
+            // Get application details before updating
+            Application application = applicationDAO.getApplicationById(applicationId, recruiter.getId());
+            if (application == null) {
+                session.setAttribute("error", "Không tìm thấy đơn ứng tuyển hoặc bạn không có quyền.");
+                response.sendRedirect("applications");
+                return;
+            }
+            
+            // Update application status
             boolean updated = applicationDAO.updateApplicationStatus(applicationId, status.trim(), recruiter.getId());
             
             if (updated) {
+                // Send email notification based on status
+                boolean emailSent = false;
+                String emailMessage = "";
+                
+                switch (status.trim()) {
+                    case "reviewed":
+                        emailSent = emailService.sendApplicationReviewedEmailByEmail(
+                            application.getJobseeker().getEmail(),
+                            application.getJobseeker().getFullName(),
+                            application.getPost().getTitle(),
+                            application.getPost().getCompanyName(),
+                            applicationId
+                        );
+                        emailMessage = "Email thông báo đã xem hồ sơ đã được gửi.";
+                        break;
+                        
+                    case "interviewed":
+                        emailSent = emailService.sendInterviewCompletedEmailByEmail(
+                            application.getJobseeker().getEmail(),
+                            application.getJobseeker().getFullName(),
+                            application.getPost().getTitle(),
+                            application.getPost().getCompanyName(),
+                            applicationId
+                        );
+                        emailMessage = "Email cảm ơn tham gia phỏng vấn đã được gửi.";
+                        break;
+                        
+                    case "rejected":
+                        emailSent = emailService.sendRejectionEmailByEmail(
+                            application.getJobseeker().getEmail(),
+                            application.getJobseeker().getFullName(),
+                            application.getPost().getTitle(),
+                            application.getPost().getCompanyName(),
+                            rejectionReason,
+                            applicationId
+                        );
+                        emailMessage = "Email từ chối đã được gửi.";
+                        break;
+                        
+                    case "offered":
+                        emailSent = emailService.sendAcceptanceEmailByEmail(
+                            application.getJobseeker().getEmail(),
+                            application.getJobseeker().getFullName(),
+                            application.getPost().getTitle(),
+                            application.getPost().getCompanyName(),
+                            offerDetails,
+                            applicationId
+                        );
+                        emailMessage = "Email chấp nhận đã được gửi.";
+                        break;
+                        
+                    default:
+                        // For "new" status, no email is sent
+                        emailSent = false;
+                        emailMessage = "";
+                        break;
+                }
+                
                 // Create status display mapping
                 String statusDisplay = "";
                 switch (status.trim()) {
@@ -82,7 +169,13 @@ public class UpdateApplicationStatusController extends HttpServlet {
                     default: statusDisplay = status;
                 }
                 
-                session.setAttribute("success", "Đã cập nhật trạng thái thành \"" + statusDisplay + "\" thành công!");
+                String successMessage = "Đã cập nhật trạng thái thành \"" + statusDisplay + "\" thành công!";
+                if (emailSent && !emailMessage.isEmpty()) {
+                    successMessage += " " + emailMessage;
+                    session.setAttribute("emailSent", true);
+                }
+                
+                session.setAttribute("success", successMessage);
             } else {
                 session.setAttribute("error", "Không thể cập nhật trạng thái. Ứng tuyển không tồn tại hoặc bạn không có quyền.");
             }
@@ -94,6 +187,6 @@ public class UpdateApplicationStatusController extends HttpServlet {
         }
         
         // Redirect back to applications page
-        response.sendRedirect("recruiter-applications");
+        response.sendRedirect("applications");
     }
 } 

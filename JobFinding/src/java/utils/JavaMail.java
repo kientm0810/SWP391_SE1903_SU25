@@ -27,7 +27,7 @@ public final class JavaMail {
 
     private static Session getMailSession() {
         final String username = Constants.EMAIL_USERNAME;
-        final String password = Constants.EMAIL_PASSWWORD;
+        final String password = Constants.EMAIL_PASSWORD;
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -101,6 +101,25 @@ public final class JavaMail {
             return true;
         } catch (MessagingException e) {
             LOGGER.log(Level.SEVERE, "Failed to send notification email to " + to, e);
+            return false;
+        }
+    }
+
+    /**
+     * Gửi email với subject và content tùy chỉnh
+     */
+    public static boolean sendEmail(String to, String subject, String htmlContent) {
+        try {
+            MimeMessage message = new MimeMessage(getMailSession());
+            message.setFrom(new InternetAddress(Constants.EMAIL_FROM));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+            message.setSubject(subject, "UTF-8");
+            
+            message.setContent(htmlContent, "text/html; charset=UTF-8");
+            Transport.send(message);
+            return true;
+        } catch (MessagingException e) {
+            LOGGER.log(Level.SEVERE, "Failed to send email to " + to, e);
             return false;
         }
     }

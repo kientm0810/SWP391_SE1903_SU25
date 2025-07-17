@@ -26,6 +26,8 @@
                                 <i class="fas fa-briefcase"></i> Jobs
                             </a>
                         </li>
+                      
+                        
                         <!-- Applications Menu for logged in users -->
                         <c:if test="${not empty sessionScope.user and (sessionScope.role == 'job-seeker' or sessionScope.role == 'recruiter')}">
                             <li class="nav-item">
@@ -165,6 +167,7 @@
                                         <c:if test="${sessionScope.role == 'recruiter'}">
                                             <li><a class="dropdown-item" href="recruiter-profile"><i class="fas fa-user"></i> My Profile</a></li>
                                             <li><a class="dropdown-item" href="post?view=my-post"><i class="fas fa-file-alt"></i> My Posts</a></li>
+                                            <li><a class="dropdown-item" href="saved-jobs"><i class="fas fa-heart"></i> Saved Jobs</a></li>
                                             <li><a class="dropdown-item" href="recruitment_dashboard.jsp"><i class="fas fa-tachometer-alt"></i> Dashboard Control</a></li>
                                         </c:if>
 

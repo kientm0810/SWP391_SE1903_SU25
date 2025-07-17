@@ -9,9 +9,9 @@ import java.util.List;
 
 import context.DBContext;
 import models.Application;
+import models.CVTemplate;
 import models.JobSeeker;
 import models.Posts;
-import models.CVTemplate;
 
 public class ApplicationDAO extends DBContext {
     
@@ -98,6 +98,7 @@ public class ApplicationDAO extends DBContext {
                 app.setApplicationId(rs.getInt("id"));
                 app.setStatus(rs.getString("status"));
                 app.setCreatedAt(rs.getTimestamp("applied_at"));
+                app.setCvFile(rs.getString("cv_file"));
                 
                 Posts post = new Posts();
                 post.setId(rs.getInt("post_id"));
@@ -304,7 +305,7 @@ public class ApplicationDAO extends DBContext {
     public List<Application> getApplicationsByRecruiter(int recruiterId, int page, int pageSize, String status, String keyword, String sortBy) throws SQLException {
         List<Application> applications = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT a.id as application_id, a.status, a.applied_at, a.cv_file, ")
-                .append("p.id as post_id, p.title, ")
+                .append("p.id as post_id, p.title, p.company_name, ")
                 .append("js.id as job_seeker_id, js.full_name as job_seeker_name, js.email as job_seeker_email, js.phone as job_seeker_phone ")
                 .append("FROM Applications a ")
                 .append("JOIN Posts p ON a.job_listing_id = p.id ")
@@ -347,6 +348,7 @@ public class ApplicationDAO extends DBContext {
                 Posts post = new Posts();
                 post.setId(rs.getInt("post_id"));
                 post.setTitle(rs.getString("title"));
+                post.setCompanyName(rs.getString("company_name"));
                 app.setPost(post);
 
                 JobSeeker jobSeeker = new JobSeeker();

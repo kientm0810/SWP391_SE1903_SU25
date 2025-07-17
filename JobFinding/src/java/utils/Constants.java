@@ -121,7 +121,7 @@ public final class Constants {
     public static final int SMTP_PORT = 587;
     public static final String EMAIL_FROM = "longrpk200313@gmail.com";
     public static final String EMAIL_USERNAME = "longrpk200313@gmail.com";
-    public static final String EMAIL_PASSWWORD = "gphi fyvo kxdf pgfr";
+    public static final String EMAIL_PASSWORD = "gphi fyvo kxdf pgfr";
     
     // Security Constants
     public static final int PASSWORD_MIN_LENGTH = 8;

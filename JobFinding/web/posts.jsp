@@ -44,7 +44,8 @@
                         </c:choose>
                     </c:if>
                     <c:if test="${sessionScope.role == 'recruiter'}">
-                        <button class="btn btn-primary" onclick="window.location.href = 'create-post.jsp'">+ Đăng
+                        <button class="btn btn-primary" onclick="window.location.href = 'create-post.jsp'">+
+                            Đăng
                             tin mới</button>
                         </c:if>
                 </div>
@@ -201,7 +202,8 @@
                         </c:otherwise>
                     </c:choose>
                     <c:if test="${sessionScope.role == 'recruiter'}">
-                        <button class="btn btn-primary" onclick="window.location.href = 'create-post.jsp'">+ Đăng
+                        <button class="btn btn-primary" onclick="window.location.href = 'create-post.jsp'">+
+                            Đăng
                             tin mới</button>
                         </c:if>
                 </div>
@@ -222,8 +224,10 @@
                 <c:remove var="notification" scope="session" />
             </c:if>
         </div>
+        <jsp:include page="footer.jsp" />
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     </body>
 
 </html>
