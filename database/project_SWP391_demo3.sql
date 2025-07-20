@@ -179,7 +179,7 @@ CREATE TABLE Financial_Transactions (
     recruiter_id INT NOT NULL,
     promotion_id INT NULL,
     type VARCHAR(10) NOT NULL CHECK (type IN ('income', 'expense')),
-    transaction_type VARCHAR(20) NOT NULL CHECK (transaction_type IN ('featured_job', 'advertising', 'subscription', 'cv_service', 'checkout', 'other')),
+    transaction_type VARCHAR(20) NOT NULL CHECK (transaction_type IN ('featured_job', 'advertising', 'subscription', 'cv_service', 'checkout', 'other', 'registration')),
     amount DECIMAL(12, 2) NOT NULL,
     description NTEXT,
     status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'failed')),
@@ -455,14 +455,6 @@ ADD transaction_id INT NULL;
 -- Add foreign key constraint
 ALTER TABLE Featured_Jobs
 ADD CONSTRAINT fk_featured_jobs_transaction FOREIGN KEY (transaction_id) REFERENCES Financial_Transactions(id);
-
--- 4. Update Financial_Transactions constraint to include new transaction types
-ALTER TABLE Financial_Transactions
-DROP CONSTRAINT CK__Financial__trans__5F7E2DAC; -- Drop existing constraint if exists
-
-ALTER TABLE Financial_Transactions
-ADD CONSTRAINT CK_Financial_Transactions_transaction_type 
-CHECK (transaction_type IN ('normal', 'featured', 'premium', 'registration', 'cv_service', 'advertising', 'subscription', 'checkout', 'other'));
 
 -- 5. Add post_type to Job_Listings table
 ALTER TABLE Job_Listings
