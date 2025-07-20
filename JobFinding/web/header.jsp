@@ -26,6 +26,22 @@
                                 <i class="fas fa-briefcase"></i> Jobs
                             </a>
                         </li>
+                        <!-- Applications Menu for logged in users -->
+                        <c:if test="${not empty sessionScope.user and (sessionScope.role == 'job-seeker' or sessionScope.role == 'recruiter')}">
+                            <li class="nav-item">
+                                <a class="nav-link" href="applications">
+                                    <i class="fas fa-file-text"></i> Applications
+                                </a>
+                            </li>
+                        </c:if>
+                        <!-- CV Management for job seekers -->
+                        <c:if test="${not empty sessionScope.user and sessionScope.role == 'job-seeker'}">
+                            <li class="nav-item">
+                                <a class="nav-link" href="list_cv">
+                                    <i class="fas fa-file-alt"></i> CV Management
+                                </a>
+                            </li>
+                        </c:if>
                         <li class="nav-item">
                             <a class="nav-link" href="blog.jsp">
                                 <i class="fas fa-blog"></i> Blog
@@ -147,43 +163,25 @@
                                         ${sessionScope.user.fullName}
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                        <li>
-                                            <a class="dropdown-item" href="profile">
-                                                <i class="fas fa-user"></i> My Profile
-                                            </a>
-                                        </li>
-                                        <c:if test="${sessionScope.role == 'recruiter'}">
-                                            <li>
-                                                <a class="dropdown-item" href="post">
-                                                    <i class="fas fa-file-alt"></i> My Posts
-                                                </a>
-                                            </li>
+                                        
+                                        <c:if test="${sessionScope.role == 'job-seeker'}">
+                                            <li><a class="dropdown-item" href="profile"><i class="fas fa-user"></i> My Profile</a></li>
+                                            <li><a class="dropdown-item" href="list_cv"><i class="fas fa-file-alt"></i> My CVs</a></li>
+                                            <li><a class="dropdown-item" href="saved-jobs"><i class="fas fa-heart"></i> Saved Jobs</a></li>
                                         </c:if>
-                                        <li>
-                                            <a class="dropdown-item" href="list_cv">
-                                                <i class="fas fa-user"></i> My CV
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="my-posts">
-                                                <i class="fas fa-file-alt"></i> My Posts
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="saved-jobs">
-                                                <i class="fas fa-heart"></i> Saved Jobs
-                                            </a>
-                                        </li>
+
                                         <c:if test="${sessionScope.role == 'recruiter'}">
-                                            <li>
-                                                <a class="dropdown-item" href="recruitment_dashboard.jsp">
-                                                    <i class="fas fa-tachometer-alt"></i> DashBoard Control
-                                                </a>
-                                            </li>
+                                            <li><a class="dropdown-item" href="recruiter-profile"><i class="fas fa-user"></i> My Profile</a></li>
+                                            <li><a class="dropdown-item" href="post?view=my-post"><i class="fas fa-file-alt"></i> My Posts</a></li>
+                                            <li><a class="dropdown-item" href="recruitment_dashboard.jsp"><i class="fas fa-tachometer-alt"></i> Dashboard Control</a></li>
                                         </c:if>
-                                        <li>
-                                            <hr class="dropdown-divider">
-                                        </li>
+
+                                        <c:if test="${sessionScope.role == 'admin'}">
+                                            <li><a class="dropdown-item" href="admin"><i class="fas fa-user"></i> My Profile</a></li>
+                                            <li><a class="dropdown-item" href="admin_dashboard.jsp"><i class="fas fa-tools"></i> Admin Dashboard</a></li>
+                                        </c:if>
+
+                                        <li><hr class="dropdown-divider"></li>
                                         <li>
                                             <a class="dropdown-item text-danger" href="logout">
                                                 <i class="fas fa-sign-out-alt"></i> Logout

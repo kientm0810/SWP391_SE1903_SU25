@@ -8,11 +8,13 @@ package daos;
  *
  * @author thaison
  */
-import context.DBContext;
-import java.sql.*;
-import models.Recruiter;
-import context.DBContext;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Vector;
+
+import context.DBContext;
+import models.Recruiter;
 
 public class RecruiterDAO extends DBContext {
 
@@ -558,5 +560,81 @@ public class RecruiterDAO extends DBContext {
         return result;
     }
 
+    public Recruiter getRecruiterById(int recruiterId) throws SQLException {
+        String sql = "SELECT * FROM [project_SWP391].[dbo].[Recruiter] WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, recruiterId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToRecruiter(rs);
+                }
+            }
+        }
+        return null;
+    }
+
+    public String getRecruiterEmail(int recruiterId) throws SQLException {
+        String sql = "SELECT email FROM Recruiters WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, recruiterId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("email");
+                }
+            }
+        }
+        return null;
+    }
+
+    public boolean getVerificationStatus(int recruiterId) throws SQLException {
+        String sql = "SELECT is_verified FROM Recruiters WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, recruiterId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBoolean("is_verified");
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean updateRecruiter(Recruiter recruiter) throws SQLException {
+        String sql = "UPDATE [project_SWP391].[dbo].[Recruiter] SET " +
+                     "full_name = ?, phone = ?, date_of_birth = ?, gender = ?, address = ?, " +
+                     "profile_picture = ?, company_name = ?, company_description = ?, logo = ?, " +
+                     "website = ?, company_address = ?, company_size = ?, industry = ?, updated_at = GETDATE() " +
+                     "WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, recruiter.getFullName());
+            ps.setString(2, recruiter.getPhone());
+            if (recruiter.getDateOfBirth() != null) {
+                ps.setDate(3, new java.sql.Date(recruiter.getDateOfBirth().getTime()));
+            } else {
+                ps.setNull(3, java.sql.Types.DATE);
+            }
+            ps.setString(4, recruiter.getGender());
+            ps.setString(5, recruiter.getAddress());
+            ps.setString(6, recruiter.getProfilePicture());
+            ps.setString(7, recruiter.getCompanyName());
+            ps.setString(8, recruiter.getCompanyDescription());
+            ps.setString(9, recruiter.getLogo());
+            ps.setString(10, recruiter.getWebsite());
+            ps.setString(11, recruiter.getCompanyAddress());
+            ps.setString(12, recruiter.getCompanySize());
+            ps.setString(13, recruiter.getIndustry());
+            ps.setInt(14, recruiter.getId());
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    public boolean updateRecruiterVerification(int recruiterId, boolean isVerified) throws SQLException {
+        String sql = "UPDATE [project_SWP391].[dbo].[Recruiter] SET is_verified = ? WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setBoolean(1, isVerified);
+            ps.setInt(2, recruiterId);
+            return ps.executeUpdate() > 0;
+        }
+    }
 
 }

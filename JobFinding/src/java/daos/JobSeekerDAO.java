@@ -427,4 +427,19 @@ public class JobSeekerDAO extends DBContext {
         }
     }
 
+    // Add this method to update contact info for a job seeker
+    public boolean updateContactInfo(JobSeeker jobSeeker) {
+        String sql = "UPDATE [project_SWP391].[dbo].[Job_Seekers] SET full_name = ?, email = ?, phone = ?, address = ?, updated_at = GETDATE() WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, jobSeeker.getFullName());
+            ps.setString(2, jobSeeker.getEmail());
+            ps.setString(3, jobSeeker.getPhone());
+            ps.setString(4, jobSeeker.getAddress());
+            ps.setInt(5, jobSeeker.getId());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

@@ -1,12 +1,12 @@
 package daos;
 
-import context.DBContext;
-import models.Banner;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
+
+import context.DBContext;
+import models.Banner;
 
 public class BannerDAO extends DBContext {
 
@@ -178,6 +178,21 @@ public class BannerDAO extends DBContext {
             ps.setString(1, "%" + title + "%");
             ps.setInt(2, start);
             ps.setInt(3, recordsPerPage);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                banners.add(mapResultSetToBanner(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return banners;
+    }
+
+    public Vector<Banner> getTopBanners(int limit) {
+        Vector<Banner> banners = new Vector<>();
+        // Build dynamic SQL with TOP clause because SQL Server does not allow binding TOP with a parameter
+        String sql = "SELECT TOP " + limit + " * FROM [project_SWP391].[dbo].[Banner] WHERE is_active = 1 ORDER BY position ASC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 banners.add(mapResultSetToBanner(rs));

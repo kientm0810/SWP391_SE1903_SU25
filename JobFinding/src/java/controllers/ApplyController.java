@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import daos.ApplicationDAO;
 import daos.JobDAO;
 import daos.RecruitmentProcessDAO;
+import daos.PostsDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,68 +17,118 @@ import models.Application;
 import models.JobListing;
 import models.JobSeeker;
 import models.RecruitmentProcess;
+import models.Posts;
+import models.CVTemplate;
+import daos.CVTemplateDAO;
+import java.util.List;
 
 @WebServlet(name = "ApplyController", urlPatterns = {"/apply"})
 public class ApplyController extends HttpServlet {
     private ApplicationDAO applicationDAO;
     private RecruitmentProcessDAO recruitmentProcessDAO;
     private JobDAO jobDAO;
+    private PostsDAO postsDAO;
+    private CVTemplateDAO cvTemplateDAO;
 
     @Override
     public void init() throws ServletException {
         applicationDAO = new ApplicationDAO();
         recruitmentProcessDAO = new RecruitmentProcessDAO();
         jobDAO = new JobDAO();
+        postsDAO = new PostsDAO();
+        cvTemplateDAO = new CVTemplateDAO();
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            HttpSession session = request.getSession(false);
+            if (session == null || session.getAttribute("user") == null || !"job-seeker".equals(session.getAttribute("role"))) {
+                response.sendRedirect(request.getContextPath() + "/login.jsp");
+                return;
+            }
+
+            JobSeeker jobSeeker = (JobSeeker) session.getAttribute("user");
+            String postIdStr = request.getParameter("id");
+            if (postIdStr == null) {
+                response.sendRedirect(request.getContextPath() + "/home");
+                return;
+            }
+            int postId = Integer.parseInt(postIdStr);
+
+            Posts post = postsDAO.getPostById(postId);
+            List<CVTemplate> cvList = cvTemplateDAO.getCVsByJobSeeker(jobSeeker.getId());
+
+            if (post == null) {
+                // Handle post not found
+                response.sendRedirect(request.getContextPath() + "/home?error=post_not_found");
+                return;
+            }
+
+            request.setAttribute("post", post);
+            request.setAttribute("cvList", cvList);
+            request.getRequestDispatcher("/apply-job.jsp").forward(request, response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Handle exceptions, maybe redirect to an error page
+            response.sendRedirect(request.getContextPath() + "/home?error=server_error");
+        }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
         try {
-            HttpSession session = request.getSession();
-            JobSeeker jobSeeker = (JobSeeker) session.getAttribute("user");
-            if (jobSeeker == null) {
-                response.sendRedirect("login.jsp");
+            HttpSession session = request.getSession(false);
+            if (session == null || session.getAttribute("user") == null || !"job-seeker".equals(session.getAttribute("role"))) {
+                response.sendRedirect(request.getContextPath() + "/login.jsp");
                 return;
             }
-            int postId = Integer.parseInt(request.getParameter("id"));
-            String cvFile = request.getParameter("cvFile");
-            String coverLetter = request.getParameter("coverLetter");
 
-            // 1. Lưu vào bảng Applications
-            Application app = new Application();
-            app.setJobseeker(jobSeeker);
-            JobListing job = new JobListing();
-            job.setId(postId);
-            app.setJob(job);
-            app.setCvFile(cvFile);
-            app.setCoverLetter(coverLetter);
-            app.setStatus("new");
-            int applicationId = applicationDAO.insertApplication(app);
+            JobSeeker jobSeeker = (JobSeeker) session.getAttribute("user");
+            int postId = Integer.parseInt(request.getParameter("postId"));
+            int cvId = Integer.parseInt(request.getParameter("cvId"));
 
-            // 2. Lưu vào quy trình tuyển dụng của recruiter
-            JobListing jobFull = jobDAO.getJobListingById(postId);
-            // Giả sử recruiterId lấy từ jobFull (nếu có recruiterId trong JobListing)
-            int recruiterId = -1;
-            if (jobFull != null && jobFull.getRecruiterName() != null) {
-                // Nếu có recruiterId thì lấy, nếu không thì cần sửa JobListing để có recruiterId
-                // recruiterId = jobFull.getRecruiterId();
+            // Lấy thông tin bài đăng để có recruiterId
+            Posts post = postsDAO.getPostById(postId);
+            if (post == null) {
+                throw new Exception("Post not found with id: " + postId);
             }
-            RecruitmentProcess process = new RecruitmentProcess();
-            process.setApplicationId(applicationId);
-            process.setCurrentStage("initial_screening");
-            process.setStatus("in_progress");
-            process.setCreatedAt(new Timestamp(System.currentTimeMillis()));
-            process.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
-            process.setAssignedRecruiterId(recruiterId);
-            process.setNotes("Ứng viên vừa ứng tuyển");
-            recruitmentProcessDAO.insert(process);
+            int recruiterId = post.getUserId();
 
-            // 3. Chuyển hướng về trang xác nhận hoặc danh sách việc làm đã ứng tuyển
-            response.sendRedirect("applications.jsp?success=1");
+            // Tạo đối tượng Application
+            Application application = new Application();
+            application.setJobSeekerId(jobSeeker.getId());
+            application.setPostId(postId);
+            application.setCvId(cvId);
+            application.setStatus("new"); // Trạng thái ban đầu
+
+            // Lưu application và tạo process, gán cho đúng recruiter
+            // Giả sử hrId được gán mặc định là 0 hoặc một giá trị nào đó
+            boolean success = applicationDAO.saveApplicationAndCreateProcess(application, recruiterId, 0);
+
+            if (success) {
+                response.sendRedirect(request.getContextPath() + "/applications?applySuccess=true");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/post/view?id=" + postId + "&applyError=true");
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/home?error=invalid_id");
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("apply-job.jsp?error=1");
+            // Gửi lỗi về trang apply hoặc trang chi tiết bài đăng
+            String postIdParam = request.getParameter("postId");
+            if (postIdParam != null && !postIdParam.isEmpty()) {
+                response.sendRedirect(request.getContextPath() + "/post/view?id=" + postIdParam + "&applyError=true");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/home?error=unknown");
+            }
         }
     }
 } 

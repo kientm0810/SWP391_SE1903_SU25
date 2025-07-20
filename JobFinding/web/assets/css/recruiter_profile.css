@@ -1,0 +1,33 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border-radius: 0.5rem;
+    border: none;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.rounded-circle {
+    border: 3px solid #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.job-listings .single-job-items {
+    border: 1px solid #e0e0e0;
+    padding: 20px;
+    border-radius: 8px;
+    transition: all .3s ease;
+}
+
+.job-listings .single-job-items:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border-color: #007bff;
+}
+.list-group-item{
+    padding-left: 0;
+}

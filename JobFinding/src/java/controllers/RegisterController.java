@@ -5,17 +5,19 @@
 
 package controllers;
 
-import daos.UserDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+
+import daos.UserDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.text.SimpleDateFormat;
 import models.JobSeeker;
 import models.Recruiter;
+import utils.PasswordUtils;
 
 
 /**
@@ -86,6 +88,13 @@ public class RegisterController extends HttpServlet {
         String gender = req.getParameter("gender");
         String address = req.getParameter("address");
 
+        // Map gender to English values
+        if ("nam".equalsIgnoreCase(gender)) {
+            gender = "male";
+        } else if ("nữ".equalsIgnoreCase(gender)) {
+            gender = "female";
+        }
+
         UserDAO dao = new UserDAO();
 
         if (dao.isUsernameTaken(username)) {
@@ -104,7 +113,7 @@ public class RegisterController extends HttpServlet {
                 // Register as job seeker
                 JobSeeker jobSeeker = new JobSeeker();
                 jobSeeker.setUsername(username);
-                jobSeeker.setPassword(password);
+                jobSeeker.setPassword(PasswordUtils.hashPassword(password));
                 jobSeeker.setEmail(email);
                 jobSeeker.setFullName(fullName);
                 jobSeeker.setPhone(phone);
@@ -128,7 +137,7 @@ public class RegisterController extends HttpServlet {
                 // Register as recruiter
                 Recruiter recruiter = new Recruiter();
                 recruiter.setUsername(username);
-                recruiter.setPassword(password);
+                recruiter.setPassword(PasswordUtils.hashPassword(password));
                 recruiter.setEmail(email);
                 recruiter.setFullName(fullName);
                 recruiter.setPhone(phone);

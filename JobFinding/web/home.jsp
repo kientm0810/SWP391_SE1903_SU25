@@ -3,6 +3,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!doctype html>
 <html class="no-js" lang="zxx">
 
@@ -58,65 +59,59 @@
         <%@ include file="header.jsp" %>
         <main>
 
+            <!-- Resolve banner images from DB or fallback -->
+            <c:choose>
+                <c:when test="${not empty banners}">
+                    <c:set var="banner1" value="${banners[0].image_url}" />
+                </c:when>
+                <c:otherwise>
+                    <c:set var="banner1" value="assets/img/hero/h1_hero.jpg" />
+                </c:otherwise>
+            </c:choose>
+
+            <c:choose>
+                <c:when test="${not empty banners and fn:length(banners) >= 2}">
+                    <c:set var="banner2" value="${banners[1].image_url}" />
+                </c:when>
+                <c:otherwise>
+                    <c:set var="banner2" value="assets/img/gallery/cv_bg.jpg" />
+                </c:otherwise>
+            </c:choose>
+
             <!-- slider Area Start-->
             <div class="slider-area ">
                 <!-- Mobile Menu -->
                 <div class="slider-active">
                     <div class="single-slider slider-height d-flex align-items-center"
-                         data-background="assets/img/hero/h1_hero.jpg">
+                         data-background="${banner1}">
                         <div class="container">
                             <div class="row">
                                 <div class="col-xl-6 col-lg-9 col-md-10">
-                                    <div class="hero__caption">
-                                        <h1>Find the most exciting startup jobs</h1>
-                                    </div>
                                 </div>
                             </div>
                             <!-- Search Box -->
                             <div class="row">
                                 <div class="col-xl-8">
                                     <!-- form -->
-                                    <form action="home" class="search-box">
+                                    <form action="${pageContext.request.contextPath}/post" method="GET" class="search-box">
                                         <div class="input-form">
                                             <input type="text" name="keyword"
-                                                   placeholder="Job Tittle or keyword"
-                                                   value="${keyword != null ? keyword : ''}">
+                                                   placeholder="Tìm kiếm theo tiêu đề, công ty..."
+                                                   value="${param.keyword}">
                                         </div>
                                         <div class="select-form">
                                             <div class="select-itms">
                                                 <select name="location" id="select1">
-                                                    <option value="">Location BD</option>
-                                                    <option value="Hà Nội" ${location=='Hà Nội'
-                                                                             ? 'selected' : '' }>Hà Nội</option>
-                                                    <option value="Hồ Chí Minh"
-                                                            ${location=='Hồ Chí Minh' ? 'selected' : '' }>Hồ
-                                                        Chí Minh</option>
-                                                    <option value="Đà Nẵng" ${location=='Đà Nẵng'
-                                                                              ? 'selected' : '' }>Đà Nẵng</option>
-                                                    <option value="" ${location=='' ? 'selected' : '' }>
-                                                        Any Location</option>
-                                                </select>
-                                            </div>
-                                            <div class="select-itms">
-                                                <select name="jobType" id="select2">
-                                                    <option value="">Job Type</option>
-                                                    <option value="Full-time" ${jobType=='Full-time'
-                                                                                ? 'selected' : '' }>Full-time</option>
-                                                    <option value="Part-time" ${jobType=='Part-time'
-                                                                                ? 'selected' : '' }>Part-time</option>
-                                                    <option value="Remote" ${jobType=='Remote'
-                                                                             ? 'selected' : '' }>Remote</option>
-                                                    <option value="Internship" ${jobType=='Internship'
-                                                                                 ? 'selected' : '' }>Internship</option>
-                                                    <option value="Contract" ${jobType=='Contract'
-                                                                               ? 'selected' : '' }>Contract</option>
-                                                    <option value="" ${jobType=='' ? 'selected' : '' }>
-                                                        Any Type</option>
+                                                    <option value="">Tất cả địa điểm</option>
+                                                    <option value="Hà Nội" ${param.location=='Hà Nội' ? 'selected' : '' }>Hà Nội</option>
+                                                    <option value="Hồ Chí Minh" ${param.location=='Hồ Chí Minh' ? 'selected' : '' }>Hồ Chí Minh</option>
+                                                    <option value="Đà Nẵng" ${param.location=='Đà Nẵng' ? 'selected' : '' }>Đà Nẵng</option>
+                                                    <option value="Remote" ${param.location=='Remote' ? 'selected' : '' }>Remote</option>
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="search-form">
-                                            <button type="submit">Find job</button>
+                                            <button type="submit" class="btn btn-primary w-100" style="height: 100%; border-radius: 0 5px 5px 0;">Tìm kiếm</button>
                                         </div>
                                     </form>
                                 </div>
@@ -245,14 +240,14 @@
 
             <!-- Online CV Area Start -->
             <div class="online-cv cv-bg section-overly pt-90 pb-120"
-                 data-background="assets/img/gallery/cv_bg.jpg">
+                 data-background="${banner2}">
                 <div class="container">
                     <div class="row justify-content-center">
                         <div class="col-xl-10">
                             <div class="cv-caption text-center">
                                 <p class="pera1">FEATURED TOURS Packages</p>
                                 <p class="pera2"> Make a Difference with Your Online Resume!</p>
-                                <a href="#" class="border-btn2 border-btn4">Upload your cv</a>
+                                <a href="./profile" class="border-btn2 border-btn4">Upload your cv</a>
                             </div>
                         </div>
                     </div>
@@ -614,48 +609,32 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-xl-6 col-lg-6 col-md-6">
-                            <div class="home-blog-single mb-30">
-                                <div class="blog-img-cap">
-                                    <div class="blog-img">
-                                        <img src="assets/img/blog/home-blog1.jpg" alt="">
-                                        <!-- Blog date -->
-                                        <div class="blog-date text-center">
-                                            <span>24</span>
-                                            <p>Now</p>
+                        <c:forEach items="${blogList}" var="blog">
+                            <div class="col-xl-6 col-lg-6 col-md-6">
+                                <div class="home-blog-single mb-30">
+                                    <div class="blog-img-cap">
+                                        <div class="blog-img">
+                                            <img src="${blog.thumbnail}" alt="${blog.title}">
+                                            <!-- Blog date -->
+                                            <div class="blog-date text-center">
+                                                <span><fmt:formatDate value="${blog.created_at}" pattern="dd"/></span>
+                                                <p><fmt:formatDate value="${blog.created_at}" pattern="MMM"/></p>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="blog-cap">
-                                        <p>| Properties</p>
-                                        <h3><a href="single-blog.html">Footprints in Time is perfect
-                                                House in
-                                                Kurashiki</a></h3>
-                                        <a href="#" class="more-btn">Read more »</a>
+                                        <div class="blog-cap">
+                                            <p>| Blog</p>
+                                            <h3><a href="#">${blog.title}</a></h3>
+                                            <a href="#" class="more-btn">Read more »</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-xl-6 col-lg-6 col-md-6">
-                            <div class="home-blog-single mb-30">
-                                <div class="blog-img-cap">
-                                    <div class="blog-img">
-                                        <img src="assets/img/blog/home-blog2.jpg" alt="">
-                                        <!-- Blog date -->
-                                        <div class="blog-date text-center">
-                                            <span>24</span>
-                                            <p>Now</p>
-                                        </div>
-                                    </div>
-                                    <div class="blog-cap">
-                                        <p>| Properties</p>
-                                        <h3><a href="single-blog.html">Footprints in Time is perfect
-                                                House in
-                                                Kurashiki</a></h3>
-                                        <a href="#" class="more-btn">Read more »</a>
-                                    </div>
-                                </div>
+                        </c:forEach>
+                        <c:if test="${empty blogList}">
+                            <div class="col-12 text-center">
+                                <p>No blog posts available.</p>
                             </div>
-                        </div>
+                        </c:if>
                     </div>
                 </div>
             </div>
