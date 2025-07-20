@@ -148,7 +148,10 @@ public class JobDAO extends DBContext {
     
     public List<JobListing> getLatestJobListings(int limit) throws SQLException {
         List<JobListing> jobs = new ArrayList<>();
-        String sql = "SELECT TOP (" + limit + ") jl.*, r.company_name AS recruiter_name FROM Job_Listings jl JOIN Recruiter r ON jl.recruiter_id = r.id WHERE jl.status IS NULL OR jl.status <> 'deleted' ORDER BY jl.created_at DESC";
+        String sql = "SELECT TOP (" + limit + ") jl.*, r.company_name AS recruiter_name "
+                + "FROM Job_Listings jl JOIN Recruiter r ON jl.recruiter_id = r.id "
+                + "WHERE jl.status IS NULL OR jl.status <> 'deleted' "
+                + "ORDER BY jl.created_at DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {

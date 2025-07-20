@@ -17,6 +17,7 @@
         <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.ico">
 
         <!-- CSS here -->
+        <link href="assets/css/Posts.css" rel="stylesheet" />
         <!-- Google Fonts -->
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
               rel="stylesheet">
@@ -28,6 +29,7 @@
 
 
         <!-- Original CSS files with updated paths -->
+        <link rel="stylesheet" href="assets/css/styleHome.css">
         <link rel="stylesheet" href="assets/css/owl.carousel.min.css">
         <link rel="stylesheet" href="assets/css/flaticon.css">
         <link rel="stylesheet" href="assets/css/price_rangs.css">
@@ -39,7 +41,7 @@
         <link rel="stylesheet" href="assets/css/slick.css">
         <link rel="stylesheet" href="assets/css/nice-select.css">
         <link rel="stylesheet" href="assets/css/style.css">
-        <link rel="stylesheet" href="assets/css/styleHome.css">
+        
 
     </head>
 
@@ -121,6 +123,93 @@
                 </div>
             </div>
             <!-- slider Area End-->
+            <br/>
+            <br/>
+            
+            <!-- Premium Job -->
+            
+            <div class="container mt-4">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="section-tittle text-center">
+                            <span>Premium Job</span>
+                            <h2>Hotest Job</h2>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Job List Container -->
+                <div class="row" id="jobList">
+                    <c:forEach items="${posts}" var="post" varStatus="status">
+                        <div class="col-xl-4 col-lg-4 col-md-6 job-item" data-index="${status.index}">
+                            <div class="card job-card">
+                                <div class="job-card-header-overlay d-flex justify-content-between align-items-center">
+                                    <div class="job-badges-left d-flex gap-2">
+                                        <c:if test="${post.postType == 'hot'}">
+                                            <span class="job-badge badge-new">Tin mới</span>
+                                        </c:if>
+                                        <c:if test="${post.postType == 'pro'}">
+                                            <span class="job-badge badge-featured">Nổi bật</span>
+                                        </c:if>
+                                    </div>
+                                </div>
+
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <img src="${post.companyLogo != null ? post.companyLogo : 'assets/img/icon/job-list1.png'}"
+                                             alt="${post.companyName}" class="company-logo me-3">
+                                        <div class="job-details">
+                                            <h5 class="card-title mb-1">
+                                                <a href="${pageContext.request.contextPath}/post/view?id=${post.id}"
+                                                   class="text-decoration-none text-dark job-title-truncate">
+                                                    ${post.title}
+                                                </a>
+                                            </h5>
+                                            <p class="text-muted mb-1 company-name-truncate">${post.companyName}</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Salary and Location Tags -->
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <span class="job-info-tag salary-tag">${post.salary}</span>
+                                        <span class="job-info-tag location-tag">${post.location}</span>
+
+                                        <form action="${pageContext.request.contextPath}/saved-jobs" method="post"
+                                              style="display:inline;">
+                                            <input type="hidden" name="postId" value="${post.id}" />
+                                            <input type="hidden" name="action" value="save" />
+                                            <button type="submit" class="btn btn-outline-primary save-job ms-auto">
+                                                <i class="far fa-heart"></i> Lưu tin
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </c:forEach>
+                </div>
+
+                <!-- Khu Phân trang Frontend -->
+                <nav aria-label="Page navigation" class="mt-4" id="paginationNav">
+                    <div class="simple-pagination d-flex justify-content-center align-items-center gap-3">
+                        <!-- Nút trang trước -->
+                        <a href="#" class="pagination-arrow" id="prevBtn" onclick="previousPage()">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+
+                        <span class="pagination-info">
+                            <span class="current-page" id="currentPage">1</span> / <span class="total-pages" id="totalPages">1</span> trang
+                        </span>
+
+                        <!-- Nút trang sau -->
+                        <a href="#" class="pagination-arrow" id="nextBtn" onclick="nextPage()">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+            <!-- Premium Job end -->
+            
             <!-- Our Services Start -->
             <div class="our-services section-pad-t30">
                 <div class="container">
@@ -556,12 +645,12 @@
             </div>
             <!-- Testimonial End -->
             <!-- Support Company Start-->
-            <div class="support-company-area support-padding fix">
+<!--            <div class="support-company-area support-padding fix">
                 <div class="container">
                     <div class="row align-items-center">
                         <div class="col-xl-6 col-lg-6">
                             <div class="right-caption">
-                                <!-- Section Tittle -->
+                                 Section Tittle 
                                 <div class="section-tittle section-tittle2">
                                     <span>What we are doing</span>
                                     <h2>24k Talented people are getting Jobs</h2>
@@ -594,7 +683,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>-->
             <!-- Support Company End-->
             <!-- Blog Area Start -->
             <div class="home-blog-area blog-h-padding">
@@ -614,7 +703,7 @@
                                 <div class="home-blog-single mb-30">
                                     <div class="blog-img-cap">
                                         <div class="blog-img">
-                                            <img src="${blog.thumbnail}" alt="${blog.title}">
+                                            <img src="/JobFinding/${blog.thumbnail}" alt="${blog.title}">
                                             <!-- Blog date -->
                                             <div class="blog-date text-center">
                                                 <span><fmt:formatDate value="${blog.created_at}" pattern="dd"/></span>
@@ -641,6 +730,8 @@
             <!-- Blog Area End -->
 
         </main>
+                        
+                        
         <footer>
             <!-- Footer Start-->
             <div class="footer-area footer-bg footer-padding">
@@ -700,7 +791,7 @@
                                         </p>
                                     </div>
                                     <!-- Form -->
-                                    <div class="footer-form">
+<!--                                    <div class="footer-form">
                                         <div id="mc_embed_signup">
                                             <form target="_blank"
                                                   action="https://spondonit.us12.list-manage.com/subscribe/post?u=1462626880ade1ac87bd9c93a&amp;id=92a4423d01"
@@ -721,15 +812,15 @@
                                                 <div class="mt-10 info"></div>
                                             </form>
                                         </div>
-                                    </div>
+                                    </div>-->
                                 </div>
                             </div>
                         </div>
                     </div>
                     <!--  -->
-                    <div class="row footer-wejed justify-content-between">
+<!--                    <div class="row footer-wejed justify-content-between">
                         <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                            <!-- logo -->
+                             logo 
                             <div class="footer-logo mb-20">
                                 <a href="index.html"><img src="assets/img/logo/logo2_footer.png"
                                                           alt=""></a>
@@ -748,13 +839,15 @@
                             </div>
                         </div>
                         <div class="col-xl-3 col-lg-3 col-md-4 col-sm-5">
-                            <!-- Footer Bottom Tittle -->
+                             Footer Bottom Tittle 
                             <div class="footer-tittle-bottom">
                                 <span>568</span>
                                 <p>Talented Hunter</p>
                             </div>
                         </div>
-                    </div>
+                    </div>-->
+
+
                 </div>
             </div>
             <!-- footer-bottom area -->
@@ -822,11 +915,118 @@
         <script src="./assets/js/jquery.validate.min.js"></script>
         <script src="./assets/js/mail-script.js"></script>
         <script src="./assets/js/jquery.ajaxchimp.min.js"></script>
+        <script src="./assets/js/header.js"></script>
 
         <!-- Jquery Plugins, main Jquery -->
         <script src="./assets/js/plugins.js"></script>
         <script src="./assets/js/main.js"></script>
 
     </body>
+    
+    <script>
+let currentPage = 1;
+let itemsPerPage = 6;
+let totalItems = 0;
+let totalPages = 0;
+
+// Khởi tạo khi trang load
+document.addEventListener('DOMContentLoaded', function() {
+    const jobItems = document.querySelectorAll('.job-item');
+    totalItems = jobItems.length;
+    
+    console.log('Total items found:', totalItems); // Debug
+    
+    if (totalItems === 0) {
+        document.getElementById('paginationNav').style.display = 'none';
+        return;
+    }
+    
+    totalPages = Math.ceil(totalItems / itemsPerPage);
+    console.log('Total pages calculated:', totalPages); // Debug
+    
+    // Cập nhật hiển thị tổng số trang ngay lập tức
+    document.getElementById('totalPages').textContent = totalPages;
+    
+    // Ẩn pagination nếu chỉ có 1 trang
+    if (totalPages <= 1) {
+        document.getElementById('paginationNav').style.display = 'none';
+    }
+    
+    showPage(1);
+});
+
+function showPage(page) {
+    const jobItems = document.querySelectorAll('.job-item');
+    const startIndex = (page - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    
+    console.log(`Showing page ${page}, items ${startIndex} to ${endIndex-1}`); // Debug
+    
+    // Ẩn TẤT CẢ job items trước
+    jobItems.forEach((item, index) => {
+        const jobCard = item.querySelector('.job-card');
+        jobCard.classList.remove('show');
+        jobCard.style.display = 'none'; // Force hide
+    });
+    
+    // Hiện những job items trong trang hiện tại
+    jobItems.forEach((item, index) => {
+        if (index >= startIndex && index < endIndex) {
+            const jobCard = item.querySelector('.job-card');
+            setTimeout(() => {
+                jobCard.style.display = 'block'; // Force show
+                jobCard.classList.add('show');
+            }, (index - startIndex) * 50);
+        }
+    });
+    
+    currentPage = page;
+    updatePaginationControls();
+    
+    // Smooth scroll to top
+    document.getElementById('jobList').scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+    });
+}
+
+function updatePaginationControls() {
+    // Update page info
+    document.getElementById('currentPage').textContent = currentPage;
+    document.getElementById('totalPages').textContent = totalPages;
+    
+    // Update button states
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    
+    if (currentPage === 1) {
+        prevBtn.classList.add('disabled');
+        prevBtn.onclick = null;
+    } else {
+        prevBtn.classList.remove('disabled');
+        prevBtn.onclick = previousPage;
+    }
+    
+    if (currentPage === totalPages) {
+        nextBtn.classList.add('disabled');
+        nextBtn.onclick = null;
+    } else {
+        nextBtn.classList.remove('disabled');
+        nextBtn.onclick = nextPage;
+    }
+}
+
+function previousPage() {
+    if (currentPage > 1) {
+        showPage(currentPage - 1);
+    }
+}
+
+function nextPage() {
+    if (currentPage < totalPages) {
+        showPage(currentPage + 1);
+    }
+}
+</script>
 
 </html>

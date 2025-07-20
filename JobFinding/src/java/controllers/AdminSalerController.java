@@ -266,7 +266,8 @@ public class AdminSalerController extends HttpServlet {
                     return;
                 }
 
-                thumbnail = UploadPicture.uploadImage(filePart, thumbnail);
+                String basePath = request.getServletContext().getRealPath("/");
+                thumbnail = UploadPicture.uploadImage(filePart, thumbnail, basePath);
 
             } catch (Exception e) {
                 log(e.getMessage());
@@ -338,7 +339,8 @@ public class AdminSalerController extends HttpServlet {
                 } else {
                 }
 
-                thumbnail = UploadPicture.uploadImage(filePart, thumbnail);
+                String basePath = request.getServletContext().getRealPath("/");
+                thumbnail = UploadPicture.uploadImage(filePart, thumbnail, basePath);
 
             } catch (Exception e) {
                 log(e.getMessage());
@@ -454,7 +456,8 @@ public class AdminSalerController extends HttpServlet {
                     return;
                 }
 
-                imageUrl = UploadPicture.uploadImage(filePart, imageUrl);
+                String basePath = request.getServletContext().getRealPath("/");
+                imageUrl = UploadPicture.uploadImage(filePart, imageUrl, basePath);
 
             } catch (Exception e) {
                 log(e.getMessage());
@@ -510,7 +513,8 @@ public class AdminSalerController extends HttpServlet {
                     }
                 }
 
-                imageUrl = UploadPicture.uploadImage(filePart, imageUrl);
+                String basePath = request.getServletContext().getRealPath("/");
+                imageUrl = UploadPicture.uploadImage(filePart, imageUrl, basePath);
 
             } catch (Exception e) {
                 log(e.getMessage());

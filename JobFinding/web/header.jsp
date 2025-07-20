@@ -70,12 +70,12 @@
                             </li>
                         </c:if>
                         <li class="nav-item">
-                            <a class="nav-link" href="about">
+                            <a class="nav-link" href="about.jsp">
                                 <i class="fas fa-info-circle"></i> About
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="contact">
+                            <a class="nav-link" href="contact.jsp">
                                 <i class="fas fa-envelope"></i> Contact
                             </a>
                         </li>

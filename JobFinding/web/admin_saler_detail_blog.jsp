@@ -93,7 +93,7 @@
                         <div class="detail-row">
                             <span class="detail-label">Thumbnail:</span>
                             <span class="detail-value">
-                                <img src="${blog.thumbnail}" alt="Thumbnail" style="max-width: 300px; max-height: 200px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <img src="/JobFinding/${blog.thumbnail}" alt="Thumbnail" style="max-width: 300px; max-height: 200px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                             </span>
                         </div>
 

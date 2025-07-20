@@ -70,7 +70,7 @@
                 <h2 class="mb-3" style="color: #2e7d32;">${banner.title}</h2>
                 
                 <div class="text-center mb-4">
-                    <img src="${banner.image_url}" alt="Banner Image" class="banner-image">
+                    <img src="/JobFinding/${banner.image_url}" alt="Banner Image" class="banner-image">
                 </div>
                 
                 <div class="detail-info">

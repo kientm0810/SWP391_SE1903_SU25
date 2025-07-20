@@ -64,7 +64,9 @@ public class HomeController extends HttpServlet {
         try {
             // Latest job listings for homepage (guest view)
             List<JobListing> latestJobs = jobDAO.getLatestJobListings(10);
-            request.setAttribute("latestJobs", latestJobs);
+            request.setAttribute("recentPosts", latestJobs);
+            
+            log("sizeof latestJob: " + latestJobs.size());
 
             // Banners for top sections (first two by position)
             request.setAttribute("banners", bannerDAO.getTopBanners(2));
@@ -87,7 +89,9 @@ public class HomeController extends HttpServlet {
             FeaturedJobDAO fjDao = new FeaturedJobDAO();
             List<Posts> premiumPost = fjDao.listPostBaseOnFeatureStillActive(premium);
             
-            request.setAttribute("premiumPost", premiumPost);
+            log("sizepremium: " + premiumPost.size());
+            
+            request.setAttribute("posts", premiumPost);
         } catch (Exception e) {
             e.printStackTrace();
         }

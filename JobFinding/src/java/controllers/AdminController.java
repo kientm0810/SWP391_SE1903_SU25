@@ -477,7 +477,8 @@ public class AdminController extends HttpServlet {
                     return;
                 }
 
-                profilePicture = UploadPicture.uploadImage(filePart, profilePicture);
+                String basePath = request.getServletContext().getRealPath("/");
+                profilePicture = UploadPicture.uploadImage(filePart, profilePicture, basePath);
 
             } catch (Exception e) {
                 log(e.getMessage());
@@ -540,7 +541,8 @@ public class AdminController extends HttpServlet {
                     }
                 }
 
-                profilePicture = UploadPicture.uploadImage(filePart, profilePicture);
+                String basePath = request.getServletContext().getRealPath("/");
+                profilePicture = UploadPicture.uploadImage(filePart, profilePicture, basePath);
 
             } catch (Exception e) {
                 log(e.getMessage());
