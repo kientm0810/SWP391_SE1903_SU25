@@ -3,7 +3,9 @@ package controllers;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import daos.ApplicationDAO;
 import daos.PostsDAO;
@@ -105,7 +107,7 @@ public class ApplicationController extends HttpServlet {
         int totalPages = (int) Math.ceil((double) totalApplications / pageSize);
 
         // Get job recommendations based on user profile
-        List<Posts> recommendedJobs = getJobRecommendations(jobSeeker);
+        List<Map<String, Object>> recommendedJobsWithScores = getJobRecommendations(jobSeeker);
 
         // Set attributes for JSP
         request.setAttribute("applications", applications);
@@ -117,58 +119,27 @@ public class ApplicationController extends HttpServlet {
         request.setAttribute("keyword", keyword);
         request.setAttribute("sortBy", sortBy);
         request.setAttribute("userType", "jobseeker");
-        request.setAttribute("recommendedJobs", recommendedJobs);
+        request.setAttribute("recommendedJobsWithScores", recommendedJobsWithScores);
 
         // Forward to jobseeker applications page
         request.getRequestDispatcher("applications.jsp").forward(request, response);
     }
 
-    private List<Posts> getJobRecommendations(JobSeeker jobSeeker) {
-        List<Posts> recommendedJobs = new ArrayList<>();
+    private List<Map<String, Object>> getJobRecommendations(JobSeeker jobSeeker) {
+        List<Map<String, Object>> recommendedJobsWithScores = new ArrayList<>();
         
         try {
-            // Get all active job posts
-            List<Posts> allJobs = postsDAO.getAllPosts();
-            List<Posts> scoredJobs = new ArrayList<>();
+            // Use the advanced job recommendation service
+            services.JobRecommendationService recommendationService = new services.JobRecommendationService();
+            List<services.JobRecommendationService.JobRecommendation> recommendations = 
+                recommendationService.getRecommendations(jobSeeker, 6);
             
-            // Score each job based on user profile
-            for (Posts job : allJobs) {
-                int score = calculateMatchScore(jobSeeker, job);
-                if (score > 0) {
-                    // Add score as a property we can use for sorting
-                    job.setViewCount(score); // Temporarily use viewCount to store score
-                    scoredJobs.add(job);
-                }
-            }
-            
-            // Sort by score (descending) and take top jobs
-            scoredJobs.sort((a, b) -> Integer.compare(b.getViewCount(), a.getViewCount()));
-            
-            // Return at least 3 jobs, maximum 6
-            int jobCount = Math.max(3, Math.min(6, scoredJobs.size()));
-            for (int i = 0; i < jobCount && i < scoredJobs.size(); i++) {
-                recommendedJobs.add(scoredJobs.get(i));
-            }
-            
-            // If we don't have enough scored jobs, fill with latest jobs
-            if (recommendedJobs.size() < 3) {
-                List<Posts> latestJobs = postsDAO.getLatestPosts(6);
-                for (Posts job : latestJobs) {
-                    if (recommendedJobs.size() >= 3) break;
-                    
-                    // Avoid duplicates
-                    boolean alreadyAdded = false;
-                    for (Posts existingJob : recommendedJobs) {
-                        if (existingJob.getId() == job.getId()) {
-                            alreadyAdded = true;
-                            break;
-                        }
-                    }
-                    
-                    if (!alreadyAdded) {
-                        recommendedJobs.add(job);
-                    }
-                }
+            // Convert to Map with job and score
+            for (services.JobRecommendationService.JobRecommendation rec : recommendations) {
+                Map<String, Object> jobWithScore = new HashMap<>();
+                jobWithScore.put("job", rec.getJob());
+                jobWithScore.put("score", rec.getScore());
+                recommendedJobsWithScores.add(jobWithScore);
             }
             
         } catch (Exception e) {
@@ -176,95 +147,24 @@ public class ApplicationController extends HttpServlet {
             
             // Fallback: return latest jobs if recommendation fails
             try {
-                recommendedJobs = postsDAO.getLatestPosts(3);
+                List<Posts> latestJobs = postsDAO.getLatestPosts(3);
+                for (Posts job : latestJobs) {
+                    Map<String, Object> jobWithScore = new HashMap<>();
+                    jobWithScore.put("job", job);
+                    jobWithScore.put("score", 0.0); // Fallback score
+                    recommendedJobsWithScores.add(jobWithScore);
+                }
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
         
-        return recommendedJobs;
+        return recommendedJobsWithScores;
     }
     
-    private int calculateMatchScore(JobSeeker jobSeeker, Posts job) {
-        int score = 0;
-        
-        try {
-            // Score based on desired job title match
-            if (jobSeeker.getDesiredJobTitle() != null && job.getTitle() != null) {
-                String desiredTitle = jobSeeker.getDesiredJobTitle().toLowerCase();
-                String jobTitle = job.getTitle().toLowerCase();
-                
-                if (jobTitle.contains(desiredTitle) || desiredTitle.contains(jobTitle)) {
-                    score += 30;
-                } else {
-                    // Check for partial matches with keywords
-                    String[] desiredWords = desiredTitle.split("\\s+");
-                    String[] jobWords = jobTitle.split("\\s+");
-                    
-                    for (String desired : desiredWords) {
-                        for (String jobWord : jobWords) {
-                            if (desired.length() > 3 && jobWord.length() > 3 && 
-                                (desired.contains(jobWord) || jobWord.contains(desired))) {
-                                score += 10;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            
-            // Score based on location match
-            if (jobSeeker.getPreferredLocation() != null && job.getLocation() != null) {
-                String preferredLocation = jobSeeker.getPreferredLocation().toLowerCase();
-                String jobLocation = job.getLocation().toLowerCase();
-                
-                if (jobLocation.contains(preferredLocation) || preferredLocation.contains(jobLocation)) {
-                    score += 20;
-                }
-            }
-            
-            // Score based on skills match
-            if (jobSeeker.getSkills() != null && job.getRequirements() != null) {
-                String[] userSkills = jobSeeker.getSkills().toLowerCase().split("[,;\\s]+");
-                String jobRequirements = job.getRequirements().toLowerCase();
-                
-                for (String skill : userSkills) {
-                    if (skill.length() > 2 && jobRequirements.contains(skill.trim())) {
-                        score += 15;
-                    }
-                }
-            }
-            
-            // Score based on experience level
-            if (jobSeeker.getExperienceYears() > 0 && job.getExperience() != null) {
-                String experienceReq = job.getExperience().toLowerCase();
-                int userExperience = jobSeeker.getExperienceYears();
-                
-                if (userExperience <= 1 && (experienceReq.contains("fresher") || experienceReq.contains("entry") || experienceReq.contains("junior"))) {
-                    score += 25;
-                } else if (userExperience >= 2 && userExperience <= 4 && (experienceReq.contains("mid") || experienceReq.contains("intermediate"))) {
-                    score += 25;
-                } else if (userExperience >= 5 && (experienceReq.contains("senior") || experienceReq.contains("lead"))) {
-                    score += 25;
-                }
-            }
-            
-            // Score based on job category match
-            if (jobSeeker.getJobCategory() != null && job.getIndustry() != null) {
-                String userCategory = jobSeeker.getJobCategory().toLowerCase();
-                String jobIndustry = job.getIndustry().toLowerCase();
-                
-                if (jobIndustry.contains(userCategory) || userCategory.contains(jobIndustry)) {
-                    score += 20;
-                }
-            }
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        
-        return score;
-    }
+
+    
+
 
     private void handleRecruiterApplications(HttpServletRequest request, HttpServletResponse response, 
             HttpSession session, int page, int pageSize, String status, String keyword, String sortBy) 

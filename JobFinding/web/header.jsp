@@ -34,6 +34,14 @@
                                 </a>
                             </li>
                         </c:if>
+                        <!-- CV Management for job seekers -->
+                        <c:if test="${not empty sessionScope.user and sessionScope.role == 'job-seeker'}">
+                            <li class="nav-item">
+                                <a class="nav-link" href="list_cv">
+                                    <i class="fas fa-file-alt"></i> CV Management
+                                </a>
+                            </li>
+                        </c:if>
                         <li class="nav-item">
                             <a class="nav-link" href="blog.jsp">
                                 <i class="fas fa-blog"></i> Blog

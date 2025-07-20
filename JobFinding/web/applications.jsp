@@ -253,10 +253,45 @@
                         background: white;
                     }
 
+                    .job-recommendation-card {
+                        position: relative;
+                        border: 1px solid #e0e0e0;
+                        border-radius: 12px;
+                        padding: 20px;
+                        margin: 8px;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        background: white;
+                    }
+
                     .job-recommendation-card:hover {
                         border-color: #28a745;
                         box-shadow: 0 4px 15px rgba(40, 167, 69, 0.15);
                         transform: translateY(-2px);
+                    }
+
+                    .match-score-badge .badge {
+                        font-size: 0.75rem;
+                        font-weight: 600;
+                        padding: 6px 10px;
+                        border-radius: 20px;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    }
+
+                    .match-score-badge .bg-success {
+                        background: linear-gradient(45deg, #28a745, #20c997) !important;
+                    }
+
+                    .match-score-badge .bg-warning {
+                        background: linear-gradient(45deg, #ffc107, #fd7e14) !important;
+                    }
+
+                    .match-score-badge .bg-info {
+                        background: linear-gradient(45deg, #17a2b8, #6f42c1) !important;
+                    }
+
+                    .match-score-badge .bg-secondary {
+                        background: linear-gradient(45deg, #6c757d, #495057) !important;
                     }
 
                     .company-logo {
@@ -512,19 +547,40 @@
                 </div>
 
                 <!-- Job Recommendations Section -->
-                <c:if test="${not empty recommendedJobs}">
+                <c:if test="${not empty recommendedJobsWithScores}">
                     <div class="card mt-4">
                         <div class="card-header bg-success text-white">
                             <h5 class="mb-0">
                                 <i class="fas fa-lightbulb me-2"></i>
                                 Việc làm gợi ý dành cho bạn
+                                <small class="ms-2">(Dựa trên hồ sơ và sở thích của bạn)</small>
                             </h5>
                         </div>
                         <div class="card-body p-0">
                             <div class="row g-0">
-                                <c:forEach items="${recommendedJobs}" var="job" varStatus="status">
+                                <c:forEach items="${recommendedJobsWithScores}" var="jobWithScore" varStatus="status">
+                                    <c:set var="job" value="${jobWithScore.job}" />
+                                    <c:set var="score" value="${jobWithScore.score}" />
                                     <div class="col-md-6 col-lg-4">
                                         <div class="job-recommendation-card h-100" onclick="viewJobDetail(${job.id})">
+                                            <!-- Match Score Badge -->
+                                            <div class="match-score-badge" style="position: absolute; top: 10px; right: 10px; z-index: 10;">
+                                                <c:choose>
+                                                    <c:when test="${score >= 80}">
+                                                        <span class="badge bg-success"><fmt:formatNumber value="${score}" pattern="#.##"/>% phù hợp</span>
+                                                    </c:when>
+                                                    <c:when test="${score >= 60}">
+                                                        <span class="badge bg-warning text-dark"><fmt:formatNumber value="${score}" pattern="#.##"/>% phù hợp</span>
+                                                    </c:when>
+                                                    <c:when test="${score >= 40}">
+                                                        <span class="badge bg-info"><fmt:formatNumber value="${score}" pattern="#.##"/>% phù hợp</span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="badge bg-secondary"><fmt:formatNumber value="${score}" pattern="#.##"/>% phù hợp</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                            
                                             <div class="job-card-header">
                                                 <div class="d-flex align-items-start">
                                                     <c:if test="${not empty job.companyLogo}">
