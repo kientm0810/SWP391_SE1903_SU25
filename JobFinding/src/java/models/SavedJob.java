@@ -1,79 +1,62 @@
 package models;
 
-import java.util.Date;
+import java.sql.Timestamp;
 
 public class SavedJob {
-
     private int id;
-    private int userId;
-    private int job_seeker_id;
-    private int recruiter_id;
+    private Integer jobSeekerId;
+    private Integer recruiterId;
     private int postId;
-    private Date savedAt;
-
+    private Timestamp savedAt;
+    
+    // Constructors
     public SavedJob() {
     }
-
-    public SavedJob(int id, int userId, int job_seeker_id, int recruiter_id, int postId, Date savedAt) {
-        this.id = id;
-        this.userId = userId;
-        this.job_seeker_id = job_seeker_id;
-        this.recruiter_id = recruiter_id;
+    
+    public SavedJob(Integer jobSeekerId, int postId) {
+        this.jobSeekerId = jobSeekerId;
         this.postId = postId;
-        this.savedAt = savedAt;
+        this.savedAt = new Timestamp(System.currentTimeMillis());
     }
     
-    
-
+    // Getters and Setters
     public int getId() {
         return id;
     }
-
+    
     public void setId(int id) {
         this.id = id;
     }
-
-    public int getUserId() {
-        return userId;
+    
+    public Integer getJobSeekerId() {
+        return jobSeekerId;
     }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
+    
+    public void setJobSeekerId(Integer jobSeekerId) {
+        this.jobSeekerId = jobSeekerId;
     }
-
+    
+    public Integer getRecruiterId() {
+        return recruiterId;
+    }
+    
+    public void setRecruiterId(Integer recruiterId) {
+        this.recruiterId = recruiterId;
+    }
+    
     public int getPostId() {
         return postId;
     }
-
+    
     public void setPostId(int postId) {
         this.postId = postId;
     }
-
-    public Date getSavedAt() {
+    
+    public Timestamp getSavedAt() {
         return savedAt;
     }
-
-    public void setSavedAt(Date savedAt) {
+    
+    public void setSavedAt(Timestamp savedAt) {
         this.savedAt = savedAt;
     }
-
-    public int getJob_seeker_id() {
-        return job_seeker_id;
-    }
-
-    public void setJob_seeker_id(int job_seeker_id) {
-        this.job_seeker_id = job_seeker_id;
-    }
-
-    public int getRecruiter_id() {
-        return recruiter_id;
-    }
-
-    public void setRecruiter_id(int recruiter_id) {
-        this.recruiter_id = recruiter_id;
-    }
-    
-    
-
-    
 }

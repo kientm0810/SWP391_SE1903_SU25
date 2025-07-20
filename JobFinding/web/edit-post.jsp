@@ -9,9 +9,6 @@
                 <title>Chỉnh sửa tin tuyển dụng</title>
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
                 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-                <script
-                    src="https://cdn.tiny.cloud/1/ainjahbwyamlr1ureczw2mbfmr73mgpn7f6ceaaxu1h8ccv8/tinymce/7/tinymce.min.js"
-                    referrerpolicy="origin"></script>
                 <link rel="stylesheet" href="assets/css/stylePosts.css">
                 <style>
                     .form-container {
@@ -23,8 +20,8 @@
                         min-height: 400px;
                     }
                 </style>
-                <!-- Thay TinyMCE bằng CKEditor 5 -->
-                <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+                <!--API TinyMCE -->
+                <script src="tinymce/tinymce.min.js"></script>
             </head>
 
             <body>
@@ -253,9 +250,105 @@
 
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
                 <script>
-                    ClassicEditor.create(document.querySelector('#jobDescription'));
-                    ClassicEditor.create(document.querySelector('#requirements'));
-                    ClassicEditor.create(document.querySelector('#benefits'));
+                    // Khởi tạo TinyMCE cho các textarea cần rich text
+                    tinymce.init({
+                        selector: '#jobDescription, #requirements, #benefits',
+                        height: 300,
+                        menubar: true,
+                        plugins: [
+                            'advlist autolink lists link image charmap print preview anchor',
+                            'searchreplace visualblocks code fullscreen',
+                            'insertdatetime media table paste code help wordcount',
+                            'emoticons template paste textpattern imagetools'
+                        ],
+                        toolbar: 'undo redo | formatselect | bold italic underline strikethrough | \
+                                 fontselect fontsizeselect | forecolor backcolor | \
+                                 alignleft aligncenter alignright alignjustify | \
+                                 bullist numlist outdent indent | link image imageupload media | \
+                                 table tabledelete | tableprops tablerowprops tablecellprops | \
+                                 tableinsertrowbefore tableinsertrowafter tabledeleterow | \
+                                 tableinsertcolbefore tableinsertcolafter tabledeletecol | \
+                                 code fullscreen preview | removeformat | help',
+                        content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }',
+                        branding: false,
+                        language: 'vi',
+                        paste_data_images: true,
+                        image_advtab: true,
+                        image_title: true,
+                        automatic_uploads: true,
+                        file_picker_types: 'image',
+                        images_upload_url: '${pageContext.request.contextPath}/upload/image',
+                        images_upload_handler: function (blobInfo, success, failure) {
+                            var xhr, formData;
+                            xhr = new XMLHttpRequest();
+                            xhr.withCredentials = false;
+                            xhr.open('POST', '${pageContext.request.contextPath}/upload/image');
+                            xhr.onload = function () {
+                                var json;
+                                if (xhr.status != 200) {
+                                    failure('HTTP Error: ' + xhr.status);
+                                    return;
+                                }
+                                json = JSON.parse(xhr.responseText);
+                                if (!json || typeof json.location != 'string') {
+                                    failure('Invalid JSON: ' + xhr.responseText);
+                                    return;
+                                }
+                                success(json.location);
+                            };
+                            formData = new FormData();
+                            formData.append('file', blobInfo.blob(), blobInfo.filename());
+                            xhr.send(formData);
+                        },
+                        file_picker_callback: function (cb, value, meta) {
+                            var input = document.createElement('input');
+                            input.setAttribute('type', 'file');
+                            input.setAttribute('accept', 'image/*');
+
+                            input.onchange = function () {
+                                var file = this.files[0];
+                                var reader = new FileReader();
+                                reader.onload = function () {
+                                    var id = 'blobid' + (new Date()).getTime();
+                                    var blobCache = tinymce.activeEditor.editorUpload.blobCache;
+                                    var base64 = reader.result.split(',')[1];
+                                    var blobInfo = blobCache.create(id, file, base64);
+                                    blobCache.add(blobInfo);
+                                    cb(blobInfo.blobUri(), { title: file.name });
+                                };
+                                reader.readAsDataURL(file);
+                            };
+                            input.click();
+                        },
+                        setup: function (editor) {
+                            // Thêm nút upload ảnh tùy chỉnh
+                            editor.ui.registry.addButton('imageupload', {
+                                text: 'Upload Ảnh',
+                                icon: 'image',
+                                onAction: function () {
+                                    var input = document.createElement('input');
+                                    input.setAttribute('type', 'file');
+                                    input.setAttribute('accept', 'image/*');
+                                    input.onchange = function () {
+                                        var file = this.files[0];
+                                        if (file) {
+                                            var reader = new FileReader();
+                                            reader.onload = function (e) {
+                                                var id = 'blobid' + (new Date()).getTime();
+                                                var blobCache = editor.editorUpload.blobCache;
+                                                var base64 = e.target.result.split(',')[1];
+                                                var blobInfo = blobCache.create(id, file, base64);
+                                                blobCache.add(blobInfo);
+                                                editor.insertContent('<img src="' + blobInfo.blobUri() + '" alt="' + file.name + '" />');
+                                            };
+                                            reader.readAsDataURL(file);
+                                        }
+                                    };
+                                    input.click();
+                                }
+                            });
+                        }
+                    });
 
                     // Logo preview function
                     function previewLogo(event) {
@@ -318,6 +411,9 @@
                             alert('Vui lòng điền đầy đủ các trường bắt buộc');
                             return;
                         }
+
+                        // Đồng bộ nội dung TinyMCE vào textarea trước khi submit
+                        tinymce.triggerSave();
 
                         // Submit form using fetch API
                         fetch(form.action, {

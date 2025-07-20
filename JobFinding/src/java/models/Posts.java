@@ -38,6 +38,9 @@ public class Posts {
     private String companyWebsite;
     private String companyDescription;
     private String keywords;
+    private Double salaryMin;
+    private Double salaryMax;
+    private Integer experienceYears;
 
     public Posts() {
     }
@@ -352,4 +355,75 @@ public class Posts {
         this.keywords = keywords;
     }
 
+    public Double getSalaryMin() {
+        return salaryMin;
+    }
+
+    public void setSalaryMin(Double salaryMin) {
+        this.salaryMin = salaryMin;
+    }
+
+    public Double getSalaryMax() {
+        return salaryMax;
+    }
+
+    public void setSalaryMax(Double salaryMax) {
+        this.salaryMax = salaryMax;
+    }
+
+    public Integer getExperienceYears() {
+        return experienceYears;
+    }
+
+    public void setExperienceYears(Integer experienceYears) {
+        this.experienceYears = experienceYears;
+    }
+
+    // Helper methods for advanced search
+    public String getFormattedSalary() {
+        if (salaryMin != null && salaryMax != null) {
+            return String.format("%.0f - %.0f triệu VND", salaryMin, salaryMax);
+        } else if (salaryMin != null) {
+            return String.format("Từ %.0f triệu VND", salaryMin);
+        } else if (salaryMax != null) {
+            return String.format("Đến %.0f triệu VND", salaryMax);
+        } else if (salary != null && !salary.trim().isEmpty()) {
+            return salary;
+        }
+        return "Thương lượng";
+    }
+
+    public String getFormattedExperience() {
+        if (experienceYears != null) {
+            if (experienceYears == 0) {
+                return "Mới tốt nghiệp";
+            } else if (experienceYears == 1) {
+                return "1 năm kinh nghiệm";
+            } else {
+                return experienceYears + " năm kinh nghiệm";
+            }
+        } else if (experience != null && !experience.trim().isEmpty()) {
+            return experience;
+        }
+        return "Không yêu cầu";
+    }
+
+    public boolean isRemote() {
+        return workingTime != null && workingTime.toLowerCase().contains("remote");
+    }
+
+    public boolean isHybrid() {
+        return workingTime != null && workingTime.toLowerCase().contains("hybrid");
+    }
+
+    public boolean isOnSite() {
+        return workingTime != null && workingTime.toLowerCase().contains("on-site");
+    }
+
+    public String getWorkType() {
+        if (isRemote()) return "remote";
+        if (isHybrid()) return "hybrid";
+        if (isOnSite()) return "on_site";
+        return "on_site"; // default
+    }
 }
