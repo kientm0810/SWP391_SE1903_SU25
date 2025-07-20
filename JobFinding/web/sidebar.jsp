@@ -47,12 +47,12 @@
         </c:if>
         
         <c:if test="${sessionScope.adminRole == 'manager' || sessionScope.adminRole == 'admin'}">
-            <a href="AdminSalerController?target=program" class="menu-item ${param.target == 'program' ? 'active' : ''}">
+            <a href="AdminPromotionController?target=program" class="menu-item ${param.target == 'program' ? 'active' : ''}">
                 <i class="fas fa-bullseye"></i>
                 <span>Program</span>
             </a>
 
-            <a href="reports.jsp" class="menu-item ${pageContext.request.servletPath == '/reports.jsp' ? 'active' : ''}">
+            <a href="ReportsController?target=report&action=dashboard" class="menu-item ${param.target == 'report' ? 'active' : ''}">
                 <i class="fas fa-chart-bar"></i>
                 <span>Reports</span>
             </a>

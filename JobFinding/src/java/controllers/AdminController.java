@@ -21,14 +21,21 @@ import java.sql.Date;
 //import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
-import daos.RecruiterNotificationDAO;
-import models.RecruiterNotification;
+import daos.NotificationDAO;
+import models.Notification;
 import utils.JavaMail;
 import models.Admin;
 import daos.AdminDAO;
+import daos.FeaturedJobDAO;
+import daos.PostsDAO;
+import daos.PromotionProgramDAO;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
+import java.util.HashMap;
+import java.util.Map;
+import models.Posts;
+import models.PromotionProgram;
 import utils.InputSanitizer;
 import utils.UploadPicture;
 
@@ -77,6 +84,8 @@ public class AdminController extends HttpServlet {
             processSaler(request, response);
         } else if (target.equals("Staff")){
             processManager(request, response);
+        } else if (target.equals("program")){
+            processProgram(request, response);
         }
 
     }
@@ -964,7 +973,7 @@ public class AdminController extends HttpServlet {
         } else if (service.equals("Detail")) {
             detailRecruiter(request, response);
         } else if (service.equals("UpdateVerificationStatus")) {
-            updateVerificationStatus(request, response);
+//            updateVerificationStatus(request, response);
         }
     }
 
@@ -1111,35 +1120,303 @@ public class AdminController extends HttpServlet {
         request.setAttribute("Recruiter", p);
         request.getRequestDispatcher("admin_detail_recruiter.jsp").forward(request, response);
     }
-
-    private void updateVerificationStatus(HttpServletRequest request, HttpServletResponse response)
+    
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    protected void processProgram(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Lấy tham số từ request
-        String idStr = request.getParameter("id");
-        String status = request.getParameter("verificationStatus");
-        String email = request.getParameter("email");
+        response.setContentType("text/html;charset=UTF-8");
         
-        if (idStr != null && status != null && !idStr.isEmpty() && !status.isEmpty()) {
-            int id = Integer.parseInt(idStr);
+        HttpSession session = request.getSession(true);
+        if (session.getAttribute("role") == null || !session.getAttribute("role").equals("admin")) {
+            response.sendRedirect("home");
+            return;
+        }
 
-            RecruiterDAO dao = new RecruiterDAO();
-            dao.updateVerificationStatus(id, status);
+        String service = request.getParameter("service");
+        if (service == null) {
+            service = "list";
+        }
+
+        switch (service) {
+            case "list":
+                listPromotionPrograms(request, response);
+                break;
+            case "viewPosts":
+                viewPostsByProgram(request, response);
+                break;
+            case "edit":
+                editPromotionProgram(request, response);
+                break;
+            case "add":
+                addPromotionProgram(request, response);
+                break;
+            case "update":
+                updatePromotionProgram(request, response);
+                break;
+            case "delete":
+                deletePromotionProgram(request, response);
+                break;
+            default:
+                listPromotionPrograms(request, response);
+                break;
+        }
+    }
+
+    private void listPromotionPrograms(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        PromotionProgramDAO programDAO = new PromotionProgramDAO();
+        FeaturedJobDAO featuredJobDAO = new FeaturedJobDAO();
+        PostsDAO postsDAO = new PostsDAO();
+        RecruiterDAO recruiterDAO = new RecruiterDAO();
+
+        // lay danh sach
+        List<PromotionProgram> promotionPrograms = programDAO.getAllPromotionPrograms();
+
+        // Luu cho tung program
+        Map<Integer, Integer> postCounts = new HashMap<>();
+        Map<Integer, Double> revenues = new HashMap<>();
+
+        // Thong ke cho tung program
+        for (PromotionProgram program : promotionPrograms) {
+            int postCount = featuredJobDAO.countPostsByPromotionId(program.getId());
+            double revenue = featuredJobDAO.getTotalRevenueByPromotionId(program.getId());
             
-            // truyền thông báo đến recruiter
-            RecruiterNotificationDAO noticeDAO = new RecruiterNotificationDAO();
-            int insert = noticeDAO.insertNotice(new RecruiterNotification(id, 
-                    "ACCOUNT_APPROVED",
-                    "ACCOUNT " + status.toUpperCase(), 
-                    "your account have been " + status.toUpperCase(),
-                    false));
-            
-            if (status.equals("verified") && insert > 0){
-                JavaMail.sendNotification(email);
+            postCounts.put(program.getId(), postCount);
+            revenues.put(program.getId(), revenue);
+        }
+
+        // Tinh tong quan
+        int totalActivePosts = postsDAO.getTotalPosts();
+        double totalRevenue = revenues.values().stream().mapToDouble(Double::doubleValue).sum();
+        int totalActiveRecruiters = recruiterDAO.countActiveRecruiters();
+
+        // Set attributes
+        request.setAttribute("promotionPrograms", promotionPrograms);
+        request.setAttribute("postCounts", postCounts);
+        request.setAttribute("revenues", revenues);
+        request.setAttribute("totalActivePosts", totalActivePosts);
+        request.setAttribute("totalRevenue", totalRevenue);
+        request.setAttribute("totalActiveRecruiters", totalActiveRecruiters);
+
+        request.getRequestDispatcher("admin_manage_promotion_programs.jsp").forward(request, response);
+    }
+
+    private void viewPostsByProgram(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+        String programIdStr = request.getParameter("programId");
+        String pageStr = request.getParameter("page");
+        String recordsPerPageStr = request.getParameter("recordsPerPage");
+        String sortField = request.getParameter("sortField");
+        String sortOrder = request.getParameter("sortOrder");
+        String submit = request.getParameter("submit");
+
+        if (programIdStr == null || programIdStr.isEmpty()) {
+            response.sendRedirect("AdminController?target=program");
+            return;
+        }
+
+        int programId = Integer.parseInt(programIdStr);
+        int page = 1;
+        int pageSize = 10;
+
+        if (pageStr != null && !pageStr.isEmpty()) {
+            page = Integer.parseInt(pageStr);
+        }
+        if (recordsPerPageStr != null && !recordsPerPageStr.isEmpty()) {
+            pageSize = Integer.parseInt(recordsPerPageStr);
+        }
+        if (sortField == null || sortField.isEmpty()) {
+            sortField = "created_at";
+        }
+        if (sortOrder == null || sortOrder.isEmpty()) {
+            sortOrder = "DESC";
+        }
+
+        PromotionProgramDAO programDAO = new PromotionProgramDAO();
+        FeaturedJobDAO featuredJobDAO = new FeaturedJobDAO();
+
+        PromotionProgram promotionProgram = programDAO.getPromotionProgramById(programId);
+        if (promotionProgram == null) {
+            response.sendRedirect("AdminController?target=program");
+            return;
+        }
+
+        List<FeaturedJobDAO.PostPromotionInfo> posts;
+        int totalPosts;
+
+        if (submit != null && submit.equals("Search")) {
+            // Chỉ search theo title
+            String title = InputSanitizer.cleanSearchQuery(request.getParameter("title"));
+
+            if (title != null && !title.isEmpty()) {
+                posts = featuredJobDAO.searchPostsByPromotionIdWithPaging(programId, title, page, pageSize, sortField, sortOrder);
+                totalPosts = featuredJobDAO.countSearchPostsByPromotionId(programId, title);
+                request.setAttribute("searchTitle", title);
+            } else {
+                posts = featuredJobDAO.getPostsByPromotionIdWithPaging(programId, page, pageSize, sortField, sortOrder);
+                totalPosts = featuredJobDAO.countUniquePostsByPromotionId(programId);
+            }
+        } else {
+            // Lấy tất cả posts với pagination và sorting
+            posts = featuredJobDAO.getPostsByPromotionIdWithPaging(programId, page, pageSize, sortField, sortOrder);
+            totalPosts = featuredJobDAO.countUniquePostsByPromotionId(programId);
+        }
+
+        double totalRevenue = featuredJobDAO.getTotalRevenueByPromotionId(programId);
+        int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
+
+        // Set attributes
+        request.setAttribute("promotionProgram", promotionProgram);
+        request.setAttribute("posts", posts);
+        request.setAttribute("totalPosts", totalPosts);
+        request.setAttribute("totalRevenue", totalRevenue);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("recordsPerPage", pageSize);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("totalRecords", totalPosts);
+        request.setAttribute("sortField", sortField);
+        request.setAttribute("sortOrder", sortOrder);
+
+        request.getRequestDispatcher("admin_promotion_posts_list.jsp").forward(request, response);
+    }
+
+    private void editPromotionProgram(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String idStr = request.getParameter("id");
+        
+        if (idStr == null || idStr.isEmpty()) {
+            response.sendRedirect("AdminController?target=program");
+            return;
+        }
+
+        int id = Integer.parseInt(idStr);
+        PromotionProgramDAO programDAO = new PromotionProgramDAO();
+        PromotionProgram program = programDAO.getPromotionProgramById(id);
+
+        if (program == null) {
+            response.sendRedirect("AdminController?target=program");
+            return;
+        }
+
+        request.setAttribute("program", program);
+        request.setAttribute("action", "edit");
+        request.getRequestDispatcher("admin_add_edit_promotion.jsp").forward(request, response);
+    }
+
+    private void addPromotionProgram(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.setAttribute("action", "add");
+        request.getRequestDispatcher("admin_add_edit_promotion.jsp").forward(request, response);
+    }
+
+    private void updatePromotionProgram(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String idStr = request.getParameter("id");
+        String name = request.getParameter("name");
+        String costStr = request.getParameter("cost");
+        String durationDaysStr = request.getParameter("durationDays");
+        String description = request.getParameter("description");
+        String positionType = request.getParameter("positionType");
+        String quantityStr = request.getParameter("quantity");
+        String isActiveStr = request.getParameter("isActive");
+
+        try {
+            int id = Integer.parseInt(idStr);
+            double cost = Double.parseDouble(costStr);
+            int durationDays = Integer.parseInt(durationDaysStr);
+            int quantity = Integer.parseInt(quantityStr);
+            boolean isActive = Boolean.parseBoolean(isActiveStr);
+
+            PromotionProgram program = new PromotionProgram();
+            program.setId(id);
+            program.setName(name);
+            program.setCost(cost);
+            program.setDurationDays(durationDays);
+            program.setDescription(description);
+            program.setPositionType(positionType);
+            program.setQuantity(quantity);
+            program.setActive(isActive);
+
+            PromotionProgramDAO programDAO = new PromotionProgramDAO();
+            boolean success = programDAO.updatePromotionProgram(program);
+
+            if (success) {
+                request.setAttribute("successMessage", "Cập nhật chương trình thành công!");
+            } else {
+                request.setAttribute("errorMessage", "Có lỗi xảy ra khi cập nhật chương trình.");
+            }
+        } catch (NumberFormatException e) {
+            request.setAttribute("errorMessage", "Dữ liệu không hợp lệ.");
+        }
+
+        response.sendRedirect("AdminController?target=program");
+    }
+
+    private void deletePromotionProgram(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String idStr = request.getParameter("id");
+        
+        if (idStr != null && !idStr.isEmpty()) {
+            try {
+                int id = Integer.parseInt(idStr);
+                
+                PromotionProgramDAO programDAO = new PromotionProgramDAO();
+                PromotionProgram program = programDAO.getPromotionProgramById(id);
+                
+                if (program != null) {
+                    program.setActive(false);
+                    boolean success = programDAO.updatePromotionProgram(program);
+                    
+                    if (success) {
+                        request.setAttribute("successMessage", "Vô hiệu hóa chương trình thành công!");
+                    } else {
+                        request.setAttribute("errorMessage", "Có lỗi xảy ra khi vô hiệu hóa chương trình.");
+                    }
+                }
+            } catch (NumberFormatException e) {
+                request.setAttribute("errorMessage", "ID không hợp lệ.");
             }
         }
-        
-        response.sendRedirect("AdminController?target=Recruiter");
+
+        response.sendRedirect("AdminController?target=program");
     }
+
+//    private void updateVerificationStatus(HttpServletRequest request, HttpServletResponse response)
+//            throws ServletException, IOException {
+//        // Lấy tham số từ request
+//        String idStr = request.getParameter("id");
+//        String status = request.getParameter("verificationStatus");
+//        String email = request.getParameter("email");
+//        
+//        if (idStr != null && status != null && !idStr.isEmpty() && !status.isEmpty()) {
+//            int id = Integer.parseInt(idStr);
+//
+//            RecruiterDAO dao = new RecruiterDAO();
+//            dao.updateVerificationStatus(id, status);
+//            
+//            // truyền thông báo đến recruiter
+//            NotificationDAO noticeDAO = new NotificationDAO();
+//            int insert = noticeDAO.insertNotice(new Notification(id, 
+//                    "ACCOUNT_APPROVED",
+//                    "ACCOUNT " + status.toUpperCase(), 
+//                    "your account have been " + status.toUpperCase(),
+//                    false));
+//            
+//            if (status.equals("verified") && insert > 0){
+//                JavaMail.sendNotification(email);
+//            }
+//        }
+//        
+//        response.sendRedirect("AdminController?target=Recruiter");
+//    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**

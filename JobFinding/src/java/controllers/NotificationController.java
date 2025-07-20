@@ -5,7 +5,7 @@
 
 package controllers;
 
-import daos.RecruiterNotificationDAO;
+import daos.NotificationDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.Vector;
-import models.RecruiterNotification;
+import models.Notification;
 
 /**
  *
@@ -31,18 +31,20 @@ public class NotificationController extends HttpServlet {
         String role = (String) session.getAttribute("role");
         if (role != null) {
 //            int id = (int) session.getAttribute("userId");
-            if (role.equals("recruiter")) {
-                processRecruiter(request, response);
-            } else if (role.equals("job-seeker")){
-                processJobSeeker(request, response);
-            }
+//            if (role.equals("recruiter")) {
+//                processRecruiter(request, response);
+//            } else if (role.equals("job-seeker")){
+//                processJobSeeker(request, response);
+//            }
+
+            processQuery(request, response);
         } else {
             response.sendRedirect("home");
 //            request.getRequestDispatcher("notification.jsp").forward(request, response);
         }
     }
 
-    private void processRecruiter(HttpServletRequest request, HttpServletResponse response)
+    private void processQuery(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String service = request.getParameter("service");
         if (service == null) {
@@ -50,29 +52,29 @@ public class NotificationController extends HttpServlet {
         }
 
         if (service.equals("list")){
-            listNoticeRecruiter(request, response);
+            listNotice(request, response);
         } else if (service.equals("detail")){
-            detailNoticeRecruiter(request, response);
+            detailNotice(request, response);
         } else if (service.equals("deleteAll")){
-            deleteAllNoticeRecruiter(request, response);
+            deleteAllNotice(request, response);
         } else if (service.equals("deleteReaded")){
-            deleteAllNoticeReadedRecruiter(request, response);
+            deleteAllNoticeReaded(request, response);
         } else if (service.equals("markAsUnread")){
-            markAsUnreadRecruiter(request, response);
+            markAsUnread(request, response);
         } else if (service.equals("deleteSpecific")){
-            deleteSpecificNoticeRecruiter(request, response);
+            deleteSpecificNotice(request, response);
         }
     }
 
-    private void listNoticeRecruiter(HttpServletRequest request, HttpServletResponse response)
+    private void listNotice(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         HttpSession session = request.getSession(true);
         String role = (String) session.getAttribute("role");
         int id = (int) session.getAttribute("userId");
-        RecruiterNotificationDAO dao = new RecruiterNotificationDAO();
+        NotificationDAO dao = new NotificationDAO();
         
         int topk = -1;
-        Vector<RecruiterNotification> list = new Vector<>();
+        Vector<Notification> list = new Vector<>();
         
         String type = request.getParameter("type");
         if (type == null){
@@ -80,10 +82,12 @@ public class NotificationController extends HttpServlet {
         }
         
         if (type.equals("all")){
-            list = dao.getNotice(id, topk);
+            list = dao.getNotice(id, topk, role);
         } else if (type.equals("unread")){
-            list = dao.getUnreadNotice(id, topk);
+            list = dao.getUnreadNotice(id, topk, role);
         }
+        
+        request.setAttribute("rr", dao.getUnreadNotice(id, topk, role).size());
         
         request.setAttribute("notice", list);
         request.setAttribute("type", "all");
@@ -91,18 +95,19 @@ public class NotificationController extends HttpServlet {
         request.getRequestDispatcher("notification.jsp").forward(request, response);
     }
     
-    private void detailNoticeRecruiter(HttpServletRequest request, HttpServletResponse response)
+    private void detailNotice(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         HttpSession session = request.getSession(true);
+        String role = (String) session.getAttribute("role");
         int id = Integer.parseInt(request.getParameter("id"));
         int recId = (int) session.getAttribute("userId");
         
-        RecruiterNotificationDAO dao = new RecruiterNotificationDAO();
+        NotificationDAO dao = new NotificationDAO();
 
-        RecruiterNotification p = dao.getSpecificNotification(id);
+        Notification p = dao.getSpecificNotification(id);
         
         int topk = -1;
-        Vector<RecruiterNotification> list = new Vector<>();
+        Vector<Notification> list = new Vector<>();
         
         String type = request.getParameter("type");
         if (type == null){
@@ -114,9 +119,9 @@ public class NotificationController extends HttpServlet {
         }
         
         if (type.equals("all")){
-            list = dao.getNotice(recId, topk);
+            list = dao.getNotice(recId, topk, role);
         } else if (type.equals("unread")){
-            list = dao.getUnreadNotice(recId, topk);
+            list = dao.getUnreadNotice(recId, topk, role);
         }
 
         dao.readSpecificNotification(id);
@@ -126,53 +131,54 @@ public class NotificationController extends HttpServlet {
         request.setAttribute("specific", p);
         request.setAttribute("notice", list);
         request.setAttribute("type", type);
+        request.setAttribute("rr", dao.getUnreadNotice(recId, topk, role).size());
         
         request.getRequestDispatcher("notification.jsp").forward(request, response);
     }
     
-    private void deleteAllNoticeRecruiter(HttpServletRequest request, HttpServletResponse response)
+    private void deleteAllNotice(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         HttpSession session = request.getSession(true);
-        
+        String role = (String) session.getAttribute("role");
         int id = (int) session.getAttribute("userId");
         
-        RecruiterNotificationDAO dao = new RecruiterNotificationDAO();
-        dao.deleteAll(id);
+        NotificationDAO dao = new NotificationDAO();
+        dao.deleteAll(id, role);
         
         response.sendRedirect("notification");
     }
     
-    private void deleteAllNoticeReadedRecruiter(HttpServletRequest request, HttpServletResponse response)
+    private void deleteAllNoticeReaded(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         HttpSession session = request.getSession(true);
-        
+        String role = (String) session.getAttribute("role");
         int id = (int) session.getAttribute("userId");
         
-        RecruiterNotificationDAO dao = new RecruiterNotificationDAO();
-        dao.deleteAllReaded(id);
+        NotificationDAO dao = new NotificationDAO();
+        dao.deleteAllReaded(id, role);
         
         response.sendRedirect("notification");
     }
     
-    private void markAsUnreadRecruiter(HttpServletRequest request, HttpServletResponse response)
+    private void markAsUnread(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         HttpSession session = request.getSession(true);
         
         int id = Integer.parseInt(request.getParameter("id"));
         
-        RecruiterNotificationDAO dao = new RecruiterNotificationDAO();
+        NotificationDAO dao = new NotificationDAO();
         dao.markAsUnread(id);
         
         response.sendRedirect("notification");
     }
     
-    private void deleteSpecificNoticeRecruiter(HttpServletRequest request, HttpServletResponse response)
+    private void deleteSpecificNotice(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         HttpSession session = request.getSession(true);
         
         int id = Integer.parseInt(request.getParameter("id"));
         
-        RecruiterNotificationDAO dao = new RecruiterNotificationDAO();
+        NotificationDAO dao = new NotificationDAO();
         dao.deleteSpecificNotice(id);
         
         response.sendRedirect("notification");

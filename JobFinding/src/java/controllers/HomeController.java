@@ -10,7 +10,9 @@ import java.util.Vector;
 
 import daos.BannerDAO;
 import daos.BlogDAO;
+import daos.FeaturedJobDAO;
 import daos.JobDAO;
+import daos.NotificationDAO;
 import daos.PostsDAO;
 import daos.RecruiterNotificationDAO;
 import jakarta.servlet.ServletException;
@@ -21,6 +23,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import models.JobListing;
 import models.JobTypeCount;
+import models.Notification;
+import models.Posts;
 import models.RecruiterNotification;
 import utils.Constants;
 
@@ -77,12 +81,21 @@ public class HomeController extends HttpServlet {
             response.sendRedirect("error.jsp");
             return;
         }
+        
+        try {
+            int premium = 3; // check here
+            FeaturedJobDAO fjDao = new FeaturedJobDAO();
+            List<Posts> premiumPost = fjDao.listPostBaseOnFeatureStillActive(premium);
+            
+            request.setAttribute("premiumPost", premiumPost);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         HttpSession session = request.getSession(true);
-
         String role = (String) session.getAttribute("role");
-        if (Constants.RECRUITER_ROLE.equals(role)) {
-            processRecruiter(request, response);
+        if (role != null && !role.equals("admin")) {
+            processQuerry(request, response);
             return;
         }
         // Job seeker sẽ dùng cùng trang home với khách, không dùng dashboard riêng
@@ -91,44 +104,38 @@ public class HomeController extends HttpServlet {
         request.getRequestDispatcher("home.jsp").forward(request, response);
     }
 
-    private void processRecruiter(HttpServletRequest request, HttpServletResponse response)
+    private void processQuerry(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String service = request.getParameter("service");
         if (service == null) {
             service = "list";
         }
+        service = "list";
 
         if (service.equals("list")){
-            listNoticeRecruiter(request, response);
+            listNotice(request, response);
         } else if (service.equals("")){
             
         }
     }
 
-    private void listNoticeRecruiter(HttpServletRequest request, HttpServletResponse response)
+    private void listNotice(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         HttpSession session = request.getSession(true);
         String role = (String) session.getAttribute("role");
         int id = (int) session.getAttribute("userId");
-        RecruiterNotificationDAO dao = new RecruiterNotificationDAO();
+        NotificationDAO dao = new NotificationDAO();
         
         int topk = 5;
-        Vector<RecruiterNotification> list = dao.getNotice(id, topk);
-        Vector<RecruiterNotification> unread = dao.getUnreadNotice(id, topk);
+        Vector<Notification> list = dao.getNotice(id, topk, role);
+        Vector<Notification> unread = dao.getUnreadNotice(id, topk, role);
         request.setAttribute("notice", list);
         request.setAttribute("unread", unread);
-
-//        String sql = "SELECT " + (topk == -1 ? "*" : "TOP (" + topk + ")")
-//                + "  FROM [project_SWP391].[dbo].[RecruiterNotification]\n"
-//                + "  WHERE [recruiter_id] = " + id 
-//                + " ORDER BY created_at DESC";
-//        
-//        log(sql);
+        request.setAttribute("rr", unread.size());
         
-                log("" + list.size());
-//                log("" + id);
-//                response.sendRedirect("admin_dashboard.jsp");
-//                return;
+        log("id recruiter:" + id + " " + role);
+        log("" + list.size());
+                
         request.getRequestDispatcher("home.jsp").forward(request, response);
     }
     

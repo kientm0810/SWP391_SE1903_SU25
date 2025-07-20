@@ -10,7 +10,7 @@ public class FinancialTransactionDAO extends DBContext{
     public int createTransaction(FinancialTransaction transaction) {
         String sql = "INSERT INTO Financial_Transactions (recruiter_id, type, transaction_type, amount, description, status) VALUES (?, ?, ?, ?, ?, ?)";
         try {
-            PreparedStatement stmt = connection.prepareStatement(sql);
+            PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             
             stmt.setInt(1, transaction.getRecruiterId());
             stmt.setString(2, transaction.getType());
