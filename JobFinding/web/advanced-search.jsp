@@ -406,6 +406,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <input type="hidden" name="action" value="search">
                         </form>
                     </div>
 

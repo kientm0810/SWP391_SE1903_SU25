@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 import models.Posts;
+import utils.UploadPicture;
 
 @WebServlet(name = "PostController", urlPatterns = {"/post/*"})
 @MultipartConfig(
@@ -249,15 +250,18 @@ public class PostController extends HttpServlet {
                             return;
                         }
 
-                        String fileName = System.currentTimeMillis() + "_" + getSubmittedFileName(filePart);
-                        String uploadPath = getServletContext().getRealPath("") + File.separator + UPLOAD_DIRECTORY;
-                        File uploadDir = new File(uploadPath);
-                        if (!uploadDir.exists()) {
-                            uploadDir.mkdirs();
-                        }
-
-                        filePart.write(uploadPath + File.separator + fileName);
-                        post.setCompanyLogo(UPLOAD_DIRECTORY + "/" + fileName);
+//                        String fileName = System.currentTimeMillis() + "_" + getSubmittedFileName(filePart);
+//                        String uploadPath = getServletContext().getRealPath("") + File.separator + UPLOAD_DIRECTORY;
+//                        File uploadDir = new File(uploadPath);
+//                        if (!uploadDir.exists()) {
+//                            uploadDir.mkdirs();
+//                        }
+//
+//                        filePart.write(uploadPath + File.separator + fileName);
+                        String basePath = request.getServletContext().getRealPath("/");
+                        String fileName = UploadPicture.uploadImage(filePart, "", basePath);
+//                        post.setCompanyLogo(UPLOAD_DIRECTORY + "/" + fileName);
+                        post.setCompanyLogo(fileName);
                     } else {
                         response.setContentType("application/json");
                         response.getWriter().write("{\"success\":false,\"message\":\"Vui lòng chọn logo công ty\"}");
@@ -271,6 +275,8 @@ public class PostController extends HttpServlet {
                     return;
                 }
 
+                log("den day van dung nay");
+                
                 // Parse deadline date
                 String deadlineStr = request.getParameter("deadline");
                 if (deadlineStr != null && !deadlineStr.isEmpty()) {
@@ -334,10 +340,14 @@ public class PostController extends HttpServlet {
                     response.getWriter().write("{\"success\":false,\"message\":\"Vui lòng điền đầy đủ thông tin\"}");
                     return;
                 }
+                
+                log("den day van dung");
 
                 // Try to create the post
                 boolean success = postsDAO.createPost(post);
 
+                log("ưtf");
+                
                 if (!success) {
                     System.err.println("Failed to create post. Database connection status: " + (postsDAO != null && postsDAO.getConnection() != null));
                 }
@@ -414,6 +424,8 @@ public class PostController extends HttpServlet {
                     post.setKeywords(request.getParameter("keywords") != null ? request.getParameter("keywords").trim() : null);
 
                     if (postsDAO.updatePost(post)) {
+                        log("update thanh cong");
+                        log(post.getJobDescription());
                         response.setContentType("application/json");
                         response.getWriter().write("{\"success\":true,\"message\":\"Post updated successfully\"}");
                     } else {

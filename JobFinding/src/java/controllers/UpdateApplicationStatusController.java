@@ -1,5 +1,8 @@
 package controllers;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
 import daos.ApplicationDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -9,34 +12,31 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import models.Application;
 import models.Recruiter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import utils.EmailService;
 
 @WebServlet(name = "UpdateApplicationStatusController", urlPatterns = {"/update-application-status"})
 public class UpdateApplicationStatusController extends HttpServlet {
+
     private ApplicationDAO applicationDAO;
     private EmailService emailService;
 
-    public UpdateApplicationStatusController() {
+    @Override
+    public void init() throws ServletException {
         applicationDAO = new ApplicationDAO();
         emailService = new EmailService();
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        PrintWriter out = response.getWriter();
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null || !"recruiter".equals(session.getAttribute("role"))) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            out.print("{\"success\": false, \"message\": \"Unauthorized: Please log in as recruiter.\"}");
-            out.flush();
+            response.sendRedirect("login.jsp");
             return;
         }
+        
         Recruiter recruiter = (Recruiter) session.getAttribute("user");
+        
+        // Get form parameters
         String applicationIdStr = request.getParameter("applicationId");
         String status = request.getParameter("status");
         String action = request.getParameter("action");
@@ -49,12 +49,19 @@ public class UpdateApplicationStatusController extends HttpServlet {
             response.sendRedirect("recruiter-applications");
             return;
         }
-        // Only allow specific statuses
-        String[] allowedStatuses = {"new", "reviewed", "interviewed", "offered", "rejected"};
-        boolean validStatus = false;
-        for (String s : allowedStatuses) {
-            if (s.equalsIgnoreCase(newStatus)) {
-                validStatus = true;
+        
+        if (status == null || status.trim().isEmpty()) {
+            session.setAttribute("error", "Vui lòng chọn trạng thái.");
+            response.sendRedirect("recruiter-applications");
+            return;
+        }
+        
+        // Validate status values
+        String[] validStatuses = {"new", "reviewed", "interviewed", "offered", "rejected"};
+        boolean isValidStatus = false;
+        for (String validStatus : validStatuses) {
+            if (validStatus.equals(status.trim())) {
+                isValidStatus = true;
                 break;
             }
         }
@@ -77,6 +84,7 @@ public class UpdateApplicationStatusController extends HttpServlet {
             response.sendRedirect("applications");
             return;
         }
+        
         try {
             int applicationId = Integer.parseInt(applicationIdStr.trim());
             
@@ -169,21 +177,16 @@ public class UpdateApplicationStatusController extends HttpServlet {
                 
                 session.setAttribute("success", successMessage);
             } else {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                out.print("{\"success\": false, \"message\": \"Application not found or you do not have permission.\"}");
+                session.setAttribute("error", "Không thể cập nhật trạng thái. Ứng tuyển không tồn tại hoặc bạn không có quyền.");
             }
         } catch (NumberFormatException e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            out.print("{\"success\": false, \"message\": \"Invalid applicationId format.\"}");
-        } catch (Exception e) {
+            session.setAttribute("error", "ID ứng tuyển không hợp lệ.");
+        } catch (SQLException e) {
             e.printStackTrace();
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.print("{\"success\": false, \"message\": \"Database error. Please try again later.\"}");
-        } finally {
-            out.flush();
+            session.setAttribute("error", "Có lỗi xảy ra khi cập nhật. Vui lòng thử lại.");
         }
         
         // Redirect back to applications page
         response.sendRedirect("applications");
     }
-}
+} 

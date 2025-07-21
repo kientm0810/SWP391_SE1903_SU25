@@ -1,11 +1,6 @@
 package models;
 
 import java.util.Date;
-
-/**
- * Model class for Search History
- * Represents job seeker search history data
- */
 import java.sql.Timestamp;
 
 public class SearchHistory {
@@ -13,12 +8,12 @@ public class SearchHistory {
     private int jobSeekerId;
     private String searchQuery;
     private String searchFilters;
-    private Date searchDate;
+    private Timestamp searchDate;
     
     public SearchHistory() {
     }
     
-    public SearchHistory(int id, int jobSeekerId, String searchQuery, String searchFilters, Date searchDate) {
+    public SearchHistory(int id, int jobSeekerId, String searchQuery, String searchFilters, Timestamp searchDate) {
         this.id = id;
         this.jobSeekerId = jobSeekerId;
         this.searchQuery = searchQuery;

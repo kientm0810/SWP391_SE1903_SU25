@@ -134,7 +134,7 @@
                                     <div class="mb-3">
                                         <label for="jobDescription" class="form-label required-field">Mô tả công
                                             việc</label>
-                                        <textarea class="form-control" id="jobDescription"
+                                        <textarea class="form-control" id="default"
                                             name="jobDescription"></textarea>
                                         <div class="invalid-feedback">Vui lòng nhập mô tả công việc</div>
                                     </div>
@@ -231,11 +231,12 @@
             </div>
 
             <!--API TinyMCE -->
-            <script src="tinymce/tinymce.min.js"></script>
+            <script src="./tinymce/tinymce.min.js"></script>
+            <script src="./assets/js/tinymceConfig.js"></script>
             <script>
                 // Khởi tạo TinyMCE cho các textarea cần rich text
                 tinymce.init({
-                    selector: '#jobDescription, #requirements, #benefits',
+                    selector: '#requirements, #benefits',
                     height: 300,
                     menubar: true,
                     plugins: [
@@ -367,7 +368,7 @@
                         // Check required fields
                         const requiredFields = [
                             'title', 'companyName', 'salary', 'location', 'jobType',
-                            'experience', 'deadline', 'workingTime', 'jobDescription',
+                            'experience', 'deadline', 'workingTime', 'default',
                             'requirements', 'benefits', 'contactAddress', 'applicationMethod',
                             'companyLogo'
                         ];

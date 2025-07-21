@@ -35,7 +35,7 @@
             </div>
             
             <div class="form-container">
-                <form action="AdminSalerController" method="post" enctype="multipart/form-data">
+                <form action="AdminSalerController" method="post" enctype="multipart/form-data" onsubmit="tinymce.triggerSave();">
                     <div class="form-group">
                         <label>Title</label>
                         <c:choose>

@@ -86,7 +86,7 @@
                             <a class="nav-link" href="contact.jsp">
                                 <i class="fas fa-envelope"></i> Contact
                             </a>
-                        </li>-->
+                        </li>
                         <c:if test="${sessionScope.role == 'admin'}">
                             <li class="nav-item">
                                 <a class="nav-link" href="admin_dashboard.jsp">

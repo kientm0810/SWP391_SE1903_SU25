@@ -675,5 +675,18 @@ public class RecruiterDAO extends DBContext {
             return ps.executeUpdate() > 0;
         }
     }
+    
+    public Recruiter getRecruiterById(int recruiterId) throws SQLException {
+        String sql = "SELECT * FROM [project_SWP391].[dbo].[Recruiter] WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, recruiterId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToRecruiter(rs);
+                }
+            }
+        }
+        return null;
+    }
 
 }

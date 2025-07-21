@@ -21,7 +21,8 @@
                     }
                 </style>
                 <!--API TinyMCE -->
-                <script src="tinymce/tinymce.min.js"></script>
+                <script src="${pageContext.request.contextPath}/tinymce/tinymce.min.js"></script>
+                <script src="${pageContext.request.contextPath}/assets/js/tinymceConfig.js"></script>
             </head>
 
             <body>
@@ -51,7 +52,7 @@
                                 </c:if>
 
                                 <form action="${pageContext.request.contextPath}/post/update" method="POST"
-                                    id="editPostForm" enctype="multipart/form-data">
+                                    id="editPostForm" enctype="multipart/form-data" onsubmit="tinymce.triggerSave();">
                                     <input type="hidden" name="id" value="${post.id}">
                                     <input type="hidden" name="parentId" value="${post.parentId}">
                                     <input type="hidden" name="postType" value="${post.postType}">
@@ -135,7 +136,7 @@
                                         <h4>Chi tiết công việc</h4>
                                         <div class="mb-3">
                                             <label for="jobDescription" class="form-label">Mô tả công việc</label>
-                                            <textarea class="form-control" id="jobDescription" name="jobDescription"
+                                            <textarea class="form-control" id="default" name="jobDescription"
                                                 required>${post.jobDescription}</textarea>
                                         </div>
                                         <div class="mb-3">
@@ -252,7 +253,7 @@
                 <script>
                     // Khởi tạo TinyMCE cho các textarea cần rich text
                     tinymce.init({
-                        selector: '#jobDescription, #requirements, #benefits',
+                        selector: '#requirements, #benefits',
                         height: 300,
                         menubar: true,
                         plugins: [
@@ -391,7 +392,7 @@
                         // Check required fields
                         const requiredFields = [
                             'title', 'companyName', 'salary', 'location', 'jobType',
-                            'experience', 'deadline', 'workingTime', 'jobDescription',
+                            'experience', 'deadline', 'workingTime', 'default',
                             'requirements', 'benefits', 'contactAddress', 'applicationMethod'
                         ];
 

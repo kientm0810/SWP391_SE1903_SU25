@@ -17,6 +17,7 @@
                     <link rel="stylesheet"
                         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
                     <link rel="stylesheet" href="assets/css/main.css">
+                    <link rel="stylesheet" href="assets/css/applications.css">
                     <style>
                         body {
                             background: #f5f7fa;
@@ -435,6 +436,94 @@
                                     </ul>
                                 </nav>
                             </c:if>
+                            
+                            <!-- Job Recommendations Section -->
+                            <c:if test="${not empty recommendedJobsWithScores}">
+                                <div class="card mt-4">
+                                    <div class="card-header bg-success text-white">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-lightbulb me-2"></i>
+                                            Việc làm gợi ý dành cho bạn
+                                            <small class="ms-2">(Dựa trên hồ sơ và sở thích của bạn)</small>
+                                        </h5>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div class="row g-0">
+                                            <c:forEach items="${recommendedJobsWithScores}" var="jobWithScore" varStatus="status">
+                                                <c:set var="job" value="${jobWithScore.job}" />
+                                                <c:set var="score" value="${jobWithScore.score}" />
+                                                <div class="col-md-6 col-lg-4">
+                                                    <div class="job-recommendation-card h-100" onclick="viewJobDetail(${job.id})">
+                                                        <!-- Match Score Badge -->
+                                                        <div class="match-score-badge" style="position: absolute; top: 10px; right: 10px; z-index: 10;">
+                                                            <c:choose>
+                                                                <c:when test="${score >= 80}">
+                                                                    <span class="badge bg-success"><fmt:formatNumber value="${score}" pattern="#.##"/>% phù hợp</span>
+                                                                </c:when>
+                                                                <c:when test="${score >= 60}">
+                                                                    <span class="badge bg-warning text-dark"><fmt:formatNumber value="${score}" pattern="#.##"/>% phù hợp</span>
+                                                                </c:when>
+                                                                <c:when test="${score >= 40}">
+                                                                    <span class="badge bg-info"><fmt:formatNumber value="${score}" pattern="#.##"/>% phù hợp</span>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <span class="badge bg-secondary"><fmt:formatNumber value="${score}" pattern="#.##"/>% phù hợp</span>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </div>
+
+                                                        <div class="job-card-header">
+                                                            <div class="d-flex align-items-start">
+                                                                <c:if test="${not empty job.companyLogo}">
+                                                                    <img src="${job.companyLogo}" alt="${job.companyName}" class="company-logo">
+                                                                </c:if>
+                                                                <div class="flex-grow-1">
+                                                                    <h6 class="job-title">${job.title}</h6>
+                                                                    <p class="company-name">${job.companyName}</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="job-card-body">
+                                                            <div class="job-meta">
+                                                                <c:if test="${not empty job.location}">
+                                                                    <span class="meta-item">
+                                                                        <i class="fas fa-map-marker-alt"></i> ${job.location}
+                                                                    </span>
+                                                                </c:if>
+                                                                <c:if test="${not empty job.salary}">
+                                                                    <span class="meta-item">
+                                                                        <i class="fas fa-dollar-sign"></i> ${job.salary}
+                                                                    </span>
+                                                                </c:if>
+                                                                <c:if test="${not empty job.experience}">
+                                                                    <span class="meta-item">
+                                                                        <i class="fas fa-briefcase"></i> ${job.experience}
+                                                                    </span>
+                                                                </c:if>
+                                                            </div>
+                                                            <c:if test="${not empty job.jobDescription}">
+                                                                <p class="job-description">
+                                                                    ${fn:substring(job.jobDescription, 0, 120)}
+                                                                    <c:if test="${fn:length(job.jobDescription) > 120}">...</c:if>
+                                                                </p>
+                                                            </c:if>
+                                                            <div class="job-card-footer">
+                                                                <span class="job-type-badge">${job.jobType}</span>
+                                                                <c:if test="${not empty job.deadline}">
+                                                                    <small class="deadline">
+                                                                        <i class="fas fa-clock"></i> 
+                                                                        Hạn: <fmt:formatDate value="${job.deadline}" pattern="dd/MM/yyyy" />
+                                                                    </small>
+                                                                </c:if>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </c:forEach>
+                                        </div>
+                                    </div>
+                                </div>
+                            </c:if>
                         </div>
 
                         <!-- Withdraw Confirmation Modal -->
@@ -461,9 +550,12 @@
                         </div>
 
                         <!-- Scripts -->
-                        <script
-                            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!--                        <script
+                            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>-->
                         <script>
+                            function viewJobDetail(jobId) {
+                                window.open('./post/view?id=' + jobId, '_blank');
+                            }
                             document.addEventListener('DOMContentLoaded', function () {
                                 const withdrawModal = new bootstrap.Modal(document.getElementById('withdrawModal'));
                                 let applicationToWithdraw = null;

@@ -61,48 +61,48 @@ public class HomeController extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
 
         try {
-            // Get search parameters
-            String keyword = request.getParameter("keyword");
-            String jobType = request.getParameter("jobType");
-            String location = request.getParameter("location");
-            
-            // Get pagination parameters
-            int page = 1;
-            int pageSize = 9; // 3 posts per row, 3 rows
-            try {
-                page = Integer.parseInt(request.getParameter("page"));
-                if (page < 1) page = 1;
-            } catch (NumberFormatException e) {
-                page = 1;
-            }
-            
-            // Get recent posts with pagination
-            List<Posts> recentPosts;
-            int totalPosts;
-            
-            if (keyword != null && !keyword.trim().isEmpty() || 
-                jobType != null && !jobType.trim().isEmpty() || 
-                location != null && !location.trim().isEmpty()) {
-                // Search posts with filters
-                recentPosts = postsDAO.getPostsByPageWithSearch(page, pageSize, keyword, jobType, location);
-                totalPosts = postsDAO.getTotalPostsWithSearch(keyword, jobType, location);
-            } else {
-                // Get latest posts
-                recentPosts = postsDAO.getPostsByPage(page, pageSize);
-                totalPosts = postsDAO.getTotalPosts();
-            }
-            
-            // Calculate pagination info
-            int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
-            
-            // Set attributes for JSP
-            request.setAttribute("recentPosts", recentPosts);
-            request.setAttribute("currentPage", page);
-            request.setAttribute("totalPages", totalPages);
-            request.setAttribute("totalPosts", totalPosts);
-            request.setAttribute("keyword", keyword);
-            request.setAttribute("jobType", jobType);
-            request.setAttribute("location", location);
+//            // Get search parameters
+//            String keyword = request.getParameter("keyword");
+//            String jobType = request.getParameter("jobType");
+//            String location = request.getParameter("location");
+//            
+//            // Get pagination parameters
+//            int page = 1;
+//            int pageSize = 9; // 3 posts per row, 3 rows
+//            try {
+//                page = Integer.parseInt(request.getParameter("page"));
+//                if (page < 1) page = 1;
+//            } catch (NumberFormatException e) {
+//                page = 1;
+//            }
+//            
+//            // Get recent posts with pagination
+//            List<Posts> recentPosts;
+//            int totalPosts;
+//            
+//            if (keyword != null && !keyword.trim().isEmpty() || 
+//                jobType != null && !jobType.trim().isEmpty() || 
+//                location != null && !location.trim().isEmpty()) {
+//                // Search posts with filters
+//                recentPosts = postsDAO.getPostsByPageWithSearch(page, pageSize, keyword, jobType, location);
+//                totalPosts = postsDAO.getTotalPostsWithSearch(keyword, jobType, location);
+//            } else {
+//                // Get latest posts
+//                recentPosts = postsDAO.getPostsByPage(page, pageSize);
+//                totalPosts = postsDAO.getTotalPosts();
+//            }
+//            
+//            // Calculate pagination info
+//            int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
+//            
+//            // Set attributes for JSP
+//            request.setAttribute("recentPosts", recentPosts);
+//            request.setAttribute("currentPage", page);
+//            request.setAttribute("totalPages", totalPages);
+//            request.setAttribute("totalPosts", totalPosts);
+//            request.setAttribute("keyword", keyword);
+//            request.setAttribute("jobType", jobType);
+//            request.setAttribute("location", location);
 
             // Banners for top sections (first two by position)
             request.setAttribute("banners", bannerDAO.getTopBanners(2));

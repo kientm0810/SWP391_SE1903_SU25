@@ -27,7 +27,7 @@ public final class JavaMail {
 
     private static Session getMailSession() {
         final String username = Constants.EMAIL_USERNAME;
-        final String password = Constants.EMAIL_PASSWORD;
+        final String password = Constants.EMAIL_PASSWWORD;
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");

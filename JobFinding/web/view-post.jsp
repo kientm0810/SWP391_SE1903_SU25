@@ -123,7 +123,7 @@
                                 <div class="col-lg-4">
                                     <div class="sidebar-box company-box">
                                         <div class="d-flex align-items-center mb-3">
-                                            <img src="${pageContext.request.contextPath}/${post.companyLogo}"
+                                            <img src="/JobFinding/${post.companyLogo}"
                                                 alt="${post.companyName}" class="company-logo me-3">
                                             <div>
                                                 <div class="fw-bold mb-1">${post.companyName}</div>
@@ -244,7 +244,7 @@
                                                                     </div>
                                                                     <div class="card-body">
                                                                         <div class="d-flex align-items-center mb-3">
-                                                                            <img src="${rel.companyLogo != null ? rel.companyLogo : 'assets/img/icon/job-list1.png'}"
+                                                                            <img src="${rel.companyLogo != null ? "/JobFinding/" + rel.companyLogo : 'assets/img/icon/job-list1.png'}"
                                                                                 alt="${rel.companyName}"
                                                                                 class="company-logo me-3">
                                                                             <div class="job-details">

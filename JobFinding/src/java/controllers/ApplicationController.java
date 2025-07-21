@@ -73,6 +73,7 @@ public class ApplicationController extends HttpServlet {
             }
 
             if ("job-seeker".equals(role)) {
+                log("diquaday");
                 handleJobSeekerApplications(request, response, session, page, pageSize, status, keyword, sortBy);
             } else if ("recruiter".equals(role)) {
                 handleRecruiterApplications(request, response, session, page, pageSize, status, keyword, sortBy);
@@ -101,8 +102,12 @@ public class ApplicationController extends HttpServlet {
         List<Application> applications = applicationDAO.getApplicationsByJobSeeker(
             jobSeeker.getId(), page, pageSize, status, keyword, sortBy);
         
+        log("size: " + applications.size());
+        
         int totalApplications = applicationDAO.countApplicationsByJobSeeker(
             jobSeeker.getId(), status, keyword);
+        
+        log("total: " + totalApplications);
         
         int totalPages = (int) Math.ceil((double) totalApplications / pageSize);
 
@@ -121,6 +126,8 @@ public class ApplicationController extends HttpServlet {
         request.setAttribute("userType", "jobseeker");
         request.setAttribute("recommendedJobsWithScores", recommendedJobsWithScores);
 
+        log("da di qua day");
+        
         // Forward to jobseeker applications page
         request.getRequestDispatcher("applications.jsp").forward(request, response);
     }

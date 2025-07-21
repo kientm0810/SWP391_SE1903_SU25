@@ -150,7 +150,7 @@
         <location>/error.jsp</location>
     </error-page>
 
-    <!-- Application Startup Listener -->
+<!--    Application Startup Listener -->
     <listener>
         <listener-class>listeners.ApplicationStartupListener</listener-class>
     </listener>

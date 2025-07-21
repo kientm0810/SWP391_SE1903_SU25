@@ -41,9 +41,19 @@ public class AdvancedSearchController extends HttpServlet {
             // Parse search criteria from request parameters
             AdvancedSearchCriteria criteria = parseSearchCriteria(request);
             
+            String action = request.getParameter("action");
+            if (action == null){
+                action = "";
+            }
+            
             // Get search results
             List<Posts> jobs = postsDAO.advancedSearch(criteria);
             int totalJobs = postsDAO.countAdvancedSearchResults(criteria);
+            
+            if (!action.equals("search")){
+                jobs = postsDAO.getAllPosts(); // can fix
+                totalJobs = jobs.size();
+            }
             
             // Calculate pagination
             int totalPages = (int) Math.ceil((double) totalJobs / criteria.getPageSize());
