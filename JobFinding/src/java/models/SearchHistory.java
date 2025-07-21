@@ -6,6 +6,8 @@ import java.util.Date;
  * Model class for Search History
  * Represents job seeker search history data
  */
+import java.sql.Timestamp;
+
 public class SearchHistory {
     private int id;
     private int jobSeekerId;
@@ -23,56 +25,52 @@ public class SearchHistory {
         this.searchFilters = searchFilters;
         this.searchDate = searchDate;
     }
-    
+
+    public SearchHistory(int jobSeekerId, String searchQuery, String searchFilters) {
+        this.jobSeekerId = jobSeekerId;
+        this.searchQuery = searchQuery;
+        this.searchFilters = searchFilters;
+        this.searchDate = new Timestamp(System.currentTimeMillis());
+    }
+
     // Getters and Setters
     public int getId() {
         return id;
     }
-    
+
     public void setId(int id) {
         this.id = id;
     }
-    
+
     public int getJobSeekerId() {
         return jobSeekerId;
     }
-    
+
     public void setJobSeekerId(int jobSeekerId) {
         this.jobSeekerId = jobSeekerId;
     }
-    
+
     public String getSearchQuery() {
         return searchQuery;
     }
-    
+
     public void setSearchQuery(String searchQuery) {
         this.searchQuery = searchQuery;
     }
-    
+
     public String getSearchFilters() {
         return searchFilters;
     }
-    
+
     public void setSearchFilters(String searchFilters) {
         this.searchFilters = searchFilters;
     }
-    
-    public Date getSearchDate() {
+
+    public Timestamp getSearchDate() {
         return searchDate;
     }
-    
-    public void setSearchDate(Date searchDate) {
+
+    public void setSearchDate(Timestamp searchDate) {
         this.searchDate = searchDate;
-    }
-    
-    @Override
-    public String toString() {
-        return "SearchHistory{" +
-                "id=" + id +
-                ", jobSeekerId=" + jobSeekerId +
-                ", searchQuery='" + searchQuery + '\'' +
-                ", searchFilters='" + searchFilters + '\'' +
-                ", searchDate=" + searchDate +
-                '}';
     }
 } 

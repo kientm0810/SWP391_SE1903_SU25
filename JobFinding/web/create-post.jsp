@@ -237,16 +237,100 @@
                 tinymce.init({
                     selector: '#jobDescription, #requirements, #benefits',
                     height: 300,
-                    menubar: false,
+                    menubar: true,
                     plugins: [
                         'advlist autolink lists link image charmap print preview anchor',
                         'searchreplace visualblocks code fullscreen',
-                        'insertdatetime media table paste code help wordcount'
+                        'insertdatetime media table paste code help wordcount',
+                        'emoticons template paste textpattern imagetools'
                     ],
-                    toolbar: 'undo redo | formatselect | bold italic backcolor | \
-                                                       alignleft aligncenter alignright alignjustify | \
-                                                       bullist numlist outdent indent | removeformat | help',
-                    branding: false
+                    toolbar: 'undo redo | formatselect | bold italic underline strikethrough | \
+                             fontselect fontsizeselect | forecolor backcolor | \
+                             alignleft aligncenter alignright alignjustify | \
+                             bullist numlist outdent indent | link image imageupload media | \
+                             table tabledelete | tableprops tablerowprops tablecellprops | \
+                             tableinsertrowbefore tableinsertrowafter tabledeleterow | \
+                             tableinsertcolbefore tableinsertcolafter tabledeletecol | \
+                             code fullscreen preview | removeformat | help',
+                    content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }',
+                    branding: false,
+                    language: 'vi',
+                    paste_data_images: true,
+                    image_advtab: true,
+                    image_title: true,
+                    automatic_uploads: true,
+                    file_picker_types: 'image',
+                    images_upload_url: '${pageContext.request.contextPath}/upload/image',
+                    images_upload_handler: function (blobInfo, success, failure) {
+                        var xhr, formData;
+                        xhr = new XMLHttpRequest();
+                        xhr.withCredentials = false;
+                        xhr.open('POST', '${pageContext.request.contextPath}/upload/image');
+                        xhr.onload = function () {
+                            var json;
+                            if (xhr.status != 200) {
+                                failure('HTTP Error: ' + xhr.status);
+                                return;
+                            }
+                            json = JSON.parse(xhr.responseText);
+                            if (!json || typeof json.location != 'string') {
+                                failure('Invalid JSON: ' + xhr.responseText);
+                                return;
+                            }
+                            success(json.location);
+                        };
+                        formData = new FormData();
+                        formData.append('file', blobInfo.blob(), blobInfo.filename());
+                        xhr.send(formData);
+                    },
+                    file_picker_callback: function (cb, value, meta) {
+                        var input = document.createElement('input');
+                        input.setAttribute('type', 'file');
+                        input.setAttribute('accept', 'image/*');
+
+                        input.onchange = function () {
+                            var file = this.files[0];
+                            var reader = new FileReader();
+                            reader.onload = function () {
+                                var id = 'blobid' + (new Date()).getTime();
+                                var blobCache = tinymce.activeEditor.editorUpload.blobCache;
+                                var base64 = reader.result.split(',')[1];
+                                var blobInfo = blobCache.create(id, file, base64);
+                                blobCache.add(blobInfo);
+                                cb(blobInfo.blobUri(), { title: file.name });
+                            };
+                            reader.readAsDataURL(file);
+                        };
+                        input.click();
+                    },
+                    setup: function (editor) {
+                        // Thêm nút upload ảnh tùy chỉnh
+                        editor.ui.registry.addButton('imageupload', {
+                            text: 'Upload Ảnh',
+                            icon: 'image',
+                            onAction: function () {
+                                var input = document.createElement('input');
+                                input.setAttribute('type', 'file');
+                                input.setAttribute('accept', 'image/*');
+                                input.onchange = function () {
+                                    var file = this.files[0];
+                                    if (file) {
+                                        var reader = new FileReader();
+                                        reader.onload = function (e) {
+                                            var id = 'blobid' + (new Date()).getTime();
+                                            var blobCache = editor.editorUpload.blobCache;
+                                            var base64 = e.target.result.split(',')[1];
+                                            var blobInfo = blobCache.create(id, file, base64);
+                                            blobCache.add(blobInfo);
+                                            editor.insertContent('<img src="' + blobInfo.blobUri() + '" alt="' + file.name + '" />');
+                                        };
+                                        reader.readAsDataURL(file);
+                                    }
+                                };
+                                input.click();
+                            }
+                        });
+                    }
                 });
 
                 // Logo preview function

@@ -9,7 +9,19 @@
                 <title>Chỉnh sửa tin tuyển dụng</title>
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
                 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-                <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+                <link rel="stylesheet" href="assets/css/stylePosts.css">
+                <style>
+                    .form-container {
+                        max-width: 800px;
+                        margin: 0 auto;
+                    }
+
+                    .tox-tinymce {
+                        min-height: 400px;
+                    }
+                </style>
+                <!--API TinyMCE -->
+                <script src="tinymce/tinymce.min.js"></script>
             </head>
 
             <body>
@@ -18,7 +30,8 @@
                 <div class="container mt-4">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/home">Home</a></li>
+                            <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/post">Danh sách
+                                    tin</a></li>
                             <li class="breadcrumb-item"><a
                                     href="${pageContext.request.contextPath}/post/view?id=${post.id}">${post.title}</a>
                             </li>
@@ -153,22 +166,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Trạng thái -->
-                                    <div class="mb-4">
-                                        <h4>Trạng thái</h4>
-                                        <div class="mb-3">
-                                            <label for="status" class="form-label">Trạng thái tin</label>
-                                            <select class="form-select" id="status" name="status" required>
-                                                <option value="active" ${post.status=='active' ? 'selected' : '' }>Đang
-                                                    tuyển</option>
-                                                <option value="draft" ${post.status=='draft' ? 'selected' : '' }>Bản
-                                                    nháp</option>
-                                                <option value="closed" ${post.status=='closed' ? 'selected' : '' }>Đã
-                                                    đóng</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
                                     <!-- Thông tin bổ sung -->
                                     <div class="mb-4">
                                         <h4>Thông tin bổ sung</h4>
@@ -206,8 +203,9 @@
                                             <div class="col-md-6 mb-3">
                                                 <label for="keywords" class="form-label">Từ khóa</label>
                                                 <input type="text" class="form-control" id="keywords" name="keywords"
-                                                    maxlength="255" value="${post.keywords}"
-                                                    placeholder="Nhập các từ khóa, cách nhau bởi dấu phẩy">
+                                                    maxlength="255"
+                                                    placeholder="Nhập các từ khóa, cách nhau bởi dấu phẩy"
+                                                    value="${post.keywords}">
                                             </div>
                                         </div>
                                         <div class="mb-3">
@@ -215,6 +213,22 @@
                                             <textarea class="form-control" id="companyDescription"
                                                 name="companyDescription" rows="3"
                                                 maxlength="1000">${post.companyDescription}</textarea>
+                                        </div>
+                                    </div>
+
+                                    <!-- Trạng thái -->
+                                    <div class="mb-4">
+                                        <h4>Trạng thái</h4>
+                                        <div class="mb-3">
+                                            <label for="status" class="form-label">Trạng thái tin</label>
+                                            <select class="form-select" id="status" name="status" required>
+                                                <option value="active" ${post.status=='active' ? 'selected' : '' }>Đang
+                                                    tuyển</option>
+                                                <option value="draft" ${post.status=='draft' ? 'selected' : '' }>Bản
+                                                    nháp</option>
+                                                <option value="closed" ${post.status=='closed' ? 'selected' : '' }>Đã
+                                                    đóng</option>
+                                            </select>
                                         </div>
                                     </div>
 
@@ -234,25 +248,106 @@
                     </div>
                 </div>
 
-
-                <!--API CKEditor-->
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-                <script src="tinymce/tinymce.min.js"></script>
                 <script>
                     // Khởi tạo TinyMCE cho các textarea cần rich text
                     tinymce.init({
                         selector: '#jobDescription, #requirements, #benefits',
                         height: 300,
-                        menubar: false,
+                        menubar: true,
                         plugins: [
                             'advlist autolink lists link image charmap print preview anchor',
                             'searchreplace visualblocks code fullscreen',
-                            'insertdatetime media table paste code help wordcount'
+                            'insertdatetime media table paste code help wordcount',
+                            'emoticons template paste textpattern imagetools'
                         ],
-                        toolbar: 'undo redo | formatselect | bold italic backcolor | \
-                        alignleft aligncenter alignright alignjustify | \
-                        bullist numlist outdent indent | removeformat | help',
-                        branding: false
+                        toolbar: 'undo redo | formatselect | bold italic underline strikethrough | \
+                                 fontselect fontsizeselect | forecolor backcolor | \
+                                 alignleft aligncenter alignright alignjustify | \
+                                 bullist numlist outdent indent | link image imageupload media | \
+                                 table tabledelete | tableprops tablerowprops tablecellprops | \
+                                 tableinsertrowbefore tableinsertrowafter tabledeleterow | \
+                                 tableinsertcolbefore tableinsertcolafter tabledeletecol | \
+                                 code fullscreen preview | removeformat | help',
+                        content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }',
+                        branding: false,
+                        language: 'vi',
+                        paste_data_images: true,
+                        image_advtab: true,
+                        image_title: true,
+                        automatic_uploads: true,
+                        file_picker_types: 'image',
+                        images_upload_url: '${pageContext.request.contextPath}/upload/image',
+                        images_upload_handler: function (blobInfo, success, failure) {
+                            var xhr, formData;
+                            xhr = new XMLHttpRequest();
+                            xhr.withCredentials = false;
+                            xhr.open('POST', '${pageContext.request.contextPath}/upload/image');
+                            xhr.onload = function () {
+                                var json;
+                                if (xhr.status != 200) {
+                                    failure('HTTP Error: ' + xhr.status);
+                                    return;
+                                }
+                                json = JSON.parse(xhr.responseText);
+                                if (!json || typeof json.location != 'string') {
+                                    failure('Invalid JSON: ' + xhr.responseText);
+                                    return;
+                                }
+                                success(json.location);
+                            };
+                            formData = new FormData();
+                            formData.append('file', blobInfo.blob(), blobInfo.filename());
+                            xhr.send(formData);
+                        },
+                        file_picker_callback: function (cb, value, meta) {
+                            var input = document.createElement('input');
+                            input.setAttribute('type', 'file');
+                            input.setAttribute('accept', 'image/*');
+
+                            input.onchange = function () {
+                                var file = this.files[0];
+                                var reader = new FileReader();
+                                reader.onload = function () {
+                                    var id = 'blobid' + (new Date()).getTime();
+                                    var blobCache = tinymce.activeEditor.editorUpload.blobCache;
+                                    var base64 = reader.result.split(',')[1];
+                                    var blobInfo = blobCache.create(id, file, base64);
+                                    blobCache.add(blobInfo);
+                                    cb(blobInfo.blobUri(), { title: file.name });
+                                };
+                                reader.readAsDataURL(file);
+                            };
+                            input.click();
+                        },
+                        setup: function (editor) {
+                            // Thêm nút upload ảnh tùy chỉnh
+                            editor.ui.registry.addButton('imageupload', {
+                                text: 'Upload Ảnh',
+                                icon: 'image',
+                                onAction: function () {
+                                    var input = document.createElement('input');
+                                    input.setAttribute('type', 'file');
+                                    input.setAttribute('accept', 'image/*');
+                                    input.onchange = function () {
+                                        var file = this.files[0];
+                                        if (file) {
+                                            var reader = new FileReader();
+                                            reader.onload = function (e) {
+                                                var id = 'blobid' + (new Date()).getTime();
+                                                var blobCache = editor.editorUpload.blobCache;
+                                                var base64 = e.target.result.split(',')[1];
+                                                var blobInfo = blobCache.create(id, file, base64);
+                                                blobCache.add(blobInfo);
+                                                editor.insertContent('<img src="' + blobInfo.blobUri() + '" alt="' + file.name + '" />');
+                                            };
+                                            reader.readAsDataURL(file);
+                                        }
+                                    };
+                                    input.click();
+                                }
+                            });
+                        }
                     });
 
                     // Logo preview function
@@ -262,22 +357,6 @@
                         const file = event.target.files[0];
 
                         if (file) {
-                            // Check if file is an image
-                            if (!file.type.match('image.*')) {
-                                alert('Vui lòng chọn file hình ảnh (jpg, jpeg, png, gif)');
-                                event.target.value = ''; // Clear the file input
-                                preview.style.display = 'none';
-                                return;
-                            }
-
-                            // Check file size (max 5MB)
-                            if (file.size > 5 * 1024 * 1024) {
-                                alert('Kích thước file không được vượt quá 5MB');
-                                event.target.value = ''; // Clear the file input
-                                preview.style.display = 'none';
-                                return;
-                            }
-
                             const reader = new FileReader();
                             reader.onload = function (e) {
                                 previewImage.src = e.target.result;
@@ -308,21 +387,6 @@
                         const form = this;
                         const formData = new FormData(form);
                         let isValid = true;
-
-                        // Validate file upload if a new file is selected
-                        const fileInput = document.getElementById('companyLogo');
-                        if (fileInput.files.length > 0) {
-                            const file = fileInput.files[0];
-                            if (!file.type.match('image.*')) {
-                                alert('Vui lòng chọn file hình ảnh (jpg, jpeg, png, gif)');
-                                fileInput.value = '';
-                                isValid = false;
-                            } else if (file.size > 5 * 1024 * 1024) {
-                                alert('Kích thước file không được vượt quá 5MB');
-                                fileInput.value = '';
-                                isValid = false;
-                            }
-                        }
 
                         // Check required fields
                         const requiredFields = [
@@ -360,7 +424,7 @@
                             .then(data => {
                                 if (data.success) {
                                     alert('Cập nhật tin thành công!');
-                                    window.location.href = '${pageContext.request.contextPath}/post';
+                                    window.location.href = '${pageContext.request.contextPath}/post/view?id=${post.id}';
                                 } else {
                                     alert(data.message || 'Có lỗi xảy ra khi cập nhật tin. Vui lòng thử lại.');
                                 }
