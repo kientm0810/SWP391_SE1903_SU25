@@ -46,13 +46,13 @@ public class UpdateApplicationStatusController extends HttpServlet {
         // Simple validation
         if (applicationIdStr == null || applicationIdStr.trim().isEmpty()) {
             session.setAttribute("error", "Không tìm thấy ID ứng tuyển.");
-            response.sendRedirect("recruiter-applications");
+            response.sendRedirect("applications");
             return;
         }
         
         if (status == null || status.trim().isEmpty()) {
             session.setAttribute("error", "Vui lòng chọn trạng thái.");
-            response.sendRedirect("recruiter-applications");
+            response.sendRedirect("applications");
             return;
         }
         
