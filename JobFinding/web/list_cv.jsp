@@ -478,7 +478,7 @@
                                                         <i class="fas fa-download"></i>
                                                     </a>
                                                 </c:if>
-                                                <button class="btn btn-outline-info btn-cv-action" onclick="previewCV(${cv.id})" title="Preview CV">
+                                                <button class="btn btn-outline-info btn-cv-action" onclick="previewCV('${cv.id}')" title="Preview CV">
                                                     <i class="fas fa-eye"></i>
                                                 </button>
                                                 <button class="btn btn-outline-danger btn-cv-action" onclick="confirmDelete(${cv.id}, '${cv.jobPosition}')" title="Delete CV">
@@ -518,6 +518,7 @@
                     <form id="deleteForm" method="post" action="list_cv" class="d-inline">
                         <input type="hidden" name="action" value="delete">
                         <input type="hidden" name="cvId" id="deleteCvId">
+                        <input type="hidden" name="csrfToken" id="csrfTokenInput" value="${sessionScope.csrfToken}">
                         <button type="submit" class="btn btn-danger">
                             <i class="fas fa-trash me-2"></i>Delete CV
                         </button>
@@ -556,7 +557,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>-->
     <script src="assets/js/main.js"></script>
     
     <script>
@@ -564,6 +565,11 @@
         function confirmDelete(cvId, cvName) {
             document.getElementById('deleteCvId').value = cvId;
             document.getElementById('cvName').textContent = cvName;
+            // Set CSRF token from a global JS variable or from the DOM if available
+            var csrfToken = '${sessionScope.csrfToken}';
+            if (csrfToken && document.getElementById('csrfTokenInput')) {
+                document.getElementById('csrfTokenInput').value = csrfToken;
+            }
             new bootstrap.Modal(document.getElementById('deleteModal')).show();
         }
 
@@ -577,6 +583,11 @@
             previewContent.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
             editLink.href = `cv-edit?id=${cvId}`;
             
+            // Guard: check for invalid or missing cvId
+            if (!cvId || isNaN(Number(cvId)) || Number(cvId) <= 0) {
+                previewContent.innerHTML = '<div class="alert alert-danger">Invalid CV ID. Please try again.</div>';
+                return;
+            }
             // Load CV preview content
             fetch(`cv-preview?id=${cvId}`)
                 .then(response => response.text())

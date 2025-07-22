@@ -16,7 +16,7 @@
             <link href="assets/css/advanced-search.css" rel="stylesheet">
 
             <style>
-/*                .search-container {
+                .search-container {
                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                     min-height: 300px;
                     padding: 60px 0;
@@ -98,90 +98,6 @@
 
                 .collapse-toggle:hover {
                     color: #764ba2;
-                }*/
-                .search-container {
-                    background: linear-gradient(135deg, #00b14f 0%, #00c85f 100%);
-                    min-height: 300px;
-                    padding: 60px 0;
-                }
-
-                .filter-card {
-                    background: white;
-                    border-radius: 15px;
-                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-                    margin-bottom: 20px;
-                }
-
-                .filter-header {
-                    background: #f8f9fa;
-                    padding: 15px 20px;
-                    border-radius: 15px 15px 0 0;
-                    border-bottom: 1px solid #e9ecef;
-                }
-
-                .filter-body {
-                    padding: 20px;
-                }
-
-                .form-control,
-                .form-select {
-                    border-radius: 10px;
-                    border: 2px solid #e9ecef;
-                    transition: all 0.3s ease;
-                }
-
-                .form-control:focus,
-                .form-select:focus {
-                    border-color: #00b14f;
-                    box-shadow: 0 0 0 0.2rem rgba(0, 177, 79, 0.25);
-                }
-
-                .btn-primary {
-                    background: linear-gradient(135deg, #00b14f 0%, #00c85f 100%);
-                    border: none;
-                    border-radius: 10px;
-                    padding: 12px 30px;
-                    font-weight: 600;
-                    color: white;
-                }
-
-                .btn-outline-secondary {
-                    border-radius: 10px;
-                    padding: 12px 30px;
-                }
-
-                .suggestion-tag {
-                    display: inline-block;
-                    background: #e9ecef;
-                    color: #495057;
-                    padding: 5px 12px;
-                    border-radius: 20px;
-                    margin: 2px;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                    font-size: 0.9em;
-                }
-
-                .suggestion-tag:hover {
-                    background: #00b14f;
-                    color: white;
-                }
-
-                .stats-card {
-                    background: linear-gradient(135deg, #00b14f 0%, #00c85f 100%);
-                    color: white;
-                    border-radius: 15px;
-                    padding: 20px;
-                    margin-bottom: 20px;
-                }
-
-                .collapse-toggle {
-                    cursor: pointer;
-                    color: #00b14f;
-                }
-
-                .collapse-toggle:hover {
-                    color: #009944;
                 }
             </style>
         </head>
@@ -281,16 +197,14 @@
                                         </label>
                                         <select class="form-select" id="jobType" name="jobType">
                                             <option value="">Tất cả loại</option>
-                                            <option value="full_time" ${param.jobType=='full_time' ? 'selected' : '' }>
+                                            <option value="Full-time" ${param.jobType=='Full-time' ? 'selected' : '' }>
                                                 Toàn thời gian</option>
-                                            <option value="part_time" ${param.jobType=='part_time' ? 'selected' : '' }>
+                                            <option value="Part-time" ${param.jobType=='Part-time' ? 'selected' : '' }>
                                                 Bán thời gian</option>
-                                            <option value="contract" ${param.jobType=='contract' ? 'selected' : '' }>Hợp
+                                            <option value="Contract" ${param.jobType=='Contract' ? 'selected' : '' }>Hợp
                                                 đồng</option>
-                                            <option value="internship" ${param.jobType=='internship' ? 'selected' : ''
+                                            <option value="Internship" ${param.jobType=='Internship' ? 'selected' : ''
                                                 }>Thực tập</option>
-                                            <option value="freelance" ${param.jobType=='freelance' ? 'selected' : '' }>
-                                                Freelance</option>
                                         </select>
                                     </div>
 
@@ -634,7 +548,7 @@
             <jsp:include page="footer.jsp" />
 
             <!-- Bootstrap JS -->
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            <!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>-->
             <!-- jQuery -->
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -701,19 +615,19 @@
                 }
 
                 // Auto-submit form when filters change
-                document.addEventListener('DOMContentLoaded', function () {
-                    const form = document.getElementById('advancedSearchForm');
-                    const inputs = form.querySelectorAll('input, select');
-
-                    inputs.forEach(input => {
-                        input.addEventListener('change', function () {
-                            // Don't auto-submit for certain fields
-                            if (this.name !== 'searchName' && this.name !== 'saveSearch') {
-                                form.submit();
-                            }
-                        });
-                    });
-                });
+//                document.addEventListener('DOMContentLoaded', function () {
+//                    const form = document.getElementById('advancedSearchForm');
+//                    const inputs = form.querySelectorAll('input, select');
+//
+//                    inputs.forEach(input => {
+//                        input.addEventListener('change', function () {
+//                            // Don't auto-submit for certain fields
+//                            if (this.name !== 'searchName' && this.name !== 'saveSearch') {
+//                                form.submit();
+//                            }
+//                        });
+//                    });
+//                });
             </script>
         </body>
 
