@@ -236,6 +236,7 @@ public class AdminSalerController extends HttpServlet {
         log(submit + " ye");
         
         if (submit.equals("submit")) {
+            log("dcm sao lai loi");
             String title = InputSanitizer.cleanSearchQuery(request.getParameter("title"));
             
             log("blah" + title + "blah");

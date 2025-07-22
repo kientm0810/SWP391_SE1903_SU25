@@ -127,29 +127,35 @@
             <br/>
             
             <!-- Premium Job -->
-            
-            <div class="container mt-4">
+            <div class="container mt-4 premium-section">
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="section-tittle text-center">
-                            <span>Premium Job</span>
-                            <h2>Hotest Job</h2>
+                            <span class="text-warning fw-bold text-uppercase">Premium Job</span>
+                            <h2 class="text-dark">Hotest Job</h2>
                         </div>
                     </div>
                 </div>
-                
+
+                <!-- Debug info -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <p class="text-muted">Number of posts: ${posts != null ? posts.size() : 0}</p>
+                    </div>
+                </div>
+
                 <!-- Job List Container -->
                 <div class="row" id="jobList">
                     <c:forEach items="${posts}" var="post" varStatus="status">
-                        <div class="col-xl-4 col-lg-4 col-md-6 job-item" data-index="${status.index}">
-                            <div class="card job-card">
-                                <div class="job-card-header-overlay d-flex justify-content-between align-items-center">
+                        <div class="col-xl-4 col-lg-4 col-md-6 job-item premium-job-item" data-index="${status.index}">
+                            <div class="card job-card border border-warning shadow-sm premium-card">
+                                <div class="job-card-header-overlay d-flex justify-content-between align-items-center bg-warning bg-opacity-10 p-2 rounded-top">
                                     <div class="job-badges-left d-flex gap-2">
                                         <c:if test="${post.postType == 'hot'}">
-                                            <span class="job-badge badge-new">Tin mới</span>
+                                            <span class="job-badge badge-new bg-danger text-white">Tin mới</span>
                                         </c:if>
                                         <c:if test="${post.postType == 'pro'}">
-                                            <span class="job-badge badge-featured">Nổi bật</span>
+                                            <span class="job-badge badge-featured bg-warning text-dark">Nổi bật</span>
                                         </c:if>
                                     </div>
                                 </div>
@@ -157,11 +163,11 @@
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-3">
                                         <img src="${post.companyLogo != null ? post.companyLogo : 'assets/img/icon/job-list1.png'}"
-                                             alt="${post.companyName}" class="company-logo me-3">
+                                             alt="${post.companyName}" class="company-logo me-3 rounded premium-logo">
                                         <div class="job-details">
                                             <h5 class="card-title mb-1">
                                                 <a href="${pageContext.request.contextPath}/post/view?id=${post.id}"
-                                                   class="text-decoration-none text-dark job-title-truncate">
+                                                   class="text-decoration-none text-dark job-title-truncate premium-job-title">
                                                     ${post.title}
                                                 </a>
                                             </h5>
@@ -171,14 +177,13 @@
 
                                     <!-- Salary and Location Tags -->
                                     <div class="d-flex flex-wrap gap-2">
-                                        <span class="job-info-tag salary-tag">${post.salary}</span>
-                                        <span class="job-info-tag location-tag">${post.location}</span>
+                                        <span class="job-info-tag salary-tag premium-salary">${post.salary}</span>
+                                        <span class="job-info-tag location-tag premium-location">${post.location}</span>
 
-                                        <form action="${pageContext.request.contextPath}/saved-jobs" method="post"
-                                              style="display:inline;">
+                                        <form action="${pageContext.request.contextPath}/saved-jobs" method="post" style="display:inline;">
                                             <input type="hidden" name="postId" value="${post.id}" />
                                             <input type="hidden" name="action" value="save" />
-                                            <button type="submit" class="btn btn-outline-primary save-job ms-auto">
+                                            <button type="submit" class="btn btn-outline-warning save-job ms-auto premium-save-btn">
                                                 <i class="far fa-heart"></i> Lưu tin
                                             </button>
                                         </form>
@@ -190,7 +195,7 @@
                 </div>
 
                 <!-- Khu Phân trang Frontend -->
-                <nav aria-label="Page navigation" class="mt-4" id="paginationNav">
+                <nav aria-label="Page navigation" class="mt-4 premium-pagination" id="paginationNav">
                     <div class="simple-pagination d-flex justify-content-center align-items-center gap-3">
                         <!-- Nút trang trước -->
                         <a href="#" class="pagination-arrow" id="prevBtn" onclick="previousPage()">
@@ -198,7 +203,8 @@
                         </a>
 
                         <span class="pagination-info">
-                            <span class="current-page" id="currentPage">1</span> / <span class="total-pages" id="totalPages">1</span> trang
+                            <span class="current-page" id="currentPage">1</span> /
+                            <span class="total-pages" id="totalPages">1</span> trang
                         </span>
 
                         <!-- Nút trang sau -->
@@ -366,43 +372,50 @@
                         </div>
                     </div>
 
-                    <div class="row">
-                        <c:if test="${empty recentPosts}">
-                            <div class="col-12 text-center">
-                                <p>No recent posts available.</p>
-                            </div>
-                        </c:if>
-                        <c:forEach items="${recentPosts}" var="post">
-                            <div class="col-xl-4 col-lg-4 col-md-6">
-                                <div class="job-card">
-                                    <div class="job-header">
-                                        <img src="${post.companyLogo}" alt="${post.companyName}"
-                                             class="company-logo">
-                                        <div class="job-info">
-                                            <div class="job-title-wrapper">
-                                                <h3 class="job-title">
-                                                    <a href="post/view?id=${post.id}">${post.title}</a>
-                                                </h3>
-                                                <div class="job-tag">${post.jobType}</div>
-                                            </div>
-                                            <div class="company-name">${post.companyName}</div>
+                    <!-- Job List Container -->
+                    <div class="row" id="recentJobList">
+                        <c:forEach items="${recentPosts}" var="post" varStatus="status">
+                            <div class="col-xl-4 col-lg-4 col-md-6 job-item-recent" data-index="${status.index}">
+                                <div class="card job-card">
+                                    <div class="job-card-header-overlay d-flex justify-content-between align-items-center">
+                                        <div class="job-badges-left d-flex gap-2">
+                                            <c:if test="${post.postType == 'hot'}">
+                                                <span class="job-badge badge-new">Tin mới</span>
+                                            </c:if>
+                                            <c:if test="${post.postType == 'pro'}">
+                                                <span class="job-badge badge-featured">Nổi bật</span>
+                                            </c:if>
                                         </div>
                                     </div>
-                                    <div class="job-meta">
-                                        <div class="job-meta-item">
-                                            <i class="fas fa-money-bill-wave"></i>
-                                            <span class="salary">${post.salary}</span>
+
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <img src="${post.companyLogo != null ? post.companyLogo : 'assets/img/icon/job-list1.png'}"
+                                                 alt="${post.companyName}" class="company-logo me-3">
+                                            <div class="job-details">
+                                                <h5 class="card-title mb-1">
+                                                    <a href="${pageContext.request.contextPath}/post/view?id=${post.id}"
+                                                       class="text-decoration-none text-dark job-title-truncate">
+                                                        ${post.title}
+                                                    </a>
+                                                </h5>
+                                                <p class="text-muted mb-1 company-name-truncate">${post.companyName}</p>
+                                            </div>
                                         </div>
-                                        <div class="job-meta-item">
-                                            <i class="fas fa-map-marker-alt"></i>
-                                            <span class="location">${post.location}</span>
-                                        </div>
-                                        <div class="job-meta-item">
-                                            <i class="fas fa-clock"></i>
-                                            <span class="deadline">Deadline:
-                                                <fmt:formatDate value="${post.deadline}"
-                                                                pattern="dd/MM/yyyy" />
-                                            </span>
+
+                                        <!-- Salary and Location Tags -->
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <span class="job-info-tag salary-tag">${post.salary}</span>
+                                            <span class="job-info-tag location-tag">${post.location}</span>
+
+                                            <form action="${pageContext.request.contextPath}/saved-jobs" method="post"
+                                                  style="display:inline;">
+                                                <input type="hidden" name="postId" value="${post.id}" />
+                                                <input type="hidden" name="action" value="save" />
+                                                <button type="submit" class="btn btn-outline-primary save-job ms-auto">
+                                                    <i class="far fa-heart"></i> Lưu tin
+                                                </button>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -410,91 +423,23 @@
                         </c:forEach>
                     </div>
 
-                    <!-- Khu phân trang -->
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="pagination-area pb-115 text-center">
-                                <c:if test="${totalPages > 1}">
-                                    <nav aria-label="Page navigation" class="mt-4">
-                                        <ul class="pagination justify-content-center">
-                                            <!-- Trang đầu tiên -->
-                                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                                <a class="page-link"
-                                                   href="home?page=1${keyword != null ? '&keyword=' : ''}${keyword != null ? keyword : ''}${jobType != null ? '&jobType=' : ''}${jobType != null ? jobType : ''}${location != null ? '&location=' : ''}${location != null ? location : ''}"
-                                                   aria-label="Trang đầu" title="Trang đầu">
-                                                    <i class="fas fa-angle-double-left"></i>
-                                                </a>
-                                            </li>
-                                            <!-- Nút trang trước -->
-                                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                                <a class="page-link"
-                                                   href="home?page=${currentPage - 1}${keyword != null ? '&keyword=' : ''}${keyword != null ? keyword : ''}${jobType != null ? '&jobType=' : ''}${jobType != null ? jobType : ''}${location != null ? '&location=' : ''}${location != null ? location : ''}"
-                                                   aria-label="Trang trước" title="Trang trước">
-                                                    <i class="fas fa-angle-left"></i>
-                                                </a>
-                                            </li>
-                                            <!-- Số trang với dấu ... -->
-                                            <c:set var="startPage" value="${currentPage - 2}" />
-                                            <c:set var="endPage" value="${currentPage + 2}" />
-                                            <c:if test="${startPage < 1}">
-                                                <c:set var="startPage" value="1" />
-                                            </c:if>
-                                            <c:if test="${endPage > totalPages}">
-                                                <c:set var="endPage" value="${totalPages}" />
-                                            </c:if>
-                                            <c:if test="${startPage > 1}">
-                                                <li class="page-item">
-                                                    <a class="page-link"
-                                                       href="home?page=1${keyword != null ? '&keyword=' : ''}${keyword != null ? keyword : ''}${jobType != null ? '&jobType=' : ''}${jobType != null ? jobType : ''}${location != null ? '&location=' : ''}${location != null ? location : ''}">1</a>
-                                                </li>
-                                                <c:if test="${startPage > 2}">
-                                                    <li class="page-item disabled">
-                                                        <span class="page-link">...</span>
-                                                    </li>
-                                                </c:if>
-                                            </c:if>
-                                            <c:forEach begin="${startPage}" end="${endPage}" var="i">
-                                                <li
-                                                    class="page-item ${currentPage == i ? 'active' : ''}">
-                                                    <a class="page-link"
-                                                       href="home?page=${i}${keyword != null ? '&keyword=' : ''}${keyword != null ? keyword : ''}${jobType != null ? '&jobType=' : ''}${jobType != null ? jobType : ''}${location != null ? '&location=' : ''}${location != null ? location : ''}">${i}</a>
-                                                </li>
-                                            </c:forEach>
-                                            <c:if test="${endPage < totalPages}">
-                                                <c:if test="${endPage < totalPages - 1}">
-                                                    <li class="page-item disabled">
-                                                        <span class="page-link">...</span>
-                                                    </li>
-                                                </c:if>
-                                                <li class="page-item">
-                                                    <a class="page-link"
-                                                       href="home?page=${totalPages}${keyword != null ? '&keyword=' : ''}${keyword != null ? keyword : ''}${jobType != null ? '&jobType=' : ''}${jobType != null ? jobType : ''}${location != null ? '&location=' : ''}${location != null ? location : ''}">${totalPages}</a>
-                                                </li>
-                                            </c:if>
-                                            <!-- Nút trang sau -->
-                                            <li
-                                                class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                                <a class="page-link"
-                                                   href="home?page=${currentPage + 1}${keyword != null ? '&keyword=' : ''}${keyword != null ? keyword : ''}${jobType != null ? '&jobType=' : ''}${jobType != null ? jobType : ''}${location != null ? '&location=' : ''}${location != null ? location : ''}"
-                                                   aria-label="Trang sau" title="Trang sau">
-                                                    <i class="fas fa-angle-right"></i>
-                                                </a>
-                                            </li>
-                                            <!-- Trang cuối cùng -->
-                                            <li
-                                                class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                                <a class="page-link"
-                                                   href="home?page=${totalPages}${keyword != null ? '&keyword=' : ''}${keyword != null ? keyword : ''}${jobType != null ? '&jobType=' : ''}${jobType != null ? jobType : ''}${location != null ? '&location=' : ''}${location != null ? location : ''}"
-                                                   aria-label="Trang cuối" title="Trang cuối">
-                                                    <i class="fas fa-angle-double-right"></i>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </nav>
-                                </c:if>
-                            </div>
+                    <!-- Pagination for Recent Posts -->
+                    <nav aria-label="Page navigation" class="mt-4" id="recentPaginationNav">
+                        <div class="simple-pagination d-flex justify-content-center align-items-center gap-3">
+                            <a href="#" class="pagination-arrow" id="recentPrevBtn">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+
+                            <span class="pagination-info">
+                                <span class="current-page" id="recentCurrentPage">1</span> /
+                                <span class="total-pages" id="recentTotalPages">1</span> trang
+                            </span>
+
+                            <a href="#" class="pagination-arrow" id="recentNextBtn">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
                         </div>
-                    </div>
+                    </nav>
 
                 </div>
             </div>
@@ -1027,6 +972,116 @@ function nextPage() {
         showPage(currentPage + 1);
     }
 }
+
+let recentCurrentPage = 1;
+let recentItemsPerPage = 6;
+let recentTotalItems = 0;
+let recentTotalPages = 0;
+
+document.addEventListener('DOMContentLoaded', function() {
+    const recentJobItems = document.querySelectorAll('.job-item-recent');
+    recentTotalItems = recentJobItems.length;
+
+    if (recentTotalItems === 0) {
+        document.getElementById('recentPaginationNav').style.display = 'none';
+        return;
+    }
+
+    recentTotalPages = Math.ceil(recentTotalItems / recentItemsPerPage);
+    document.getElementById('recentTotalPages').textContent = recentTotalPages;
+
+    if (recentTotalPages <= 1) {
+        document.getElementById('recentPaginationNav').style.display = 'none';
+    }
+
+    showRecentPage(1);
+
+    // Gắn lại sự kiện click (sau khi DOM loaded)
+    document.getElementById('recentPrevBtn').addEventListener('click', recentPreviousPage);
+    document.getElementById('recentNextBtn').addEventListener('click', recentNextPage);
+});
+
+function showRecentPage(page) {
+    const recentJobItems = document.querySelectorAll('.job-item-recent');
+    const startIndex = (page - 1) * recentItemsPerPage;
+    const endIndex = startIndex + recentItemsPerPage;
+
+    recentJobItems.forEach((item, index) => {
+        const jobCard = item.querySelector('.job-card');
+        jobCard.classList.remove('show');
+        jobCard.style.display = 'none';
+    });
+
+    recentJobItems.forEach((item, index) => {
+        if (index >= startIndex && index < endIndex) {
+            const jobCard = item.querySelector('.job-card');
+            setTimeout(() => {
+                jobCard.style.display = 'block';
+                jobCard.classList.add('show');
+            }, (index - startIndex) * 50);
+        }
+    });
+
+    recentCurrentPage = page;
+    updateRecentPaginationControls();
+
+    document.getElementById('recentJobList').scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+    });
+}
+
+function updateRecentPaginationControls() {
+    document.getElementById('recentCurrentPage').textContent = recentCurrentPage;
+    document.getElementById('recentTotalPages').textContent = recentTotalPages;
+
+    const prevBtn = document.getElementById('recentPrevBtn');
+    const nextBtn = document.getElementById('recentNextBtn');
+
+    prevBtn.classList.toggle('disabled', recentCurrentPage === 1);
+    nextBtn.classList.toggle('disabled', recentCurrentPage === recentTotalPages);
+}
+
+function recentPreviousPage(event) {
+    event.preventDefault();
+    if (recentCurrentPage > 1) {
+        showRecentPage(recentCurrentPage - 1);
+    }
+}
+
+function recentNextPage(event) {
+    event.preventDefault();
+    if (recentCurrentPage < recentTotalPages) {
+        showRecentPage(recentCurrentPage + 1);
+    }
+}
 </script>
+
+<style>
+    .premium-section .section-tittle span {
+        font-size: 14px;
+        letter-spacing: 1px;
+    }
+
+    .premium-job-item .job-card {
+        transition: 0.3s ease;
+        border: 2px solid #ffc107 !important;
+        box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
+    }
+
+    .premium-job-item .job-card:hover {
+        transform: scale(1.02);
+    }
+
+    .premium-save-btn {
+        border-color: #ffc107 !important;
+        color: #ffc107;
+    }
+
+    .premium-save-btn:hover {
+        background-color: #ffc107 !important;
+        color: white;
+    }
+</style>
 
 </html>

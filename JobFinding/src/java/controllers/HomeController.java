@@ -128,6 +128,13 @@ public class HomeController extends HttpServlet {
             log("sizepremium: " + premiumPost.size());
             
             request.setAttribute("posts", premiumPost);
+            
+            int lastest = 2; // check here
+            List<Posts> recentPost = fjDao.listPostBaseOnFeatureStillActive(lastest);
+            
+            log("sizerecent: " + recentPost.size());
+            
+            request.setAttribute("recentPosts", recentPost);
         } catch (Exception e) {
             e.printStackTrace();
         }

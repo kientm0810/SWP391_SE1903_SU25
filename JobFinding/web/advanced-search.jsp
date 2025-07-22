@@ -16,7 +16,7 @@
             <link href="assets/css/advanced-search.css" rel="stylesheet">
 
             <style>
-                .search-container {
+/*                .search-container {
                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                     min-height: 300px;
                     padding: 60px 0;
@@ -98,6 +98,90 @@
 
                 .collapse-toggle:hover {
                     color: #764ba2;
+                }*/
+                .search-container {
+                    background: linear-gradient(135deg, #00b14f 0%, #00c85f 100%);
+                    min-height: 300px;
+                    padding: 60px 0;
+                }
+
+                .filter-card {
+                    background: white;
+                    border-radius: 15px;
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                    margin-bottom: 20px;
+                }
+
+                .filter-header {
+                    background: #f8f9fa;
+                    padding: 15px 20px;
+                    border-radius: 15px 15px 0 0;
+                    border-bottom: 1px solid #e9ecef;
+                }
+
+                .filter-body {
+                    padding: 20px;
+                }
+
+                .form-control,
+                .form-select {
+                    border-radius: 10px;
+                    border: 2px solid #e9ecef;
+                    transition: all 0.3s ease;
+                }
+
+                .form-control:focus,
+                .form-select:focus {
+                    border-color: #00b14f;
+                    box-shadow: 0 0 0 0.2rem rgba(0, 177, 79, 0.25);
+                }
+
+                .btn-primary {
+                    background: linear-gradient(135deg, #00b14f 0%, #00c85f 100%);
+                    border: none;
+                    border-radius: 10px;
+                    padding: 12px 30px;
+                    font-weight: 600;
+                    color: white;
+                }
+
+                .btn-outline-secondary {
+                    border-radius: 10px;
+                    padding: 12px 30px;
+                }
+
+                .suggestion-tag {
+                    display: inline-block;
+                    background: #e9ecef;
+                    color: #495057;
+                    padding: 5px 12px;
+                    border-radius: 20px;
+                    margin: 2px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    font-size: 0.9em;
+                }
+
+                .suggestion-tag:hover {
+                    background: #00b14f;
+                    color: white;
+                }
+
+                .stats-card {
+                    background: linear-gradient(135deg, #00b14f 0%, #00c85f 100%);
+                    color: white;
+                    border-radius: 15px;
+                    padding: 20px;
+                    margin-bottom: 20px;
+                }
+
+                .collapse-toggle {
+                    cursor: pointer;
+                    color: #00b14f;
+                }
+
+                .collapse-toggle:hover {
+                    color: #009944;
                 }
             </style>
         </head>

@@ -51,7 +51,7 @@
                             </li>
                         </c:if>
                         <li class="nav-item">
-                            <a class="nav-link" href="blog.jsp">
+                            <a class="nav-link" href="BlogController">
                                 <i class="fas fa-blog"></i> Blog
                             </a>
                         </li>
