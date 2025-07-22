@@ -1,4 +1,3 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <footer style="background-color: #0a101e; color: #fff; padding: 60px 0 0 0;">
     <div class="container">
         <!-- Top Section - Information Columns -->

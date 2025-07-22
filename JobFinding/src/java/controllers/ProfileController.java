@@ -135,6 +135,18 @@ public class ProfileController extends HttpServlet {
             case "addAward":
                 handleAddAward(request, response);
                 break;
+            case "editExperience":
+                handleEditExperience(request, response);
+                break;
+            case "editCertificate":
+                handleEditCertificate(request, response);
+                break;
+            case "editEducation":
+                handleEditEducation(request, response);
+                break;
+            case "editAward":
+                handleEditAward(request, response);
+                break;
             case "editContact":
                 handleEditContact(request, response);
                 break;
@@ -550,6 +562,198 @@ public class ProfileController extends HttpServlet {
             session.setAttribute("errorMessage", "Lỗi hệ thống khi thêm giải thưởng!");
         }
         
+        response.sendRedirect("profile");
+    }
+
+    private void handleEditExperience(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null || !"job-seeker".equals(session.getAttribute("role"))) {
+            response.sendRedirect("login");
+            return;
+        }
+        JobSeeker jobSeeker = (JobSeeker) session.getAttribute("user");
+        try {
+            int experienceId = Integer.parseInt(request.getParameter("experienceId"));
+            String position = request.getParameter("position");
+            String company = request.getParameter("company");
+            String startDateStr = request.getParameter("startDate");
+            String endDateStr = request.getParameter("endDate");
+            String skillsUsed = request.getParameter("skillsUsed");
+            String achievements = request.getParameter("achievements");
+            boolean isCurrent = "true".equals(request.getParameter("isCurrent"));
+            if (position == null || company == null || startDateStr == null || position.trim().isEmpty() || company.trim().isEmpty()) {
+                session.setAttribute("errorMessage", "Vui lòng điền đầy đủ thông tin bắt buộc!");
+                response.sendRedirect("profile");
+                return;
+            }
+            Experience experience = experienceDAO.getExperienceById(experienceId);
+            if (experience == null || experience.getJobSeekerId() != jobSeeker.getId()) {
+                session.setAttribute("errorMessage", "Không tìm thấy kinh nghiệm hoặc bạn không có quyền sửa!");
+                response.sendRedirect("profile");
+                return;
+            }
+            experience.setPosition(position.trim());
+            experience.setCompanyName(company.trim());
+            experience.setStartDate(Date.valueOf(startDateStr));
+            if (!isCurrent && endDateStr != null && !endDateStr.trim().isEmpty()) {
+                experience.setEndDate(Date.valueOf(endDateStr));
+            } else {
+                experience.setEndDate(null);
+            }
+            experience.setSkillsUsed(skillsUsed != null ? skillsUsed.trim() : "");
+            experience.setAchievements(achievements != null ? achievements.trim() : "");
+            experience.setCurrent(isCurrent);
+            boolean updated = experienceDAO.updateExperience(experience);
+            if (updated) {
+                session.setAttribute("successMessage", "Kinh nghiệm làm việc đã được cập nhật thành công!");
+            } else {
+                session.setAttribute("errorMessage", "Không thể cập nhật kinh nghiệm làm việc. Vui lòng thử lại!");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error editing experience", e);
+            session.setAttribute("errorMessage", "Lỗi hệ thống khi cập nhật kinh nghiệm làm việc!");
+        }
+        response.sendRedirect("profile");
+    }
+
+    private void handleEditCertificate(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null || !"job-seeker".equals(session.getAttribute("role"))) {
+            response.sendRedirect("login");
+            return;
+        }
+        JobSeeker jobSeeker = (JobSeeker) session.getAttribute("user");
+        try {
+            int certificateId = Integer.parseInt(request.getParameter("certificateId"));
+            String name = request.getParameter("name");
+            String organization = request.getParameter("organization");
+            String issueDateStr = request.getParameter("issueDate");
+            String credentialId = request.getParameter("credentialId");
+            String credentialUrl = request.getParameter("credentialUrl");
+            String description = request.getParameter("description");
+            if (name == null || organization == null || issueDateStr == null || name.trim().isEmpty() || organization.trim().isEmpty()) {
+                session.setAttribute("errorMessage", "Vui lòng điền đầy đủ thông tin bắt buộc!");
+                response.sendRedirect("profile");
+                return;
+            }
+            Certificate certificate = certificateDAO.getCertificateById(certificateId);
+            if (certificate == null || certificate.getJobSeekerId() != jobSeeker.getId()) {
+                session.setAttribute("errorMessage", "Không tìm thấy chứng chỉ hoặc bạn không có quyền sửa!");
+                response.sendRedirect("profile");
+                return;
+            }
+            certificate.setCertificateName(name.trim());
+            certificate.setIssuingOrganization(organization.trim());
+            certificate.setIssueDate(Date.valueOf(issueDateStr));
+            certificate.setCredentialId(credentialId != null ? credentialId.trim() : "");
+            certificate.setCredentialUrl(credentialUrl != null ? credentialUrl.trim() : "");
+            certificate.setDescription(description != null ? description.trim() : "");
+            boolean updated = certificateDAO.updateCertificate(certificate);
+            if (updated) {
+                session.setAttribute("successMessage", "Chứng chỉ đã được cập nhật thành công!");
+            } else {
+                session.setAttribute("errorMessage", "Không thể cập nhật chứng chỉ. Vui lòng thử lại!");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error editing certificate", e);
+            session.setAttribute("errorMessage", "Lỗi hệ thống khi cập nhật chứng chỉ!");
+        }
+        response.sendRedirect("profile");
+    }
+
+    private void handleEditEducation(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null || !"job-seeker".equals(session.getAttribute("role"))) {
+            response.sendRedirect("login");
+            return;
+        }
+        JobSeeker jobSeeker = (JobSeeker) session.getAttribute("user");
+        try {
+            int educationId = Integer.parseInt(request.getParameter("educationId"));
+            String degree = request.getParameter("degree");
+            String fieldOfStudy = request.getParameter("fieldOfStudy");
+            String institution = request.getParameter("institution");
+            String startDateStr = request.getParameter("startDate");
+            String endDateStr = request.getParameter("endDate");
+            String activities = request.getParameter("activities");
+            boolean isCurrent = "true".equals(request.getParameter("isCurrent"));
+            if (degree == null || fieldOfStudy == null || institution == null || startDateStr == null || degree.trim().isEmpty() || fieldOfStudy.trim().isEmpty() || institution.trim().isEmpty()) {
+                session.setAttribute("errorMessage", "Vui lòng điền đầy đủ thông tin bắt buộc!");
+                response.sendRedirect("profile");
+                return;
+            }
+            Education education = educationDAO.getEducationById(educationId);
+            if (education == null || education.getJobSeekerId() != jobSeeker.getId()) {
+                session.setAttribute("errorMessage", "Không tìm thấy học vấn hoặc bạn không có quyền sửa!");
+                response.sendRedirect("profile");
+                return;
+            }
+            education.setDegree(degree.trim());
+            education.setFieldOfStudy(fieldOfStudy.trim());
+            education.setInstitutionName(institution.trim());
+            education.setStartDate(Date.valueOf(startDateStr));
+            if (!isCurrent && endDateStr != null && !endDateStr.trim().isEmpty()) {
+                education.setEndDate(Date.valueOf(endDateStr));
+            } else {
+                education.setEndDate(null);
+            }
+            education.setActivities(activities != null ? activities.trim() : "");
+            education.setCurrent(isCurrent);
+            boolean updated = educationDAO.updateEducation(education);
+            if (updated) {
+                session.setAttribute("successMessage", "Học vấn đã được cập nhật thành công!");
+            } else {
+                session.setAttribute("errorMessage", "Không thể cập nhật học vấn. Vui lòng thử lại!");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error editing education", e);
+            session.setAttribute("errorMessage", "Lỗi hệ thống khi cập nhật học vấn!");
+        }
+        response.sendRedirect("profile");
+    }
+
+    private void handleEditAward(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null || !"job-seeker".equals(session.getAttribute("role"))) {
+            response.sendRedirect("login");
+            return;
+        }
+        JobSeeker jobSeeker = (JobSeeker) session.getAttribute("user");
+        try {
+            int awardId = Integer.parseInt(request.getParameter("awardId"));
+            String name = request.getParameter("name");
+            String organization = request.getParameter("organization");
+            String issueDateStr = request.getParameter("issueDate");
+            String description = request.getParameter("description");
+            if (name == null || organization == null || issueDateStr == null || name.trim().isEmpty() || organization.trim().isEmpty()) {
+                session.setAttribute("errorMessage", "Vui lòng điền đầy đủ thông tin bắt buộc!");
+                response.sendRedirect("profile");
+                return;
+            }
+            Award award = awardDAO.getAwardById(awardId);
+            if (award == null || award.getJobSeekerId() != jobSeeker.getId()) {
+                session.setAttribute("errorMessage", "Không tìm thấy giải thưởng hoặc bạn không có quyền sửa!");
+                response.sendRedirect("profile");
+                return;
+            }
+            award.setAwardName(name.trim());
+            award.setIssuingOrganization(organization.trim());
+            award.setDateReceived(Date.valueOf(issueDateStr));
+            award.setDescription(description != null ? description.trim() : "");
+            boolean updated = awardDAO.updateAward(award);
+            if (updated) {
+                session.setAttribute("successMessage", "Giải thưởng đã được cập nhật thành công!");
+            } else {
+                session.setAttribute("errorMessage", "Không thể cập nhật giải thưởng. Vui lòng thử lại!");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error editing award", e);
+            session.setAttribute("errorMessage", "Lỗi hệ thống khi cập nhật giải thưởng!");
+        }
         response.sendRedirect("profile");
     }
 

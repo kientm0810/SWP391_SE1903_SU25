@@ -66,6 +66,10 @@
         <servlet-name>AddProfileSectionController</servlet-name>
         <servlet-class>controllers.AddProfileSectionController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>CVPreviewController</servlet-name>
+        <servlet-class>controllers.CVPreviewController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>ajaxServlet</servlet-name>
         <url-pattern>/payment</url-pattern>
@@ -133,6 +137,26 @@
     <servlet-mapping>
         <servlet-name>AddProfileSectionController</servlet-name>
         <url-pattern>/award-add</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AddProfileSectionController</servlet-name>
+        <url-pattern>/experience-edit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AddProfileSectionController</servlet-name>
+        <url-pattern>/certificate-edit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AddProfileSectionController</servlet-name>
+        <url-pattern>/education-edit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AddProfileSectionController</servlet-name>
+        <url-pattern>/award-edit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CVPreviewController</servlet-name>
+        <url-pattern>/cv-preview</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>
