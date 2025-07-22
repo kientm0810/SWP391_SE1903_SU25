@@ -820,6 +820,7 @@
                                     <i class="fas fa-times me-2"></i> Đóng
                                 </button>
                             </div>
+                            <!-- Trong phần modal, thay đổi các ID để unique cho từng modal -->
                             <div class="update-status-section p-3 bg-light rounded">
                                 <h6 class="mb-3">
                                     <i class="fas fa-edit me-2"></i>Cập nhật trạng thái
@@ -884,6 +885,8 @@
         <!-- Scripts -->
         <!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>-->
         <script>
+            // Thay thế toàn bộ JavaScript trong file JSP bằng code này:
+
             function resetFilters() {
                 document.getElementById('status').value = '';
                 document.getElementById('sortBy').value = 'applied_at';
@@ -891,8 +894,42 @@
                 document.getElementById('filterForm').submit();
             }
 
+// Sử dụng event delegation thay vì add listener cho từng modal
+            document.addEventListener('change', function (e) {
+                if (e.target.classList.contains('status-select')) {
+                    console.log('Status select changed:', e.target.value);
+
+                    const modal = e.target.closest('.modal');
+                    const selectedStatus = e.target.value;
+
+                    console.log('Modal found:', modal);
+
+                    // Tìm các fields trong modal này
+                    const rejectionField = modal.querySelector('.rejection-reason-field');
+                    const offerField = modal.querySelector('.offer-details-field');
+
+                    console.log('Rejection field:', rejectionField);
+                    console.log('Offer field:', offerField);
+
+                    // Hide all fields
+                    if (rejectionField)
+                        rejectionField.style.display = 'none';
+                    if (offerField)
+                        offerField.style.display = 'none';
+
+                    // Show based on status
+                    if (selectedStatus === 'rejected' && rejectionField) {
+                        console.log('Showing rejection field');
+                        rejectionField.style.display = 'block';
+                    } else if (selectedStatus === 'offered' && offerField) {
+                        console.log('Showing offer field');
+                        offerField.style.display = 'block';
+                    }
+                }
+            });
+
             document.addEventListener("DOMContentLoaded", function () {
-                // Handle modal open - populate with candidate data  
+                // Handle modal open
                 document.querySelectorAll('.view-candidate-btn').forEach(button => {
                     button.addEventListener('click', function () {
                         const applicationId = this.dataset.applicationId;
@@ -901,146 +938,51 @@
                         if (!modal)
                             return;
 
-                        // Get elements specific to this modal
+                        // Set application data
                         const modalApplicationIdInput = modal.querySelector('.modal-application-id');
-                        const statusSelect = modal.querySelector(`#statusSelect-${applicationId}`);
-                        const updateStatusForm = modal.querySelector('.updateStatusForm');
-                        const rejectionReasonField = modal.querySelector(`#rejectionReasonField-${applicationId}`);
-                        const offerDetailsField = modal.querySelector(`#offerDetailsField-${applicationId}`);
-                        const rejectionReasonInput = modal.querySelector(`#rejectionReason-${applicationId}`);
-                        const offerDetailsInput = modal.querySelector(`#offerDetails-${applicationId}`);
-
-                        // Set application ID for form submission
                         if (modalApplicationIdInput) {
                             modalApplicationIdInput.value = applicationId;
                         }
 
-                        // Set current status as selected
+                        // Set current status
+                        const statusSelect = modal.querySelector('.status-select');
                         const currentStatus = this.dataset.currentStatus || '';
                         if (statusSelect) {
                             statusSelect.value = currentStatus.toLowerCase();
                         }
 
-                        // Reset form fields
-                        if (rejectionReasonInput)
-                            rejectionReasonInput.value = '';
-                        if (offerDetailsInput)
-                            offerDetailsInput.value = '';
-                        if (rejectionReasonField)
-                            rejectionReasonField.style.display = 'none';
-                        if (offerDetailsField)
-                            offerDetailsField.style.display = 'none';
+                        // Reset fields
+                        const rejectionField = modal.querySelector('.rejection-reason-field');
+                        const offerField = modal.querySelector('.offer-details-field');
+                        const rejectionInput = modal.querySelector('textarea[name="rejectionReason"]');
+                        const offerInput = modal.querySelector('textarea[name="offerDetails"]');
 
-                        // Add event listener for status change - specific to this modal
-                        if (statusSelect) {
-                            // Remove any existing listeners to avoid duplicates
-                            statusSelect.removeEventListener('change', handleStatusChange);
-                            statusSelect.addEventListener('change', handleStatusChange);
+                        if (rejectionInput)
+                            rejectionInput.value = '';
+                        if (offerInput)
+                            offerInput.value = '';
+                        if (rejectionField)
+                            rejectionField.style.display = 'none';
+                        if (offerField)
+                            offerField.style.display = 'none';
 
-                            function handleStatusChange() {
-                                const selectedStatus = statusSelect.value;
-
-                                // Hide all additional fields first
-                                if (rejectionReasonField)
-                                    rejectionReasonField.style.display = 'none';
-                                if (offerDetailsField)
-                                    offerDetailsField.style.display = 'none';
-
-                                // Show relevant field based on status
-                                if (selectedStatus === 'rejected' && rejectionReasonField) {
-                                    rejectionReasonField.style.display = 'block';
-                                } else if (selectedStatus === 'offered' && offerDetailsField) {
-                                    offerDetailsField.style.display = 'block';
-                                }
-                            }
-                        }
-
-                        // Handle form submission with confirmation
-                        if (updateStatusForm) {
-                            updateStatusForm.removeEventListener('submit', handleFormSubmit);
-                            updateStatusForm.addEventListener('submit', handleFormSubmit);
-
-                            function handleFormSubmit(e) {
-                                e.preventDefault();
-
-                                const selectedStatus = statusSelect ? statusSelect.value : '';
-                                const selectedText = statusSelect ? statusSelect.options[statusSelect.selectedIndex].text : '';
-                                const rejectionReason = rejectionReasonInput ? rejectionReasonInput.value.trim() : '';
-                                const offerDetails = offerDetailsInput ? offerDetailsInput.value.trim() : '';
-
-                                // Validation
-                                if (!applicationId) {
-                                    alert('Lỗi: Không tìm thấy ID ứng tuyển.');
-                                    return;
-                                }
-
-                                if (!selectedStatus) {
-                                    alert('Vui lòng chọn trạng thái.');
-                                    return;
-                                }
-
-                                if (selectedStatus === 'rejected' && !rejectionReason) {
-                                    alert('Vui lòng nhập lý do từ chối.');
-                                    if (rejectionReasonInput)
-                                        rejectionReasonInput.focus();
-                                    return;
-                                }
-
-                                if (selectedStatus === 'offered' && !offerDetails) {
-                                    alert('Vui lòng nhập chi tiết đề nghị.');
-                                    if (offerDetailsInput)
-                                        offerDetailsInput.focus();
-                                    return;
-                                }
-
-                                // Get email message based on status
-                                const getEmailMessage = (status) => {
-                                    switch (status) {
-                                        case 'reviewed':
-                                            return 'Email thông báo đã xem hồ sơ sẽ được gửi tự động.';
-                                        case 'interviewed':
-                                            return 'Email cảm ơn tham gia phỏng vấn sẽ được gửi tự động.';
-                                        case 'rejected':
-                                            return 'Email từ chối với lý do sẽ được gửi tự động.';
-                                        case 'offered':
-                                            return 'Email chấp nhận với chi tiết đề nghị sẽ được gửi tự động.';
-                                        default:
-                                            return '';
-                                    }
-                                };
-
-                                const emailMessage = getEmailMessage(selectedStatus);
-                                const confirmMessage = `Bạn có chắc muốn cập nhật trạng thái thành "${selectedText}"?\n\n${emailMessage}`;
-
-                                // Show confirmation dialog
-                                if (confirm(confirmMessage)) {
-                                    // Submit the form normally - this will cause a page reload
-                                    updateStatusForm.submit();
-                                }
-                            }
-                        }
-
-                        // Handle other modal elements like CV download, send email etc.
+                        // Handle CV and email buttons
                         const modalDownloadCvBtn = modal.querySelector('#modal-download-cv-btn');
                         const modalSendEmailBtn = modal.querySelector('#modal-send-email-btn');
 
-                        // Handle CV download
                         const cvUrl = this.dataset.cvUrl;
                         if (modalDownloadCvBtn) {
                             if (cvUrl && cvUrl !== 'null' && cvUrl !== '' && !cvUrl.includes('null')) {
                                 modalDownloadCvBtn.href = cvUrl;
                                 modalDownloadCvBtn.style.display = 'inline-block';
                                 modalDownloadCvBtn.classList.remove('disabled');
-                                modalDownloadCvBtn.title = 'Tải CV';
                             } else {
                                 modalDownloadCvBtn.href = '#';
                                 modalDownloadCvBtn.style.display = 'inline-block';
                                 modalDownloadCvBtn.classList.add('disabled');
-                                modalDownloadCvBtn.title = 'CV không có sẵn';
                             }
                         }
 
-                        // Handle Send Email button  
                         if (modalSendEmailBtn) {
                             const sendEmailUrl = 'send-custom-email?recipientEmail=' + encodeURIComponent(this.dataset.email) +
                                     '&candidateName=' + encodeURIComponent(this.dataset.fullname) +
@@ -1050,6 +992,43 @@
                             modalSendEmailBtn.href = sendEmailUrl;
                         }
                     });
+                });
+
+                // Handle form submission
+                document.addEventListener('submit', function (e) {
+                    if (e.target.classList.contains('updateStatusForm')) {
+                        e.preventDefault();
+
+                        const form = e.target;
+                        const modal = form.closest('.modal');
+                        const statusSelect = modal.querySelector('.status-select');
+                        const selectedStatus = statusSelect ? statusSelect.value : '';
+
+                        if (!selectedStatus) {
+                            alert('Vui lòng chọn trạng thái.');
+                            return;
+                        }
+
+                        const rejectionInput = modal.querySelector('textarea[name="rejectionReason"]');
+                        const offerInput = modal.querySelector('textarea[name="offerDetails"]');
+
+                        if (selectedStatus === 'rejected' && rejectionInput && !rejectionInput.value.trim()) {
+                            alert('Vui lòng nhập lý do từ chối.');
+                            rejectionInput.focus();
+                            return;
+                        }
+
+                        if (selectedStatus === 'offered' && offerInput && !offerInput.value.trim()) {
+                            alert('Vui lòng nhập chi tiết đề nghị.');
+                            offerInput.focus();
+                            return;
+                        }
+
+                        const selectedText = statusSelect.options[statusSelect.selectedIndex].text;
+                        if (confirm(`Bạn có chắc muốn cập nhật trạng thái thành "${selectedText}"?`)) {
+                            form.submit();
+                        }
+                    }
                 });
             });
         </script>
