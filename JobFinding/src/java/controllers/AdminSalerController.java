@@ -6,6 +6,7 @@ package controllers;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import daos.AdminDAO;
 import daos.BlogDAO;
 import models.Blog;
 import models.Banner;
@@ -49,6 +50,19 @@ public class AdminSalerController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
 
+        HttpSession session = request.getSession(true);
+        if (session.getAttribute("role") == null || !session.getAttribute("role").equals("admin")) {
+            response.sendRedirect("home");
+            return;
+        }
+        
+        AdminDAO dao = new AdminDAO();
+        int userID = (int)session.getAttribute("userId");
+        if (dao.getSpecificStaff(userID).getRole().equals("manager")){
+            response.sendRedirect("home");
+            return;
+        }
+        
         String target = request.getParameter("target");
 
         if (target == null) {
@@ -337,11 +351,12 @@ public class AdminSalerController extends HttpServlet {
                         request.getRequestDispatcher("admin_saler_add_blog.jsp").forward(request, response);
                         return;
                     }
+                    String basePath = request.getServletContext().getRealPath("/");
+                    thumbnail = UploadPicture.uploadImage(filePart, thumbnail, basePath);
                 } else {
                 }
-
-                String basePath = request.getServletContext().getRealPath("/");
-                thumbnail = UploadPicture.uploadImage(filePart, thumbnail, basePath);
+//                log(thumbnail);
+//                log("after: " + thumbnail);
 
             } catch (Exception e) {
                 log(e.getMessage());

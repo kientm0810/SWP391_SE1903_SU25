@@ -706,6 +706,47 @@ CREATE TABLE Job_Seeker_Awards (
     FOREIGN KEY (job_seeker_id) REFERENCES Job_Seekers(id) ON DELETE CASCADE
 );
 
+-- Tạo bảng HomePageComponentType
+CREATE TABLE HomePageComponentType (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    type_name NVARCHAR(100) NOT NULL UNIQUE,
+    description NVARCHAR(255),
+    created_at DATETIME DEFAULT GETDATE(),
+    updated_at DATETIME DEFAULT GETDATE()
+);
+
+-- Tạo bảng HomePageComponentContent
+CREATE TABLE HomePageComponentContent (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    type_id INT NOT NULL,
+    position INT NOT NULL,
+    name NVARCHAR(255) NOT NULL,
+    title NVARCHAR(500) NOT NULL,
+    content NTEXT,
+    icon_class NVARCHAR(100), -- Để lưu class icon như flaticon-search
+    status NVARCHAR(20) DEFAULT 'active',
+    created_at DATETIME DEFAULT GETDATE(),
+    updated_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (type_id) REFERENCES HomePageComponentType(id) ON DELETE CASCADE
+);
+
+-- Insert dữ liệu cho HomePageComponentType
+INSERT INTO HomePageComponentType (type_name, description) VALUES
+('testimonial', 'Testimonial section components'),
+('apply_process', 'Apply process steps components');
+
+-- Insert dữ liệu cho Testimonial
+INSERT INTO HomePageComponentContent (type_id, position, name, title, content, status) VALUES
+(1, 1, 'Margaret Lawson', 'Creative Director', 'I am at an age where I just want to be fit and healthy our bodies are our responsibility! So start caring for your body and it will care for you. Eat clean it will care for you and workout hard.', 'active'),
+(1, 2, 'John Smith', 'Senior Developer', 'Working with this platform has been an amazing experience. The recruitment process was smooth and professional. I found my dream job within weeks!', 'active'),
+(1, 3, 'Sarah Johnson', 'Marketing Manager', 'The best job portal I have ever used. Great interface, responsive support team, and excellent job matching algorithm. Highly recommended!', 'active');
+
+-- Insert dữ liệu cho Apply Process
+INSERT INTO HomePageComponentContent (type_id, position, name, title, content, icon_class, status) VALUES
+(2, 1, 'Search Job', '1. Search a job', 'Sorem spsum dolor sit amsectetur adipisclit, seddo eiusmod tempor incididunt ut laborea.', 'flaticon-search', 'active'),
+(2, 2, 'Apply Job', '2. Apply for job', 'Sorem spsum dolor sit amsectetur adipisclit, seddo eiusmod tempor incididunt ut laborea.', 'flaticon-curriculum-vitae', 'active'),
+(2, 3, 'Get Job', '3. Get your job', 'Sorem spsum dolor sit amsectetur adipisclit, seddo eiusmod tempor incididunt ut laborea.', 'flaticon-tour', 'active');
+
 -- =====================================================
 -- DỮ LIỆU MẪU ĐỂ TEST
 -- =====================================================

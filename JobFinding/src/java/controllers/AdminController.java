@@ -68,6 +68,13 @@ public class AdminController extends HttpServlet {
             response.sendRedirect("home");
             return;
         }
+        
+        AdminDAO dao = new AdminDAO();
+        int userID = (int)session.getAttribute("userId");
+        if (dao.getSpecificStaff(userID).getRole().equals("saler")){
+            response.sendRedirect("home");
+            return;
+        }
 
         String target = request.getParameter("target");
         if (target == null) {

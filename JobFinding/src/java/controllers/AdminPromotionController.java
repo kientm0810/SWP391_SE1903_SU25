@@ -4,6 +4,7 @@
  */
 package controllers;
 
+import daos.AdminDAO;
 import daos.FeaturedJobDAO;
 import daos.PromotionProgramDAO;
 import daos.PostsDAO;
@@ -44,6 +45,13 @@ public class AdminPromotionController extends HttpServlet {
         
         HttpSession session = request.getSession(true);
         if (session.getAttribute("role") == null || !session.getAttribute("role").equals("admin")) {
+            response.sendRedirect("home");
+            return;
+        }
+        
+        AdminDAO dao = new AdminDAO();
+        int userID = (int)session.getAttribute("userId");
+        if (dao.getSpecificStaff(userID).getRole().equals("saler")){
             response.sendRedirect("home");
             return;
         }
