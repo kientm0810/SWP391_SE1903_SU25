@@ -11,6 +11,7 @@ import daos.BlogDAO;
 import models.Blog;
 import models.Banner;
 import daos.BannerDAO;
+import daos.HomepageDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -26,6 +27,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Vector;
+import models.HomepageComponentContent;
 import utils.InputSanitizer;
 import utils.UploadPicture;
 
@@ -72,8 +74,10 @@ public class AdminSalerController extends HttpServlet {
         if (target.equals("blog")) {
             processBlog(request, response);
         } else if (target.equals("banner")) {
-            log("qua day truoc da");
+//            log("qua day truoc da");
             processBanner(request, response);
+        } else if (target.equals("homecomponent")){
+            processHomepageComponent(request, response);
         }
     }
 
@@ -99,9 +103,101 @@ public class AdminSalerController extends HttpServlet {
             deleteBlog(request, response);
         }
     }
+    
+    private void processHomepageComponent(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String service = request.getParameter("service");
 
+        if (service == null) {
+            service = "listAll";
+        }
+
+        if (service.equals("listAll")) {
+            listAllHomepageComponent(request, response);
+        } else if (service.equals("listMy")) {
+
+        } else if (service.equals("Add")) {
+            addBlog(request, response);
+        } else if (service.equals("Detail")) {
+            detailBlog(request, response);
+        } else if (service.equals("Update")){
+            updateBlog(request, response);
+        } else if (service.equals("Delete")){
+            deleteHomepageComponent(request, response);
+        }
+    }
+
+    private void listAllHomepageComponent(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HomepageDAO dao = new HomepageDAO();
+        Vector<HomepageComponentContent> components = new Vector<>();
+        
+        // Pagination parameters
+        String pageStr = request.getParameter("page");
+        String recordsPerPageStr = request.getParameter("recordsPerPage");
+        String sortField = request.getParameter("sortField");
+        String sortOrder = request.getParameter("sortOrder");
+        String searchType = InputSanitizer.cleanSearchQuery(request.getParameter("componentType"));
+        
+        int page = 1;
+        int recordsPerPage = 10;
+        
+        if (pageStr != null && !pageStr.isEmpty()) {
+            page = Integer.parseInt(pageStr);
+        }
+        if (recordsPerPageStr != null && !recordsPerPageStr.isEmpty()) {
+            recordsPerPage = Integer.parseInt(recordsPerPageStr);
+        }
+        if (sortField == null || sortField.isEmpty()) {
+            sortField = "id";
+        }
+        if (sortOrder == null || sortOrder.isEmpty()) {
+            sortOrder = "DESC";
+        }
+        
+        int totalRecords;
+
+        if (searchType == null){
+            searchType = "";
+        }
+        
+//        if (searchType != null && !searchType.isEmpty()) {
+        components = dao.getComponentContentsWithPaging(searchType, page, recordsPerPage, sortField, sortOrder);
+        totalRecords = dao.getComponentContentsByType(searchType);
+//        } 
+//        else {
+//            components = blogDAO.getAllBlogsWithPagingAndSorting(page, recordsPerPage, sortField, sortOrder);
+//            totalRecords = blogDAO.getTotalBlogs();
+//        }
+        
+        log("type: " + searchType + " " + components.size());
+
+        int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+        
+        request.setAttribute("components", components);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("recordsPerPage", recordsPerPage);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("totalRecords", totalRecords);
+        request.setAttribute("sortField", sortField);
+        request.setAttribute("sortOrder", sortOrder);
+        request.setAttribute("searchComponentType", searchType);
+        
+        request.getRequestDispatcher("admin_saler_all_homecomponent.jsp").forward(request, response);
+    }
+    
+    private void deleteHomepageComponent(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        int componentID = Integer.parseInt(request.getParameter("componentId"));
+        
+        HomepageDAO dao = new HomepageDAO();
+        boolean flag = dao.deleteComponentContent(componentID);
+        
+//        log("delete " + flag);
+        response.sendRedirect("AdminSalerController?target=homecomponent");
+    }
+    
     // Thay thế phương thức listAll bằng:
-
     private void listAlls(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         BlogDAO blogDAO = new BlogDAO();

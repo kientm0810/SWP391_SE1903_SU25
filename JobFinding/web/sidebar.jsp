@@ -44,6 +44,11 @@
                 <i class="fas fa-image"></i>
                 <span>Manage Banners</span>
             </a>
+                
+            <a href="AdminSalerController?target=homecomponent" class="menu-item ${param.target == 'homecomponent' ? 'active' : ''}">
+                <i class="fas fa-cog"></i>
+                <span>Homepage Component</span>
+            </a>
         </c:if>
         
         <c:if test="${sessionScope.adminRole == 'manager' || sessionScope.adminRole == 'admin'}">
@@ -68,11 +73,6 @@
         <a href="profile.jsp" class="menu-item">
             <i class="fas fa-user-circle"></i>
             <span>My Profile</span>
-        </a>
-
-        <a href="settings.jsp" class="menu-item">
-            <i class="fas fa-cog"></i>
-            <span>Settings</span>
         </a>
 
         <a href="logout" class="menu-item">
