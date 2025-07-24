@@ -175,6 +175,8 @@
                                     <button type="submit" class="btn btn-danger"><i
                                             class="fas fa-trash me-2"></i> Xóa tin</button>
                                 </form>
+                                <a href="/JobFinding/checkout?action=showPricing&jobId=${post.id}"
+                                   class="btn btn-primary"><i class="fas fa-edit me-2"></i> Đăng tin</a>
                             </div>
                         </div>
                     </c:if>
