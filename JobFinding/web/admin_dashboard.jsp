@@ -183,10 +183,10 @@
             <div class="quick-actions">
                 <h2>Quick Actions</h2>
                 <div class="action-buttons">
-                    <a href="AdminController?target=JobSeeker&service=Add" class="action-btn">
+<!--                    <a href="AdminController?target=JobSeeker&service=Add" class="action-btn">
                         <i class="fas fa-user-plus"></i>
                         <span>Add Job Seeker</span>
-                    </a>
+                    </a>-->
                     <a href="AdminController?target=Recruiter&service=Add" class="action-btn">
                         <i class="fas fa-building"></i>
                         <span>Add Recruiter</span>
