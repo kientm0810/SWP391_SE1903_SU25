@@ -41,7 +41,7 @@
         <link rel="stylesheet" href="assets/css/slick.css">
         <link rel="stylesheet" href="assets/css/nice-select.css">
         <link rel="stylesheet" href="assets/css/style.css">
-        
+
 
     </head>
 
@@ -125,7 +125,7 @@
             <!-- slider Area End-->
             <br/>
             <br/>
-            
+
             <!-- Premium Job -->
             <div class="container mt-4 premium-section">
                 <div class="row">
@@ -215,7 +215,7 @@
                 </nav>
             </div>
             <!-- Premium Job end -->
-            
+
             <!-- Our Services Start -->
             <div class="our-services section-pad-t30">
                 <div class="container">
@@ -450,10 +450,66 @@
 
 
             <!-- How  Apply Process Start-->
+            <!--            <div class="apply-process-area apply-bg pt-150 pb-150"
+                             data-background="assets/img/gallery/how-applybg.png">
+                            <div class="container">
+                                 Section Tittle 
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="section-tittle white-text text-center">
+                                            <span>Apply process</span>
+                                            <h2> How it works</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                                 Apply Process Caption 
+                                <div class="row">
+                                    <div class="col-lg-4 col-md-6">
+                                        <div class="single-process text-center mb-30">
+                                            <div class="process-ion">
+                                                <span class="flaticon-search"></span>
+                                            </div>
+                                            <div class="process-cap">
+                                                <h5>1. Search a job</h5>
+                                                <p>Sorem spsum dolor sit amsectetur adipisclit, seddo eiusmod tempor
+                                                    incididunt ut laborea.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-6">
+                                        <div class="single-process text-center mb-30">
+                                            <div class="process-ion">
+                                                <span class="flaticon-curriculum-vitae"></span>
+                                            </div>
+                                            <div class="process-cap">
+                                                <h5>2. Apply for job</h5>
+                                                <p>Sorem spsum dolor sit amsectetur adipisclit, seddo eiusmod tempor
+                                                    incididunt ut laborea.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-6">
+                                        <div class="single-process text-center mb-30">
+                                            <div class="process-ion">
+                                                <span class="flaticon-tour"></span>
+                                            </div>
+                                            <div class="process-cap">
+                                                <h5>3. Get your job</h5>
+                                                <p>Sorem spsum dolor sit amsectetur adipisclit, seddo eiusmod tempor
+                                                    incididunt ut laborea.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>-->
+
+            <!-- Apply Process Section Fragment -->
+            <!-- Apply Process Caption -->
             <div class="apply-process-area apply-bg pt-150 pb-150"
                  data-background="assets/img/gallery/how-applybg.png">
                 <div class="container">
-                    <!-- Section Tittle -->
+                    Section Tittle 
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="section-tittle white-text text-center">
@@ -462,48 +518,110 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Apply Process Caption -->
                     <div class="row">
-                        <div class="col-lg-4 col-md-6">
-                            <div class="single-process text-center mb-30">
-                                <div class="process-ion">
-                                    <span class="flaticon-search"></span>
-                                </div>
-                                <div class="process-cap">
-                                    <h5>1. Search a job</h5>
-                                    <p>Sorem spsum dolor sit amsectetur adipisclit, seddo eiusmod tempor
-                                        incididunt ut laborea.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-md-6">
-                            <div class="single-process text-center mb-30">
-                                <div class="process-ion">
-                                    <span class="flaticon-curriculum-vitae"></span>
-                                </div>
-                                <div class="process-cap">
-                                    <h5>2. Apply for job</h5>
-                                    <p>Sorem spsum dolor sit amsectetur adipisclit, seddo eiusmod tempor
-                                        incididunt ut laborea.</p>
+                        <c:forEach var="process" items="${applyProcesses}">
+                            <div class="col-lg-4 col-md-6">
+                                <div class="single-process text-center mb-30">
+                                    <div class="process-ion">
+                                        <span class="${process.iconClass}"></span>
+                                    </div>
+                                    <div class="process-cap">
+                                        <h5>${process.title}</h5>
+                                        <p>${process.content}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-lg-4 col-md-6">
-                            <div class="single-process text-center mb-30">
-                                <div class="process-ion">
-                                    <span class="flaticon-tour"></span>
-                                </div>
-                                <div class="process-cap">
-                                    <h5>3. Get your job</h5>
-                                    <p>Sorem spsum dolor sit amsectetur adipisclit, seddo eiusmod tempor
-                                        incididunt ut laborea.</p>
-                                </div>
-                            </div>
-                        </div>
+                        </c:forEach>
                     </div>
                 </div>
             </div>
+
+
             <!-- How  Apply Process End-->
+            <!--             Testimonial Start 
+                        <div class="testimonial-area testimonial-padding">
+                            <div class="container">
+                                 Testimonial contents 
+                                <div class="row d-flex justify-content-center">
+                                    <div class="col-xl-8 col-lg-8 col-md-10">
+                                        <div class="h1-testimonial-active dot-style">
+                                             Single Testimonial 
+                                            <div class="single-testimonial text-center">
+                                                 Testimonial Content 
+                                                <div class="testimonial-caption ">
+                                                     founder 
+                                                    <div class="testimonial-founder  ">
+                                                        <div class="founder-img mb-30">
+                                                            <img src="assets/img/testmonial/testimonial-founder.png"
+                                                                 alt="">
+                                                            <span>Margaret Lawson</span>
+                                                            <p>Creative Director</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="testimonial-top-cap">
+                                                        <p>"I am at an age where I just want to be fit and healthy
+                                                            our
+                                                            bodies are our responsibility! So start caring for your
+                                                            body and
+                                                            it will care for you. Eat clean it will care for you and
+                                                            workout
+                                                            hard."</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                             Single Testimonial 
+                                            <div class="single-testimonial text-center">
+                                                 Testimonial Content 
+                                                <div class="testimonial-caption ">
+                                                     founder 
+                                                    <div class="testimonial-founder  ">
+                                                        <div class="founder-img mb-30">
+                                                            <img src="assets/img/testmonial/testimonial-founder.png"
+                                                                 alt="">
+                                                            <span>Margaret Lawson</span>
+                                                            <p>Creative Director</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="testimonial-top-cap">
+                                                        <p>"I am at an age where I just want to be fit and healthy
+                                                            our
+                                                            bodies are our responsibility! So start caring for your
+                                                            body and
+                                                            it will care for you. Eat clean it will care for you and
+                                                            workout
+                                                            hard."</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                             Single Testimonial 
+                                            <div class="single-testimonial text-center">
+                                                 Testimonial Content 
+                                                <div class="testimonial-caption ">
+                                                     founder 
+                                                    <div class="testimonial-founder  ">
+                                                        <div class="founder-img mb-30">
+                                                            <img src="assets/img/testmonial/testimonial-founder.png"
+                                                                 alt="">
+                                                            <span>Margaret Lawson</span>
+                                                            <p>Creative Director</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="testimonial-top-cap">
+                                                        <p>"I am at an age where I just want to be fit and healthy
+                                                            our
+                                                            bodies are our responsibility! So start caring for your
+                                                            body and
+                                                            it will care for you. Eat clean it will care for you and
+                                                            workout
+                                                            hard."</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>-->
             <!-- Testimonial Start -->
             <div class="testimonial-area testimonial-padding">
                 <div class="container">
@@ -511,124 +629,74 @@
                     <div class="row d-flex justify-content-center">
                         <div class="col-xl-8 col-lg-8 col-md-10">
                             <div class="h1-testimonial-active dot-style">
-                                <!-- Single Testimonial -->
-                                <div class="single-testimonial text-center">
-                                    <!-- Testimonial Content -->
-                                    <div class="testimonial-caption ">
-                                        <!-- founder -->
-                                        <div class="testimonial-founder  ">
-                                            <div class="founder-img mb-30">
-                                                <img src="assets/img/testmonial/testimonial-founder.png"
-                                                     alt="">
-                                                <span>Margaret Lawson</span>
-                                                <p>Creative Director</p>
+                                <c:forEach var="testimonial" items="${testimonials}">
+                                    <!-- Single Testimonial -->
+                                    <div class="single-testimonial text-center">
+                                        <!-- Testimonial Content -->
+                                        <div class="testimonial-caption">
+                                            <!-- founder -->
+                                            <div class="testimonial-founder">
+                                                <div class="founder-img mb-30">
+                                                    <img src="assets/img/testmonial/testimonial-founder.png" alt="${testimonial.name}">
+                                                    <span>${testimonial.name}</span>
+                                                    <p>${testimonial.title}</p>
+                                                </div>
+                                            </div>
+                                            <div class="testimonial-top-cap">
+                                                <p>"${testimonial.content}"</p>
                                             </div>
                                         </div>
-                                        <div class="testimonial-top-cap">
-                                            <p>"I am at an age where I just want to be fit and healthy
-                                                our
-                                                bodies are our responsibility! So start caring for your
-                                                body and
-                                                it will care for you. Eat clean it will care for you and
-                                                workout
-                                                hard."</p>
-                                        </div>
                                     </div>
-                                </div>
-                                <!-- Single Testimonial -->
-                                <div class="single-testimonial text-center">
-                                    <!-- Testimonial Content -->
-                                    <div class="testimonial-caption ">
-                                        <!-- founder -->
-                                        <div class="testimonial-founder  ">
-                                            <div class="founder-img mb-30">
-                                                <img src="assets/img/testmonial/testimonial-founder.png"
-                                                     alt="">
-                                                <span>Margaret Lawson</span>
-                                                <p>Creative Director</p>
-                                            </div>
-                                        </div>
-                                        <div class="testimonial-top-cap">
-                                            <p>"I am at an age where I just want to be fit and healthy
-                                                our
-                                                bodies are our responsibility! So start caring for your
-                                                body and
-                                                it will care for you. Eat clean it will care for you and
-                                                workout
-                                                hard."</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Single Testimonial -->
-                                <div class="single-testimonial text-center">
-                                    <!-- Testimonial Content -->
-                                    <div class="testimonial-caption ">
-                                        <!-- founder -->
-                                        <div class="testimonial-founder  ">
-                                            <div class="founder-img mb-30">
-                                                <img src="assets/img/testmonial/testimonial-founder.png"
-                                                     alt="">
-                                                <span>Margaret Lawson</span>
-                                                <p>Creative Director</p>
-                                            </div>
-                                        </div>
-                                        <div class="testimonial-top-cap">
-                                            <p>"I am at an age where I just want to be fit and healthy
-                                                our
-                                                bodies are our responsibility! So start caring for your
-                                                body and
-                                                it will care for you. Eat clean it will care for you and
-                                                workout
-                                                hard."</p>
-                                        </div>
-                                    </div>
-                                </div>
+                                </c:forEach>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <!-- Testimonial End -->
+
+
+            <!-- Testimonial End -->
             <!-- Support Company Start-->
-<!--            <div class="support-company-area support-padding fix">
-                <div class="container">
-                    <div class="row align-items-center">
-                        <div class="col-xl-6 col-lg-6">
-                            <div class="right-caption">
-                                 Section Tittle 
-                                <div class="section-tittle section-tittle2">
-                                    <span>What we are doing</span>
-                                    <h2>24k Talented people are getting Jobs</h2>
-                                </div>
-                                <div class="support-caption">
-                                    <p class="pera-top">Mollit anim laborum duis au dolor in voluptate
-                                        velit ess
-                                        cillum dolore eu lore dsu quality mollit anim laborumuis au
-                                        dolor in
-                                        voluptate velit cillum.</p>
-                                    <p>Mollit anim laborum.Duis aute irufg dhjkolohr in re voluptate
-                                        velit
-                                        esscillumlore eu quife nrulla parihatur. Excghcepteur signjnt
-                                        occa
-                                        cupidatat non inulpadeserunt mollit aboru. temnthp incididbnt ut
-                                        labore
-                                        mollit anim laborum suis aute.</p>
-                                    <a href="job_listing.jsp" class="btn post-btn">Post a job</a>
+            <!--            <div class="support-company-area support-padding fix">
+                            <div class="container">
+                                <div class="row align-items-center">
+                                    <div class="col-xl-6 col-lg-6">
+                                        <div class="right-caption">
+                                             Section Tittle 
+                                            <div class="section-tittle section-tittle2">
+                                                <span>What we are doing</span>
+                                                <h2>24k Talented people are getting Jobs</h2>
+                                            </div>
+                                            <div class="support-caption">
+                                                <p class="pera-top">Mollit anim laborum duis au dolor in voluptate
+                                                    velit ess
+                                                    cillum dolore eu lore dsu quality mollit anim laborumuis au
+                                                    dolor in
+                                                    voluptate velit cillum.</p>
+                                                <p>Mollit anim laborum.Duis aute irufg dhjkolohr in re voluptate
+                                                    velit
+                                                    esscillumlore eu quife nrulla parihatur. Excghcepteur signjnt
+                                                    occa
+                                                    cupidatat non inulpadeserunt mollit aboru. temnthp incididbnt ut
+                                                    labore
+                                                    mollit anim laborum suis aute.</p>
+                                                <a href="job_listing.jsp" class="btn post-btn">Post a job</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6">
+                                        <div class="support-location-img">
+                                            <img src="assets/img/service/support-img.jpg" alt="">
+                                            <div class="support-img-cap text-center">
+                                                <p>Since</p>
+                                                <span>1994</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-xl-6 col-lg-6">
-                            <div class="support-location-img">
-                                <img src="assets/img/service/support-img.jpg" alt="">
-                                <div class="support-img-cap text-center">
-                                    <p>Since</p>
-                                    <span>1994</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>-->
+                        </div>-->
             <!-- Support Company End-->
             <!-- Blog Area Start -->
             <div class="home-blog-area blog-h-padding">
@@ -675,8 +743,8 @@
             <!-- Blog Area End -->
 
         </main>
-                        
-                        
+
+
         <footer>
             <!-- Footer Start-->
             <div class="footer-area footer-bg footer-padding">
@@ -736,61 +804,61 @@
                                         </p>
                                     </div>
                                     <!-- Form -->
-<!--                                    <div class="footer-form">
-                                        <div id="mc_embed_signup">
-                                            <form target="_blank"
-                                                  action="https://spondonit.us12.list-manage.com/subscribe/post?u=1462626880ade1ac87bd9c93a&amp;id=92a4423d01"
-                                                  method="get" class="subscribe_form relative mail_part">
-                                                <input type="email" name="email"
-                                                       id="newsletter-form-email"
-                                                       placeholder="Email Address"
-                                                       class="placeholder hide-on-focus"
-                                                       onfocus="this.placeholder = ''"
-                                                       onblur="this.placeholder = ' Email Address '">
-                                                <div class="form-icon">
-                                                    <button type="submit" name="submit"
-                                                            id="newsletter-submit"
-                                                            class="email_icon newsletter-submit button-contactForm"><img
-                                                            src="assets/img/icon/form.png"
-                                                            alt=""></button>
-                                                </div>
-                                                <div class="mt-10 info"></div>
-                                            </form>
-                                        </div>
-                                    </div>-->
+                                    <!--                                    <div class="footer-form">
+                                                                            <div id="mc_embed_signup">
+                                                                                <form target="_blank"
+                                                                                      action="https://spondonit.us12.list-manage.com/subscribe/post?u=1462626880ade1ac87bd9c93a&amp;id=92a4423d01"
+                                                                                      method="get" class="subscribe_form relative mail_part">
+                                                                                    <input type="email" name="email"
+                                                                                           id="newsletter-form-email"
+                                                                                           placeholder="Email Address"
+                                                                                           class="placeholder hide-on-focus"
+                                                                                           onfocus="this.placeholder = ''"
+                                                                                           onblur="this.placeholder = ' Email Address '">
+                                                                                    <div class="form-icon">
+                                                                                        <button type="submit" name="submit"
+                                                                                                id="newsletter-submit"
+                                                                                                class="email_icon newsletter-submit button-contactForm"><img
+                                                                                                src="assets/img/icon/form.png"
+                                                                                                alt=""></button>
+                                                                                    </div>
+                                                                                    <div class="mt-10 info"></div>
+                                                                                </form>
+                                                                            </div>
+                                                                        </div>-->
                                 </div>
                             </div>
                         </div>
                     </div>
                     <!--  -->
-<!--                    <div class="row footer-wejed justify-content-between">
-                        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                             logo 
-                            <div class="footer-logo mb-20">
-                                <a href="index.html"><img src="assets/img/logo/logo2_footer.png"
-                                                          alt=""></a>
-                            </div>
-                        </div>
-                        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-5">
-                            <div class="footer-tittle-bottom">
-                                <span>5000+</span>
-                                <p>Talented Hunter</p>
-                            </div>
-                        </div>
-                        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-5">
-                            <div class="footer-tittle-bottom">
-                                <span>451</span>
-                                <p>Talented Hunter</p>
-                            </div>
-                        </div>
-                        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-5">
-                             Footer Bottom Tittle 
-                            <div class="footer-tittle-bottom">
-                                <span>568</span>
-                                <p>Talented Hunter</p>
-                            </div>
-                        </div>
-                    </div>-->
+                    <!--                    <div class="row footer-wejed justify-content-between">
+                                            <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
+                                                 logo 
+                                                <div class="footer-logo mb-20">
+                                                    <a href="index.html"><img src="assets/img/logo/logo2_footer.png"
+                                                                              alt=""></a>
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-3 col-lg-3 col-md-4 col-sm-5">
+                                                <div class="footer-tittle-bottom">
+                                                    <span>5000+</span>
+                                                    <p>Talented Hunter</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-3 col-lg-3 col-md-4 col-sm-5">
+                                                <div class="footer-tittle-bottom">
+                                                    <span>451</span>
+                                                    <p>Talented Hunter</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-3 col-lg-3 col-md-4 col-sm-5">
+                                                 Footer Bottom Tittle 
+                                                <div class="footer-tittle-bottom">
+                                                    <span>568</span>
+                                                    <p>Talented Hunter</p>
+                                                </div>
+                                            </div>
+                                        </div>-->
 
 
                 </div>
@@ -867,221 +935,221 @@
         <script src="./assets/js/main.js"></script>
 
     </body>
-    
+
     <script>
-let currentPage = 1;
-let itemsPerPage = 6;
-let totalItems = 0;
-let totalPages = 0;
+                                            let currentPage = 1;
+                                            let itemsPerPage = 6;
+                                            let totalItems = 0;
+                                            let totalPages = 0;
 
 // Khởi tạo khi trang load
-document.addEventListener('DOMContentLoaded', function() {
-    const jobItems = document.querySelectorAll('.job-item');
-    totalItems = jobItems.length;
-    
-    console.log('Total items found:', totalItems); // Debug
-    
-    if (totalItems === 0) {
-        document.getElementById('paginationNav').style.display = 'none';
-        return;
-    }
-    
-    totalPages = Math.ceil(totalItems / itemsPerPage);
-    console.log('Total pages calculated:', totalPages); // Debug
-    
-    // Cập nhật hiển thị tổng số trang ngay lập tức
-    document.getElementById('totalPages').textContent = totalPages;
-    
-    // Ẩn pagination nếu chỉ có 1 trang
-    if (totalPages <= 1) {
-        document.getElementById('paginationNav').style.display = 'none';
-    }
-    
-    showPage(1);
-});
+                                            document.addEventListener('DOMContentLoaded', function () {
+                                                const jobItems = document.querySelectorAll('.job-item');
+                                                totalItems = jobItems.length;
 
-function showPage(page) {
-    const jobItems = document.querySelectorAll('.job-item');
-    const startIndex = (page - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    
-    console.log(`Showing page ${page}, items ${startIndex} to ${endIndex-1}`); // Debug
-    
-    // Ẩn TẤT CẢ job items trước
-    jobItems.forEach((item, index) => {
-        const jobCard = item.querySelector('.job-card');
-        jobCard.classList.remove('show');
-        jobCard.style.display = 'none'; // Force hide
-    });
-    
-    // Hiện những job items trong trang hiện tại
-    jobItems.forEach((item, index) => {
-        if (index >= startIndex && index < endIndex) {
-            const jobCard = item.querySelector('.job-card');
-            setTimeout(() => {
-                jobCard.style.display = 'block'; // Force show
-                jobCard.classList.add('show');
-            }, (index - startIndex) * 50);
+                                                console.log('Total items found:', totalItems); // Debug
+
+                                                if (totalItems === 0) {
+                                                    document.getElementById('paginationNav').style.display = 'none';
+                                                    return;
+                                                }
+
+                                                totalPages = Math.ceil(totalItems / itemsPerPage);
+                                                console.log('Total pages calculated:', totalPages); // Debug
+
+                                                // Cập nhật hiển thị tổng số trang ngay lập tức
+                                                document.getElementById('totalPages').textContent = totalPages;
+
+                                                // Ẩn pagination nếu chỉ có 1 trang
+                                                if (totalPages <= 1) {
+                                                    document.getElementById('paginationNav').style.display = 'none';
+                                                }
+
+                                                showPage(1);
+                                            });
+
+                                            function showPage(page) {
+                                                const jobItems = document.querySelectorAll('.job-item');
+                                                const startIndex = (page - 1) * itemsPerPage;
+                                                const endIndex = startIndex + itemsPerPage;
+
+                                                console.log(`Showing page ${page}, items ${startIndex} to ${endIndex-1}`); // Debug
+
+                                                // Ẩn TẤT CẢ job items trước
+                                                jobItems.forEach((item, index) => {
+                                                    const jobCard = item.querySelector('.job-card');
+                                                    jobCard.classList.remove('show');
+                                                    jobCard.style.display = 'none'; // Force hide
+                                                });
+
+                                                // Hiện những job items trong trang hiện tại
+                                                jobItems.forEach((item, index) => {
+                                                    if (index >= startIndex && index < endIndex) {
+                                                        const jobCard = item.querySelector('.job-card');
+                                                        setTimeout(() => {
+                                                            jobCard.style.display = 'block'; // Force show
+                                                            jobCard.classList.add('show');
+                                                        }, (index - startIndex) * 50);
+                                                    }
+                                                });
+
+                                                currentPage = page;
+                                                updatePaginationControls();
+
+                                                // Smooth scroll to top
+                                                document.getElementById('jobList').scrollIntoView({
+                                                    behavior: 'smooth',
+                                                    block: 'start'
+                                                });
+                                            }
+
+                                            function updatePaginationControls() {
+                                                // Update page info
+                                                document.getElementById('currentPage').textContent = currentPage;
+                                                document.getElementById('totalPages').textContent = totalPages;
+
+                                                // Update button states
+                                                const prevBtn = document.getElementById('prevBtn');
+                                                const nextBtn = document.getElementById('nextBtn');
+
+                                                if (currentPage === 1) {
+                                                    prevBtn.classList.add('disabled');
+                                                    prevBtn.onclick = null;
+                                                } else {
+                                                    prevBtn.classList.remove('disabled');
+                                                    prevBtn.onclick = previousPage;
+                                                }
+
+                                                if (currentPage === totalPages) {
+                                                    nextBtn.classList.add('disabled');
+                                                    nextBtn.onclick = null;
+                                                } else {
+                                                    nextBtn.classList.remove('disabled');
+                                                    nextBtn.onclick = nextPage;
+                                                }
+                                            }
+
+                                            function previousPage() {
+                                                if (currentPage > 1) {
+                                                    showPage(currentPage - 1);
+                                                }
+                                            }
+
+                                            function nextPage() {
+                                                if (currentPage < totalPages) {
+                                                    showPage(currentPage + 1);
+                                                }
+                                            }
+
+                                            let recentCurrentPage = 1;
+                                            let recentItemsPerPage = 6;
+                                            let recentTotalItems = 0;
+                                            let recentTotalPages = 0;
+
+                                            document.addEventListener('DOMContentLoaded', function () {
+                                                const recentJobItems = document.querySelectorAll('.job-item-recent');
+                                                recentTotalItems = recentJobItems.length;
+
+                                                if (recentTotalItems === 0) {
+                                                    document.getElementById('recentPaginationNav').style.display = 'none';
+                                                    return;
+                                                }
+
+                                                recentTotalPages = Math.ceil(recentTotalItems / recentItemsPerPage);
+                                                document.getElementById('recentTotalPages').textContent = recentTotalPages;
+
+                                                if (recentTotalPages <= 1) {
+                                                    document.getElementById('recentPaginationNav').style.display = 'none';
+                                                }
+
+                                                showRecentPage(1);
+
+                                                // Gắn lại sự kiện click (sau khi DOM loaded)
+                                                document.getElementById('recentPrevBtn').addEventListener('click', recentPreviousPage);
+                                                document.getElementById('recentNextBtn').addEventListener('click', recentNextPage);
+                                            });
+
+                                            function showRecentPage(page) {
+                                                const recentJobItems = document.querySelectorAll('.job-item-recent');
+                                                const startIndex = (page - 1) * recentItemsPerPage;
+                                                const endIndex = startIndex + recentItemsPerPage;
+
+                                                recentJobItems.forEach((item, index) => {
+                                                    const jobCard = item.querySelector('.job-card');
+                                                    jobCard.classList.remove('show');
+                                                    jobCard.style.display = 'none';
+                                                });
+
+                                                recentJobItems.forEach((item, index) => {
+                                                    if (index >= startIndex && index < endIndex) {
+                                                        const jobCard = item.querySelector('.job-card');
+                                                        setTimeout(() => {
+                                                            jobCard.style.display = 'block';
+                                                            jobCard.classList.add('show');
+                                                        }, (index - startIndex) * 50);
+                                                    }
+                                                });
+
+                                                recentCurrentPage = page;
+                                                updateRecentPaginationControls();
+
+                                                document.getElementById('recentJobList').scrollIntoView({
+                                                    behavior: 'smooth',
+                                                    block: 'start'
+                                                });
+                                            }
+
+                                            function updateRecentPaginationControls() {
+                                                document.getElementById('recentCurrentPage').textContent = recentCurrentPage;
+                                                document.getElementById('recentTotalPages').textContent = recentTotalPages;
+
+                                                const prevBtn = document.getElementById('recentPrevBtn');
+                                                const nextBtn = document.getElementById('recentNextBtn');
+
+                                                prevBtn.classList.toggle('disabled', recentCurrentPage === 1);
+                                                nextBtn.classList.toggle('disabled', recentCurrentPage === recentTotalPages);
+                                            }
+
+                                            function recentPreviousPage(event) {
+                                                event.preventDefault();
+                                                if (recentCurrentPage > 1) {
+                                                    showRecentPage(recentCurrentPage - 1);
+                                                }
+                                            }
+
+                                            function recentNextPage(event) {
+                                                event.preventDefault();
+                                                if (recentCurrentPage < recentTotalPages) {
+                                                    showRecentPage(recentCurrentPage + 1);
+                                                }
+                                            }
+    </script>
+
+    <style>
+        .premium-section .section-tittle span {
+            font-size: 14px;
+            letter-spacing: 1px;
         }
-    });
-    
-    currentPage = page;
-    updatePaginationControls();
-    
-    // Smooth scroll to top
-    document.getElementById('jobList').scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-    });
-}
 
-function updatePaginationControls() {
-    // Update page info
-    document.getElementById('currentPage').textContent = currentPage;
-    document.getElementById('totalPages').textContent = totalPages;
-    
-    // Update button states
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    
-    if (currentPage === 1) {
-        prevBtn.classList.add('disabled');
-        prevBtn.onclick = null;
-    } else {
-        prevBtn.classList.remove('disabled');
-        prevBtn.onclick = previousPage;
-    }
-    
-    if (currentPage === totalPages) {
-        nextBtn.classList.add('disabled');
-        nextBtn.onclick = null;
-    } else {
-        nextBtn.classList.remove('disabled');
-        nextBtn.onclick = nextPage;
-    }
-}
-
-function previousPage() {
-    if (currentPage > 1) {
-        showPage(currentPage - 1);
-    }
-}
-
-function nextPage() {
-    if (currentPage < totalPages) {
-        showPage(currentPage + 1);
-    }
-}
-
-let recentCurrentPage = 1;
-let recentItemsPerPage = 6;
-let recentTotalItems = 0;
-let recentTotalPages = 0;
-
-document.addEventListener('DOMContentLoaded', function() {
-    const recentJobItems = document.querySelectorAll('.job-item-recent');
-    recentTotalItems = recentJobItems.length;
-
-    if (recentTotalItems === 0) {
-        document.getElementById('recentPaginationNav').style.display = 'none';
-        return;
-    }
-
-    recentTotalPages = Math.ceil(recentTotalItems / recentItemsPerPage);
-    document.getElementById('recentTotalPages').textContent = recentTotalPages;
-
-    if (recentTotalPages <= 1) {
-        document.getElementById('recentPaginationNav').style.display = 'none';
-    }
-
-    showRecentPage(1);
-
-    // Gắn lại sự kiện click (sau khi DOM loaded)
-    document.getElementById('recentPrevBtn').addEventListener('click', recentPreviousPage);
-    document.getElementById('recentNextBtn').addEventListener('click', recentNextPage);
-});
-
-function showRecentPage(page) {
-    const recentJobItems = document.querySelectorAll('.job-item-recent');
-    const startIndex = (page - 1) * recentItemsPerPage;
-    const endIndex = startIndex + recentItemsPerPage;
-
-    recentJobItems.forEach((item, index) => {
-        const jobCard = item.querySelector('.job-card');
-        jobCard.classList.remove('show');
-        jobCard.style.display = 'none';
-    });
-
-    recentJobItems.forEach((item, index) => {
-        if (index >= startIndex && index < endIndex) {
-            const jobCard = item.querySelector('.job-card');
-            setTimeout(() => {
-                jobCard.style.display = 'block';
-                jobCard.classList.add('show');
-            }, (index - startIndex) * 50);
+        .premium-job-item .job-card {
+            transition: 0.3s ease;
+            border: 2px solid #ffc107 !important;
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
         }
-    });
 
-    recentCurrentPage = page;
-    updateRecentPaginationControls();
+        .premium-job-item .job-card:hover {
+            transform: scale(1.02);
+        }
 
-    document.getElementById('recentJobList').scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-    });
-}
+        .premium-save-btn {
+            border-color: #ffc107 !important;
+            color: #ffc107;
+        }
 
-function updateRecentPaginationControls() {
-    document.getElementById('recentCurrentPage').textContent = recentCurrentPage;
-    document.getElementById('recentTotalPages').textContent = recentTotalPages;
-
-    const prevBtn = document.getElementById('recentPrevBtn');
-    const nextBtn = document.getElementById('recentNextBtn');
-
-    prevBtn.classList.toggle('disabled', recentCurrentPage === 1);
-    nextBtn.classList.toggle('disabled', recentCurrentPage === recentTotalPages);
-}
-
-function recentPreviousPage(event) {
-    event.preventDefault();
-    if (recentCurrentPage > 1) {
-        showRecentPage(recentCurrentPage - 1);
-    }
-}
-
-function recentNextPage(event) {
-    event.preventDefault();
-    if (recentCurrentPage < recentTotalPages) {
-        showRecentPage(recentCurrentPage + 1);
-    }
-}
-</script>
-
-<style>
-    .premium-section .section-tittle span {
-        font-size: 14px;
-        letter-spacing: 1px;
-    }
-
-    .premium-job-item .job-card {
-        transition: 0.3s ease;
-        border: 2px solid #ffc107 !important;
-        box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
-    }
-
-    .premium-job-item .job-card:hover {
-        transform: scale(1.02);
-    }
-
-    .premium-save-btn {
-        border-color: #ffc107 !important;
-        color: #ffc107;
-    }
-
-    .premium-save-btn:hover {
-        background-color: #ffc107 !important;
-        color: white;
-    }
-</style>
+        .premium-save-btn:hover {
+            background-color: #ffc107 !important;
+            color: white;
+        }
+    </style>
 
 </html>

@@ -11,6 +11,7 @@ import java.util.Vector;
 import daos.BannerDAO;
 import daos.BlogDAO;
 import daos.FeaturedJobDAO;
+import daos.HomepageDAO;
 import daos.JobDAO;
 import daos.NotificationDAO;
 import daos.PostsDAO;
@@ -21,6 +22,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import models.HomepageComponentContent;
 import models.JobTypeCount;
 import models.Notification;
 import models.Posts;
@@ -103,6 +105,15 @@ public class HomeController extends HttpServlet {
 //            request.setAttribute("keyword", keyword);
 //            request.setAttribute("jobType", jobType);
 //            request.setAttribute("location", location);
+
+            // Get testimonials
+            HomepageDAO homepageDAO = new HomepageDAO();
+            Vector<HomepageComponentContent> testimonials = homepageDAO.getListComponentContentsByType("testimonial");
+            request.setAttribute("testimonials", testimonials);
+
+            // Get apply process steps
+            Vector<HomepageComponentContent> applyProcesses = homepageDAO.getListComponentContentsByType("apply_process");
+            request.setAttribute("applyProcesses", applyProcesses);
 
             // Banners for top sections (first two by position)
             request.setAttribute("banners", bannerDAO.getTopBanners(2));

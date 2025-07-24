@@ -718,6 +718,7 @@ CREATE TABLE HomePageComponentType (
 -- Tạo bảng HomePageComponentContent
 CREATE TABLE HomePageComponentContent (
     id INT IDENTITY(1,1) PRIMARY KEY,
+	img NVARCHAR(255),
     type_id INT NOT NULL,
     position INT NOT NULL,
     name NVARCHAR(255) NOT NULL,

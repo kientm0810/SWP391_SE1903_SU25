@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Vector;
 import models.HomepageComponentContent;
+import models.HomepageComponentType;
 import utils.InputSanitizer;
 import utils.UploadPicture;
 
@@ -57,14 +58,14 @@ public class AdminSalerController extends HttpServlet {
             response.sendRedirect("home");
             return;
         }
-        
+
         AdminDAO dao = new AdminDAO();
-        int userID = (int)session.getAttribute("userId");
-        if (dao.getSpecificStaff(userID).getRole().equals("manager")){
+        int userID = (int) session.getAttribute("userId");
+        if (dao.getSpecificStaff(userID).getRole().equals("manager")) {
             response.sendRedirect("home");
             return;
         }
-        
+
         String target = request.getParameter("target");
 
         if (target == null) {
@@ -76,7 +77,7 @@ public class AdminSalerController extends HttpServlet {
         } else if (target.equals("banner")) {
 //            log("qua day truoc da");
             processBanner(request, response);
-        } else if (target.equals("homecomponent")){
+        } else if (target.equals("homecomponent")) {
             processHomepageComponent(request, response);
         }
     }
@@ -97,13 +98,13 @@ public class AdminSalerController extends HttpServlet {
             addBlog(request, response);
         } else if (service.equals("Detail")) {
             detailBlog(request, response);
-        } else if (service.equals("Update")){
+        } else if (service.equals("Update")) {
             updateBlog(request, response);
-        } else if (service.equals("Delete")){
+        } else if (service.equals("Delete")) {
             deleteBlog(request, response);
         }
     }
-    
+
     private void processHomepageComponent(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String service = request.getParameter("service");
@@ -117,12 +118,12 @@ public class AdminSalerController extends HttpServlet {
         } else if (service.equals("listMy")) {
 
         } else if (service.equals("Add")) {
-            addBlog(request, response);
+            addHomeComponent(request, response);
         } else if (service.equals("Detail")) {
-            detailBlog(request, response);
-        } else if (service.equals("Update")){
-            updateBlog(request, response);
-        } else if (service.equals("Delete")){
+            detailHomeComponent(request, response);
+        } else if (service.equals("Update")) {
+            updateHomeComponent(request, response);
+        } else if (service.equals("Delete")) {
             deleteHomepageComponent(request, response);
         }
     }
@@ -131,17 +132,17 @@ public class AdminSalerController extends HttpServlet {
             throws ServletException, IOException {
         HomepageDAO dao = new HomepageDAO();
         Vector<HomepageComponentContent> components = new Vector<>();
-        
+
         // Pagination parameters
         String pageStr = request.getParameter("page");
         String recordsPerPageStr = request.getParameter("recordsPerPage");
         String sortField = request.getParameter("sortField");
         String sortOrder = request.getParameter("sortOrder");
         String searchType = InputSanitizer.cleanSearchQuery(request.getParameter("componentType"));
-        
+
         int page = 1;
         int recordsPerPage = 10;
-        
+
         if (pageStr != null && !pageStr.isEmpty()) {
             page = Integer.parseInt(pageStr);
         }
@@ -154,13 +155,13 @@ public class AdminSalerController extends HttpServlet {
         if (sortOrder == null || sortOrder.isEmpty()) {
             sortOrder = "DESC";
         }
-        
+
         int totalRecords;
 
-        if (searchType == null){
+        if (searchType == null) {
             searchType = "";
         }
-        
+
 //        if (searchType != null && !searchType.isEmpty()) {
         components = dao.getComponentContentsWithPaging(searchType, page, recordsPerPage, sortField, sortOrder);
         totalRecords = dao.getComponentContentsByType(searchType);
@@ -169,11 +170,11 @@ public class AdminSalerController extends HttpServlet {
 //            components = blogDAO.getAllBlogsWithPagingAndSorting(page, recordsPerPage, sortField, sortOrder);
 //            totalRecords = blogDAO.getTotalBlogs();
 //        }
-        
+
         log("type: " + searchType + " " + components.size());
 
         int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
-        
+
         request.setAttribute("components", components);
         request.setAttribute("currentPage", page);
         request.setAttribute("recordsPerPage", recordsPerPage);
@@ -182,37 +183,300 @@ public class AdminSalerController extends HttpServlet {
         request.setAttribute("sortField", sortField);
         request.setAttribute("sortOrder", sortOrder);
         request.setAttribute("searchComponentType", searchType);
-        
+
         request.getRequestDispatcher("admin_saler_all_homecomponent.jsp").forward(request, response);
     }
-    
+
     private void deleteHomepageComponent(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         int componentID = Integer.parseInt(request.getParameter("componentId"));
-        
+
         HomepageDAO dao = new HomepageDAO();
         boolean flag = dao.deleteComponentContent(componentID);
-        
+
 //        log("delete " + flag);
         response.sendRedirect("AdminSalerController?target=homecomponent");
     }
-    
+
+    private void detailHomeComponent(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            int componentId = Integer.parseInt(request.getParameter("componentId"));
+
+            HomepageDAO dao = new HomepageDAO();
+            HomepageComponentContent component = dao.getComponentContentById(componentId);
+
+            if (component == null) {
+                response.sendRedirect("AdminSalerController?target=homecomponent");
+                return;
+            }
+
+            request.setAttribute("component", component);
+            request.getRequestDispatcher("admin_saler_detail_homecomponent.jsp").forward(request, response);
+
+        } catch (NumberFormatException e) {
+            response.sendRedirect("AdminSalerController?target=homecomponent");
+        }
+    }
+
+    private void updateHomeComponent(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String submit = request.getParameter("submit");
+        if (submit == null) {
+            submit = "";
+        }
+
+        if (submit.equals("submit")) {
+            // Handle update submission
+            try {
+                int componentId = Integer.parseInt(request.getParameter("componentId"));
+
+                // Validate input data
+                String name = InputSanitizer.cleanSearchQuery(request.getParameter("name"));
+                String title = InputSanitizer.cleanSearchQuery(request.getParameter("title"));
+                String typeIdStr = request.getParameter("typeId");
+                String positionStr = request.getParameter("position");
+
+                HomepageDAO dao = new HomepageDAO();
+                HomepageComponentContent existingComponent = dao.getComponentContentById(componentId);
+
+                if (existingComponent == null) {
+                    response.sendRedirect("AdminSalerController?target=homecomponent");
+                    return;
+                }
+
+                // Validation
+                if (name == null || name.length() == 0) {
+                    request.setAttribute("message", "Tên component không được để trống!");
+                    loadComponentTypesForForm(request);
+                    request.setAttribute("component", existingComponent);
+                    request.getRequestDispatcher("admin_saler_add_homecomponent.jsp").forward(request, response);
+                    return;
+                }
+
+                if (title == null || title.length() == 0) {
+                    request.setAttribute("message", "Tiêu đề không được để trống!");
+                    loadComponentTypesForForm(request);
+                    request.setAttribute("component", existingComponent);
+                    request.getRequestDispatcher("admin_saler_add_homecomponent.jsp").forward(request, response);
+                    return;
+                }
+
+                if (typeIdStr == null || typeIdStr.isEmpty()) {
+                    request.setAttribute("message", "Vui lòng chọn loại component!");
+                    loadComponentTypesForForm(request);
+                    request.setAttribute("component", existingComponent);
+                    request.getRequestDispatcher("admin_saler_add_homecomponent.jsp").forward(request, response);
+                    return;
+                }
+
+                if (positionStr == null || positionStr.isEmpty()) {
+                    request.setAttribute("message", "Vui lòng nhập vị trí hiển thị!");
+                    loadComponentTypesForForm(request);
+                    request.setAttribute("component", existingComponent);
+                    request.getRequestDispatcher("admin_saler_add_homecomponent.jsp").forward(request, response);
+                    return;
+                }
+
+                int typeId = Integer.parseInt(typeIdStr);
+                int position = Integer.parseInt(positionStr);
+
+                if (position < 1) {
+                    request.setAttribute("message", "Vị trí hiển thị phải lớn hơn 0!");
+                    loadComponentTypesForForm(request);
+                    request.setAttribute("component", existingComponent);
+                    request.getRequestDispatcher("admin_saler_add_homecomponent.jsp").forward(request, response);
+                    return;
+                }
+
+                String content = request.getParameter("content");
+                String iconClass = request.getParameter("iconClass");
+                String status = request.getParameter("status");
+
+                if (content == null) {
+                    content = "";
+                }
+                if (iconClass == null) {
+                    iconClass = "";
+                }
+                if (status == null) {
+                    status = "active";
+                }
+
+                // Update component object
+                HomepageComponentContent component = new HomepageComponentContent();
+                component.setId(componentId);
+                component.setTypeId(typeId);
+                component.setPosition(position);
+                component.setName(name);
+                component.setTitle(title);
+                component.setContent(content);
+                component.setIconClass(iconClass);
+                component.setStatus(status);
+
+                // Update in database
+                boolean flag = dao.updateComponentContent(component);
+
+                if (flag) {
+                    response.sendRedirect("AdminSalerController?target=homecomponent");
+                } else {
+                    request.setAttribute("message", "Có lỗi xảy ra khi cập nhật component!");
+                    loadComponentTypesForForm(request);
+                    request.setAttribute("component", component);
+                    request.getRequestDispatcher("admin_saler_add_homecomponent.jsp").forward(request, response);
+                }
+
+            } catch (NumberFormatException e) {
+                response.sendRedirect("AdminSalerController?target=homecomponent");
+            }
+
+        } else {
+            // Load form for editing existing component
+            try {
+                int componentId = Integer.parseInt(request.getParameter("componentId"));
+                HomepageDAO dao = new HomepageDAO();
+                HomepageComponentContent component = dao.getComponentContentById(componentId);
+
+                if (component == null) {
+                    response.sendRedirect("AdminSalerController?target=homecomponent");
+                    return;
+                }
+
+                loadComponentTypesForForm(request);
+                request.setAttribute("component", component);
+                request.getRequestDispatcher("admin_saler_add_homecomponent.jsp").forward(request, response);
+
+            } catch (NumberFormatException e) {
+                response.sendRedirect("AdminSalerController?target=homecomponent");
+            }
+        }
+    }
+
+    private void loadComponentTypesForForm(HttpServletRequest request) {
+        HomepageDAO dao = new HomepageDAO();
+        Vector<HomepageComponentType> componentTypes = dao.getAllComponentTypes();
+        request.setAttribute("componentTypes", componentTypes);
+    }
+
+    private void addHomeComponent(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String submit = request.getParameter("submit");
+        if (submit == null) {
+            submit = "";
+        }
+
+        if (submit.equals("submit")) {
+            // Validate input data
+            String name = InputSanitizer.cleanSearchQuery(request.getParameter("name"));
+            String title = InputSanitizer.cleanSearchQuery(request.getParameter("title"));
+            String typeIdStr = request.getParameter("typeId");
+            String positionStr = request.getParameter("position");
+
+            // Validation
+            if (name == null || name.length() == 0) {
+                request.setAttribute("message", "Tên component không được để trống!");
+                loadComponentTypesForForm(request);
+                request.getRequestDispatcher("admin_saler_add_homecomponent.jsp").forward(request, response);
+                return;
+            }
+
+            if (title == null || title.length() == 0) {
+                request.setAttribute("message", "Tiêu đề không được để trống!");
+                loadComponentTypesForForm(request);
+                request.getRequestDispatcher("admin_saler_add_homecomponent.jsp").forward(request, response);
+                return;
+            }
+
+            if (typeIdStr == null || typeIdStr.isEmpty()) {
+                request.setAttribute("message", "Vui lòng chọn loại component!");
+                loadComponentTypesForForm(request);
+                request.getRequestDispatcher("admin_saler_add_homecomponent.jsp").forward(request, response);
+                return;
+            }
+
+            if (positionStr == null || positionStr.isEmpty()) {
+                request.setAttribute("message", "Vui lòng nhập vị trí hiển thị!");
+                loadComponentTypesForForm(request);
+                request.getRequestDispatcher("admin_saler_add_homecomponent.jsp").forward(request, response);
+                return;
+            }
+
+            try {
+                int typeId = Integer.parseInt(typeIdStr);
+                int position = Integer.parseInt(positionStr);
+
+                if (position < 1) {
+                    request.setAttribute("message", "Vị trí hiển thị phải lớn hơn 0!");
+                    loadComponentTypesForForm(request);
+                    request.getRequestDispatcher("admin_saler_add_homecomponent.jsp").forward(request, response);
+                    return;
+                }
+
+                String content = request.getParameter("content");
+                String iconClass = request.getParameter("iconClass");
+                String status = request.getParameter("status");
+
+                if (content == null) {
+                    content = "";
+                }
+                if (iconClass == null) {
+                    iconClass = "";
+                }
+                if (status == null) {
+                    status = "active";
+                }
+
+                // Create component object
+                HomepageComponentContent component = new HomepageComponentContent();
+                component.setTypeId(typeId);
+                component.setPosition(position);
+                component.setName(name);
+                component.setTitle(title);
+                component.setContent(content);
+                component.setIconClass(iconClass);
+                component.setStatus(status);
+
+                // Save to database
+                HomepageDAO dao = new HomepageDAO();
+                boolean flag = dao.insertComponentContent(component);
+
+                if (flag) {
+                    response.sendRedirect("AdminSalerController?target=homecomponent");
+                } else {
+                    request.setAttribute("message", "Có lỗi xảy ra khi thêm component!");
+                    loadComponentTypesForForm(request);
+                    request.getRequestDispatcher("admin_saler_add_homecomponent.jsp").forward(request, response);
+                }
+
+            } catch (NumberFormatException e) {
+                request.setAttribute("message", "Dữ liệu không hợp lệ!");
+                loadComponentTypesForForm(request);
+                request.getRequestDispatcher("admin_saler_add_homecomponent.jsp").forward(request, response);
+            }
+
+        } else {
+            // Load form for adding new component
+            loadComponentTypesForForm(request);
+            request.getRequestDispatcher("admin_saler_add_homecomponent.jsp").forward(request, response);
+        }
+    }
+
     // Thay thế phương thức listAll bằng:
     private void listAlls(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         BlogDAO blogDAO = new BlogDAO();
         Vector<Blog> blogs = new Vector<>();
-        
+
         // Pagination parameters
         String pageStr = request.getParameter("page");
         String recordsPerPageStr = request.getParameter("recordsPerPage");
         String sortField = request.getParameter("sortField");
         String sortOrder = request.getParameter("sortOrder");
         String searchTitle = InputSanitizer.cleanSearchQuery(request.getParameter("title"));
-        
+
         int page = 1;
         int recordsPerPage = 10;
-        
+
         if (pageStr != null && !pageStr.isEmpty()) {
             page = Integer.parseInt(pageStr);
         }
@@ -225,9 +489,9 @@ public class AdminSalerController extends HttpServlet {
         if (sortOrder == null || sortOrder.isEmpty()) {
             sortOrder = "DESC";
         }
-        
+
         int totalRecords;
-        
+
         String who = request.getParameter("who");
         if (who == null) {
             who = "";
@@ -240,9 +504,9 @@ public class AdminSalerController extends HttpServlet {
             blogs = blogDAO.getAllBlogsWithPagingAndSorting(page, recordsPerPage, sortField, sortOrder);
             totalRecords = blogDAO.getTotalBlogs();
         }
-        
+
         int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
-        
+
         request.setAttribute("blogs", blogs);
         request.setAttribute("currentPage", page);
         request.setAttribute("recordsPerPage", recordsPerPage);
@@ -251,27 +515,26 @@ public class AdminSalerController extends HttpServlet {
         request.setAttribute("sortField", sortField);
         request.setAttribute("sortOrder", sortOrder);
         request.setAttribute("searchTitle", searchTitle);
-        
+
         request.getRequestDispatcher("admin_saler_allblog.jsp").forward(request, response);
     }
 
 // Thay thế phương thức listAllBanner bằng:
-
     private void listAllBanners(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
         BannerDAO bannerDAO = new BannerDAO();
         Vector<Banner> banners = new Vector<>();
-        
+
         // Pagination parameters
         String pageStr = request.getParameter("page");
         String recordsPerPageStr = request.getParameter("recordsPerPage");
         String sortField = request.getParameter("sortField");
         String sortOrder = request.getParameter("sortOrder");
         String searchTitle = InputSanitizer.cleanSearchQuery(request.getParameter("title"));
-        
+
         int page = 1;
         int recordsPerPage = 10;
-        
+
         if (pageStr != null && !pageStr.isEmpty()) {
             page = Integer.parseInt(pageStr);
         }
@@ -284,9 +547,9 @@ public class AdminSalerController extends HttpServlet {
         if (sortOrder == null || sortOrder.isEmpty()) {
             sortOrder = "ASC";
         }
-        
+
         int totalRecords;
-        
+
         if (searchTitle != null && !searchTitle.isEmpty()) {
             banners = bannerDAO.searchBannersByTitleWithPaging(searchTitle, page, recordsPerPage, sortField, sortOrder);
             totalRecords = bannerDAO.getTotalBannersByTitle(searchTitle);
@@ -294,9 +557,9 @@ public class AdminSalerController extends HttpServlet {
             banners = bannerDAO.getAllBannersWithPagingAndSorting(page, recordsPerPage, sortField, sortOrder);
             totalRecords = bannerDAO.getTotalBanners();
         }
-        
+
         int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
-        
+
         request.setAttribute("banners", banners);
         request.setAttribute("currentPage", page);
         request.setAttribute("recordsPerPage", recordsPerPage);
@@ -308,7 +571,7 @@ public class AdminSalerController extends HttpServlet {
 
         request.getRequestDispatcher("admin_saler_allbanner.jsp").forward(request, response);
     }
-    
+
     private void listAll(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         BlogDAO blogDAO = new BlogDAO();
@@ -344,24 +607,24 @@ public class AdminSalerController extends HttpServlet {
         }
 
         log(submit + " ye");
-        
+
         if (submit.equals("submit")) {
             log("dcm sao lai loi");
             String title = InputSanitizer.cleanSearchQuery(request.getParameter("title"));
-            
+
             log("blah" + title + "blah");
             log("blah" + title.length() + "blah");
-            
-            if (title == null){
+
+            if (title == null) {
                 request.setAttribute("message", "Tiêu đề không được để trống!");
                 request.getRequestDispatcher("admin_saler_add_blog.jsp").forward(request, response);
                 return;
-            } else if (title.length() == 0){
+            } else if (title.length() == 0) {
                 request.setAttribute("message", "Tiêu đề không được để trống!");
                 request.getRequestDispatcher("admin_saler_add_blog.jsp").forward(request, response);
                 return;
             }
-            
+
             ///
             String thumbnail = "";
             try {
@@ -384,7 +647,7 @@ public class AdminSalerController extends HttpServlet {
                 log(e.getMessage());
             }
             ///
-            
+
             String description = request.getParameter("description");
             String status = "draft";
             int admin_id = 1;//Integer.parseInt(1); // can fix
@@ -402,14 +665,14 @@ public class AdminSalerController extends HttpServlet {
             request.getRequestDispatcher("admin_saler_add_blog.jsp").forward(request, response);
         }
     }
-    
+
     private void detailBlog(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         int blogId = Integer.parseInt(request.getParameter("blogId"));
-        
+
         BlogDAO dao = new BlogDAO();
         Blog blog = dao.getBlogById(blogId);
-        
+
         request.setAttribute("blog", blog);
         request.getRequestDispatcher("admin_saler_detail_blog.jsp").forward(request, response);
     }
@@ -424,19 +687,19 @@ public class AdminSalerController extends HttpServlet {
 
         if (submit.equals("submit")) {
             String title = InputSanitizer.cleanSearchQuery(request.getParameter("title"));
-            
+
             int blogId = Integer.parseInt(request.getParameter("blogId"));
             BlogDAO dao = new BlogDAO();
-            
+
             Blog x = dao.getBlogById(blogId);
-            
+
             //
             String thumbnail = x.getThumbnail();
-            
+
             try {
                 Part filePart = request.getPart("thumbnail");
-                
-                if (filePart != null && filePart.getSize() > 0){
+
+                if (filePart != null && filePart.getSize() > 0) {
                     String contentType = filePart.getContentType();
 
                     if (contentType != null && contentType.startsWith("image/")) {
@@ -457,14 +720,13 @@ public class AdminSalerController extends HttpServlet {
             } catch (Exception e) {
                 log(e.getMessage());
             }
-            
+
             //
-            
             String description = request.getParameter("description");
             String status = "draft";
             int admin_id = 1;//Integer.parseInt(1); // can fix
             int blogID = Integer.parseInt(request.getParameter("blogId"));
-           
+
             Blog blog = new Blog(blogID, admin_id, title, description, thumbnail, status);
 
             boolean flag = dao.updateBlogFields(blog);
@@ -476,23 +738,23 @@ public class AdminSalerController extends HttpServlet {
             int blogId = Integer.parseInt(request.getParameter("blogId"));
             BlogDAO dao = new BlogDAO();
             Blog blog = dao.getBlogById(blogId);
-            
+
             request.setAttribute("blog", blog);
             request.getRequestDispatcher("admin_saler_add_blog.jsp").forward(request, response);
         }
     }
-    
+
     private void deleteBlog(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         int blogID = Integer.parseInt(request.getParameter("blogId"));
-        
+
         BlogDAO dao = new BlogDAO();
         boolean flag = dao.deleteBlog(blogID);
-        
+
 //        log("delete " + flag);
         response.sendRedirect("AdminSalerController?target=blog");
     }
-    
+
     private void processBanner(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String service = request.getParameter("service");
@@ -509,15 +771,15 @@ public class AdminSalerController extends HttpServlet {
             addBanner(request, response);
         } else if (service.equals("Detail")) {
             detailBanner(request, response);
-        } else if (service.equals("Update")){
+        } else if (service.equals("Update")) {
             updateBanner(request, response);
-        } else if (service.equals("Delete")){
+        } else if (service.equals("Delete")) {
             deleteBanner(request, response);
         }
     }
-    
+
     private void listAllBanner(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
         BannerDAO bannerDAO = new BannerDAO();
         Vector<Banner> banners = new Vector<>();
 
@@ -533,7 +795,7 @@ public class AdminSalerController extends HttpServlet {
         } else {
             banners = bannerDAO.getAllBanners(); // Lấy toàn bộ banner
         }
-        
+
         log("banner " + banners.size());
 
         request.setAttribute("banners", banners);
@@ -541,19 +803,18 @@ public class AdminSalerController extends HttpServlet {
     }
 
     private void addBanner(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
         String submit = request.getParameter("submit");
 
         if (submit == null) {
             submit = "";
         }
-        
+
         if (submit.equals("submit")) {
             String title = InputSanitizer.cleanSearchQuery(request.getParameter("title"));
             log("da qua day ");
-            
+
             /// xu li check xem co phai la file anh hay khong
-            
             String imageUrl = "";
             try {
                 Part filePart = request.getPart("file");
@@ -575,7 +836,7 @@ public class AdminSalerController extends HttpServlet {
                 log(e.getMessage());
             }
             ///
-            
+
             String redirectUrl = request.getParameter("redirect_url");
             int position = Integer.parseInt(request.getParameter("position"));
             boolean isActive = request.getParameter("is_active") != null;
@@ -594,7 +855,7 @@ public class AdminSalerController extends HttpServlet {
     }
 
     private void updateBanner(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
         String submit = request.getParameter("submit");
 
         if (submit == null) {
@@ -606,13 +867,13 @@ public class AdminSalerController extends HttpServlet {
             int bannerId = Integer.parseInt(request.getParameter("bannerId"));
             BannerDAO dao = new BannerDAO();
             Banner x = dao.getBannerById(bannerId);
-            
+
             //
             String imageUrl = x.getImage_url();
             try {
                 Part filePart = request.getPart("file");
 
-                if (filePart != null && filePart.getSize() > 0){
+                if (filePart != null && filePart.getSize() > 0) {
                     String contentType = filePart.getContentType();
 
                     if (contentType != null && contentType.startsWith("image/")) {
@@ -632,7 +893,7 @@ public class AdminSalerController extends HttpServlet {
                 log(e.getMessage());
             }
             //
-            
+
             String redirectUrl = request.getParameter("redirect_url");
             int position = Integer.parseInt(request.getParameter("position"));
             boolean isActive = request.getParameter("is_active") != null;
@@ -651,9 +912,9 @@ public class AdminSalerController extends HttpServlet {
             request.getRequestDispatcher("admin_saler_add_banner.jsp").forward(request, response);
         }
     }
-    
+
     private void detailBanner(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
         int bannerId = Integer.parseInt(request.getParameter("bannerId"));
 
         BannerDAO dao = new BannerDAO();
@@ -664,7 +925,7 @@ public class AdminSalerController extends HttpServlet {
     }
 
     private void deleteBanner(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
         int bannerId = Integer.parseInt(request.getParameter("bannerId"));
 
         BannerDAO dao = new BannerDAO();

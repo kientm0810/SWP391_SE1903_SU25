@@ -6,6 +6,7 @@ import java.util.Date;
 public class HomepageComponentContent { 
     private int id;
     private int typeId;
+    private String img;
     private int position;
     private String name;
     private String title;
@@ -19,6 +20,16 @@ public class HomepageComponentContent {
     // Constructors
     public HomepageComponentContent() {}
 
+    public HomepageComponentContent(int typeId, String img, int position, String name, String title, String content) {
+        this.typeId = typeId;
+        this.position = position;
+        this.name = name;
+        this.title = title;
+        this.content = content;
+        this.status = "active";
+        this.img = img;
+    }
+    
     public HomepageComponentContent(int typeId, int position, String name, String title, String content) {
         this.typeId = typeId;
         this.position = position;
@@ -26,6 +37,14 @@ public class HomepageComponentContent {
         this.title = title;
         this.content = content;
         this.status = "active";
+    }
+
+    public String getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
     }
 
     // Getters and Setters

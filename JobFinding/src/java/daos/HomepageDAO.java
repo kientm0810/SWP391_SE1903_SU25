@@ -94,6 +94,24 @@ public class HomepageDAO extends DBContext {
         }
         return contents;
     }
+    
+    public Vector<HomepageComponentContent> getListComponentContentsByType(String typeName) {
+        Vector<HomepageComponentContent> contents = new Vector<>();
+        String sql = "SELECT hcc.*, hct.type_name FROM HomePageComponentContent hcc " +
+                     "JOIN HomePageComponentType hct ON hcc.type_id = hct.id " +
+                     "WHERE hct.type_name = ? AND hcc.status = 'active' " +
+                     "ORDER BY hcc.position";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, typeName);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                contents.add(mapResultSetToComponentContent(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return contents;
+    }
 
     public HomepageComponentContent getComponentContentById(int id) {
         String sql = "SELECT hcc.*, hct.type_name FROM HomePageComponentContent hcc "
@@ -217,6 +235,7 @@ public class HomepageDAO extends DBContext {
     private HomepageComponentContent mapResultSetToComponentContent(ResultSet rs) throws SQLException {
         HomepageComponentContent content = new HomepageComponentContent();
         content.setId(rs.getInt("id"));
+        content.setImg(rs.getString("img"));
         content.setTypeId(rs.getInt("type_id"));
         content.setPosition(rs.getInt("position"));
         content.setName(rs.getString("name"));
