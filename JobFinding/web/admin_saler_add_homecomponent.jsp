@@ -35,7 +35,7 @@
             </div>
             
             <div class="form-container">
-                <form action="AdminSalerController" method="post" onsubmit="tinymce.triggerSave();">
+                <form action="AdminSalerController" method="post" enctype="multipart/form-data" onsubmit="tinymce.triggerSave();">
                     <div class="form-group">
                         <label>Component Type</label>
                         <c:choose>
@@ -69,6 +69,21 @@
                             </c:otherwise>
                         </c:choose>
                         <small class="form-text text-muted">Choose the type of homepage component you want to manage</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Image</label>
+                        <c:choose>
+                            <c:when test="${not empty component.id}">
+                                <input type="file" name="thumbnail" accept="image/*" class="form-control" />
+                            </c:when>
+                            <c:otherwise>
+                                <input type="file" name="thumbnail" accept="image/*" class="form-control" required />
+                            </c:otherwise>
+                        </c:choose>
+                        <c:if test="${not empty mustbeImg}">
+                            ${mustbeImg}
+                        </c:if>
                     </div>
 
                     <div class="form-group">

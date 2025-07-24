@@ -289,6 +289,35 @@ public class AdminSalerController extends HttpServlet {
                     return;
                 }
 
+                //
+                String thumbnail = existingComponent.getImg();
+
+                try {
+                    Part filePart = request.getPart("thumbnail");
+
+                    if (filePart != null && filePart.getSize() > 0) {
+                        String contentType = filePart.getContentType();
+
+                        if (contentType != null && contentType.startsWith("image/")) {
+                        } else {
+                            // Không phải ảnh
+                            request.setAttribute("mustbeImg", "Chỉ cho phép upload file ảnh!");
+                            request.setAttribute("component", existingComponent);
+                            request.getRequestDispatcher("admin_saler_add_homecomponent.jsp").forward(request, response);
+                            return;
+                        }
+                        String basePath = request.getServletContext().getRealPath("/");
+                        thumbnail = UploadPicture.uploadImage(filePart, thumbnail, basePath);
+                    } else {
+                    }
+//                log(thumbnail);
+//                log("after: " + thumbnail);
+
+                } catch (Exception e) {
+                    log(e.getMessage());
+                }
+
+                //
                 String content = request.getParameter("content");
                 String iconClass = request.getParameter("iconClass");
                 String status = request.getParameter("status");
@@ -313,7 +342,10 @@ public class AdminSalerController extends HttpServlet {
                 component.setContent(content);
                 component.setIconClass(iconClass);
                 component.setStatus(status);
+                component.setImg(thumbnail);
 
+                log("update: " + thumbnail + " - " + component.getImg());
+                
                 // Update in database
                 boolean flag = dao.updateComponentContent(component);
 
@@ -401,6 +433,29 @@ public class AdminSalerController extends HttpServlet {
                 return;
             }
 
+            ///
+            String thumbnail = "";
+            try {
+                Part filePart = request.getPart("thumbnail");
+
+                String contentType = filePart.getContentType();
+
+                if (contentType != null && contentType.startsWith("image/")) {
+                } else {
+                    // Không phải ảnh
+                    request.setAttribute("mustbeImg", "Chỉ cho phép upload file ảnh!");
+                    request.getRequestDispatcher("admin_saler_add_homecomponent.jsp").forward(request, response);
+                    return;
+                }
+
+                String basePath = request.getServletContext().getRealPath("/");
+                thumbnail = UploadPicture.uploadImage(filePart, thumbnail, basePath);
+
+            } catch (Exception e) {
+                log(e.getMessage());
+            }
+            ///
+
             try {
                 int typeId = Integer.parseInt(typeIdStr);
                 int position = Integer.parseInt(positionStr);
@@ -435,6 +490,7 @@ public class AdminSalerController extends HttpServlet {
                 component.setContent(content);
                 component.setIconClass(iconClass);
                 component.setStatus(status);
+                component.setImg(thumbnail);
 
                 // Save to database
                 HomepageDAO dao = new HomepageDAO();

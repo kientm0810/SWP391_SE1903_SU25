@@ -130,8 +130,8 @@ public class HomepageDAO extends DBContext {
     }
 
     public boolean insertComponentContent(HomepageComponentContent content) {
-        String sql = "INSERT INTO HomePageComponentContent (type_id, position, name, title, content, icon_class, status) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO HomePageComponentContent (type_id, position, name, title, content, icon_class, status, img) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, content.getTypeId());
             ps.setInt(2, content.getPosition());
@@ -140,6 +140,7 @@ public class HomepageDAO extends DBContext {
             ps.setString(5, content.getContent());
             ps.setString(6, content.getIconClass());
             ps.setString(7, content.getStatus());
+            ps.setString(8, content.getImg());
 
             int rows = ps.executeUpdate();
             return rows > 0;
@@ -152,7 +153,7 @@ public class HomepageDAO extends DBContext {
     public boolean updateComponentContent(HomepageComponentContent content) {
         String sql = "UPDATE HomePageComponentContent SET "
                 + "type_id = ?, position = ?, name = ?, title = ?, content = ?, icon_class = ?, "
-                + "status = ?, updated_at = GETDATE() WHERE id = ?";
+                + "status = ?, updated_at = GETDATE(), img = ? WHERE id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, content.getTypeId());
             ps.setInt(2, content.getPosition());
@@ -161,7 +162,8 @@ public class HomepageDAO extends DBContext {
             ps.setString(5, content.getContent());
             ps.setString(6, content.getIconClass());
             ps.setString(7, content.getStatus());
-            ps.setInt(8, content.getId());
+            ps.setString(8, content.getImg());
+            ps.setInt(9, content.getId());
 
             int rows = ps.executeUpdate();
             return rows > 0;

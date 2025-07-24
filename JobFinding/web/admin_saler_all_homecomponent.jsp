@@ -187,7 +187,7 @@
                             <th>Title</th>
                             <th>Content</th>
                             <th>Position</th>
-                            <th>Status</th>
+                            <!--<th>Status</th>-->
                             <!--<th>Created Date</th>-->
                             <th>Actions</th>
                         </tr>
@@ -225,16 +225,16 @@
                                     </div>
                                 </td>
                                 <td>${component.position}</td>
-                                <td>
-                                    <c:choose>
+<!--                                <td>
+                                    <%--<c:choose>
                                         <c:when test="${component.status == 'active'}">
                                             <span class="status-badge status-published">Active</span>
                                         </c:when>
                                         <c:otherwise>
                                             <span class="status-badge status-draft">Inactive</span>
                                         </c:otherwise>
-                                    </c:choose>
-                                </td>
+                                    </c:choose>--%>
+                                </td>-->
                                 <!--<td>{component.createdAt}</td>-->
                                 <td>
                                     <div class="action-buttons">
