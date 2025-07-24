@@ -373,7 +373,7 @@
                                                                         class="badge bg-${app.statusColor}">${app.status}</span>
                                                                 </td>
                                                                 <td>
-                                                                    <a href="download-cv?applicationId=${app.id}"
+                                                                    <a href="/JobFinding/uploads/cvs/${app.cvName}" target="_blank"
                                                                         class="text-decoration-none">
                                                                         <i
                                                                             class="fas fa-file-alt me-1"></i>${app.cvName}
