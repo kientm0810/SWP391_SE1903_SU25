@@ -109,9 +109,11 @@ public class PostController extends HttpServlet {
                 }
             } else {
                 // user thường hoặc chưa đăng nhập: chỉ xem tất cả bài post
-                int totalPosts = postsDAO.getTotalPostsWithSearch(keyword, jobType, location);
+//                int totalPosts = postsDAO.getTotalPostsWithSearch(keyword, jobType, location);
+                int totalPosts = postsDAO.getTotalFeaturedPostsWithSearch(keyword, jobType, location);
                 int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
-                request.setAttribute("posts", postsDAO.getPostsByPageWithSearch(page, pageSize, keyword, jobType, location));
+//                request.setAttribute("posts", postsDAO.getPostsByPageWithSearch(page, pageSize, keyword, jobType, location));
+                request.setAttribute("posts", postsDAO.getFeaturedPostsByPageWithSearch(page, pageSize, keyword, jobType, location));
                 request.setAttribute("currentPage", page);
                 request.setAttribute("totalPages", totalPages);
                 request.setAttribute("pageSize", pageSize);
@@ -220,7 +222,7 @@ public class PostController extends HttpServlet {
 
         if (path == null || path.equals("/")) {
             // List all posts
-            request.setAttribute("posts", postsDAO.getAllPosts());
+            request.setAttribute("posts", postsDAO.getAllPostFeature());
             request.getRequestDispatcher("/posts.jsp").forward(request, response);
         } else if (path.equals("/create")) {
             try {

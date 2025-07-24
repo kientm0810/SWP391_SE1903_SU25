@@ -740,8 +740,8 @@
                                         </div>
                                         <div class="blog-cap">
                                             <p>| Blog</p>
-                                            <h3><a href="#">${blog.title}</a></h3>
-                                            <a href="#" class="more-btn">Read more »</a>
+                                            <h3><a href="BlogController?service=detail&id=${blog.id}">${blog.title}</a></h3>
+                                            <a href="BlogController?service=detail&id=${blog.id}" class="more-btn">Read more »</a>
                                         </div>
                                     </div>
                                 </div>

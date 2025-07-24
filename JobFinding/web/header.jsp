@@ -5,7 +5,7 @@
             <div class="container">
                 <!-- Logo -->
                 <a class="navbar-brand" href="home">
-                    <img src="assets/img/logo/logo.png" alt="JobFinding Logo" height="40">
+                    <img src="/JobFinding/assets/img/logo/logo.png" alt="JobFinding Logo" height="40">
                 </a>
 
                 <!-- Mobile Toggle -->
@@ -17,17 +17,17 @@
                 <div class="collapse navbar-collapse" id="navbarMain">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" href="home">
+                            <a class="nav-link" href="/JobFinding/home">
                                 <i class="fas fa-home"></i> Home
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="post?viewAll=true">
+                            <a class="nav-link" href="/JobFinding/post?viewAll=true">
                                 <i class="fas fa-briefcase"></i> Jobs
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="advanced-search">
+                            <a class="nav-link" href="/JobFinding/advanced-search">
                                 <i class="fas fa-search-plus"></i> Advanced Search
                             </a>
                         </li>
@@ -37,7 +37,7 @@
                         <c:if
                             test="${not empty sessionScope.user and (sessionScope.role == 'job-seeker' or sessionScope.role == 'recruiter')}">
                             <li class="nav-item">
-                                <a class="nav-link" href="applications">
+                                <a class="nav-link" href="/JobFinding/applications">
                                     <i class="fas fa-file-text"></i> Applications
                                 </a>
                             </li>
@@ -45,13 +45,13 @@
                         <!-- CV Management for job seekers -->
                         <c:if test="${not empty sessionScope.user and sessionScope.role == 'job-seeker'}">
                             <li class="nav-item">
-                                <a class="nav-link" href="list_cv">
+                                <a class="nav-link" href="/JobFinding/list_cv">
                                     <i class="fas fa-file-alt"></i> CV Management
                                 </a>
                             </li>
                         </c:if>
                         <li class="nav-item">
-                            <a class="nav-link" href="BlogController">
+                            <a class="nav-link" href="/JobFinding/BlogController">
                                 <i class="fas fa-blog"></i> Blog
                             </a>
                         </li>
@@ -69,7 +69,7 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="post?view=my-post">
+                                        <a class="dropdown-item" href="/JobFinding/post?view=my-post">
                                             <i class="fas fa-user-edit"></i> My Posts
                                         </a>
                                     </li>
@@ -78,18 +78,18 @@
                             </li>
                         </c:if>
                         <li class="nav-item">
-                            <a class="nav-link" href="about.jsp">
+                            <a class="nav-link" href="/JobFinding/about.jsp">
                                 <i class="fas fa-info-circle"></i> About
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="contact.jsp">
+                            <a class="nav-link" href="/JobFinding/contact.jsp">
                                 <i class="fas fa-envelope"></i> Contact
                             </a>
                         </li>
                         <c:if test="${sessionScope.role == 'admin'}">
                             <li class="nav-item">
-                                <a class="nav-link" href="admin_dashboard.jsp">
+                                <a class="nav-link" href="/JobFinding/admin_dashboard.jsp">
                                     <i class="fas fa-tools"></i> Dashboard
                                 </a>
                             </li>
@@ -173,31 +173,31 @@
                                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
 
                                         <c:if test="${sessionScope.role == 'job-seeker'}">
-                                            <li><a class="dropdown-item" href="profile"><i class="fas fa-user"></i> My
+                                            <li><a class="dropdown-item" href="/JobFinding/profile"><i class="fas fa-user"></i> My
                                                     Profile</a></li>
-                                            <li><a class="dropdown-item" href="list_cv"><i class="fas fa-file-alt"></i>
+                                            <li><a class="dropdown-item" href="/JobFinding/list_cv"><i class="fas fa-file-alt"></i>
                                                     My CVs</a></li>
-                                            <li><a class="dropdown-item" href="saved-jobs"><i class="fas fa-heart"></i>
+                                            <li><a class="dropdown-item" href="/JobFinding/saved-jobs"><i class="fas fa-heart"></i>
                                                     Saved Jobs</a></li>
-                                            <li><a class="dropdown-item" href="advanced-search"><i
+                                            <li><a class="dropdown-item" href="/JobFinding/advanced-search"><i
                                                         class="fas fa-search-plus"></i> Advanced Job Search</a></li>
                                         </c:if>
 
                                         <c:if test="${sessionScope.role == 'recruiter'}">
-                                            <li><a class="dropdown-item" href="recruiter-profile"><i
+                                            <li><a class="dropdown-item" href="/JobFinding/recruiter-profile"><i
                                                         class="fas fa-user"></i> My Profile</a></li>
-                                            <li><a class="dropdown-item" href="post?view=my-post"><i
+                                            <li><a class="dropdown-item" href="/JobFinding/post?view=my-post"><i
                                                         class="fas fa-file-alt"></i> My Posts</a></li>
-                                            <li><a class="dropdown-item" href="saved-jobs"><i class="fas fa-heart"></i>
+                                            <li><a class="dropdown-item" href="/JobFinding/saved-jobs"><i class="fas fa-heart"></i>
                                                     Saved Jobs</a></li>
-                                            <li><a class="dropdown-item" href="recruitment_dashboard.jsp"><i
+                                            <li><a class="dropdown-item" href="/JobFinding/recruitment_dashboard.jsp"><i
                                                         class="fas fa-tachometer-alt"></i> Dashboard Control</a></li>
                                         </c:if>
 
                                         <c:if test="${sessionScope.role == 'admin'}">
                                             <li><a class="dropdown-item" href="admin"><i class="fas fa-user"></i> My
                                                     Profile</a></li>
-                                            <li><a class="dropdown-item" href="admin_dashboard.jsp"><i
+                                            <li><a class="dropdown-item" href="/JobFinding/admin_dashboard.jsp"><i
                                                         class="fas fa-tools"></i> Admin Dashboard</a></li>
                                         </c:if>
 
@@ -205,7 +205,7 @@
                                             <hr class="dropdown-divider">
                                         </li>
                                         <li>
-                                            <a class="dropdown-item text-danger" href="logout">
+                                            <a class="dropdown-item text-danger" href="/JobFinding/logout">
                                                 <i class="fas fa-sign-out-alt"></i> Logout
                                             </a>
                                         </li>
@@ -213,10 +213,10 @@
                                 </div>
                             </c:when>
                             <c:otherwise>
-                                <a href="register" class="btn btn-outline-primary me-2">
+                                <a href="/JobFinding/register" class="btn btn-outline-primary me-2">
                                     <i class="fas fa-user-plus"></i> Register
                                 </a>
-                                <a href="login" class="btn btn-primary">
+                                <a href="/JobFinding/login" class="btn btn-primary">
                                     <i class="fas fa-sign-in-alt"></i> Login
                                 </a>
                             </c:otherwise>
