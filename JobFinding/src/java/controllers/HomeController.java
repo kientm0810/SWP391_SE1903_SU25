@@ -116,7 +116,7 @@ public class HomeController extends HttpServlet {
             request.setAttribute("applyProcesses", applyProcesses);
 
             // Banners for top sections (first two by position)
-            request.setAttribute("banners", bannerDAO.getTopBanners(2));
+            request.setAttribute("banners", bannerDAO.getTopBanners(3));
 
             // Latest published blogs for "Our recent news" section
             request.setAttribute("blogList", blogDAO.getLatestBlogs(2));

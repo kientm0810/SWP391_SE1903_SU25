@@ -506,8 +506,18 @@
 
             <!-- Apply Process Section Fragment -->
             <!-- Apply Process Caption -->
+            
+            <c:choose>
+                <c:when test="${not empty banners and fn:length(banners) >= 3}">
+                    <c:set var="banner3" value="${banners[2].image_url}" />
+                </c:when>
+                <c:otherwise>
+                    <c:set var="banner3" value="assets/img/gallery/how-applybg.png" />
+                </c:otherwise>
+            </c:choose>
             <div class="apply-process-area apply-bg pt-150 pb-150"
-                 data-background="assets/img/gallery/how-applybg.png">
+                 data-background="${banner3}">
+            
                 <div class="container">
                     Section Tittle 
                     <div class="row">
