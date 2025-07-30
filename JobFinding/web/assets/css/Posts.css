@@ -185,10 +185,32 @@ h2 {
 }
 
 .location-tag::before {
-    content: "\f3c5";
-    font-family: "Font Awesome 6 Free";
-    font-weight: 900;
-    margin-right: 5px;
+    content: "📍";
+    margin-right: 4px;
+}
+
+/* Update tag styling */
+.update-tag {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    border: 1px solid #bbdefb;
+}
+
+.update-tag::before {
+    content: "🕒";
+    margin-right: 4px;
+}
+
+/* New tag styling */
+.new-tag {
+    background-color: #e8f5e8;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.new-tag::before {
+    content: "⭐";
+    margin-right: 4px;
 }
 
 .save-job-icon {

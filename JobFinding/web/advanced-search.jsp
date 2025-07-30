@@ -16,24 +16,53 @@
             <link href="assets/css/advanced-search.css" rel="stylesheet">
 
             <style>
+                :root {
+                    --topcv-primary: rgb(31, 136, 33);
+                    --topcv-secondary: #19d225;
+                    --topcv-accent: #07e207;
+                    --topcv-light: #e3f2fd;
+                    --topcv-dark: #23c015;
+                    --topcv-text: #333333;
+                    --topcv-gray: #757575;
+                    --topcv-light-gray: #f5f5f5;
+                }
+
+                body {
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    color: var(--topcv-text);
+                }
+
                 .search-container {
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    background: linear-gradient(135deg, var(--topcv-primary) 0%, var(--topcv-secondary) 100%);
                     min-height: 300px;
                     padding: 60px 0;
                 }
 
                 .filter-card {
                     background: white;
-                    border-radius: 15px;
-                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                    border-radius: 12px;
+                    box-shadow: 0 4px 20px rgba(30, 136, 229, 0.1);
                     margin-bottom: 20px;
+                    border: 1px solid #e0e0e0;
+                    transition: all 0.3s ease;
+                }
+
+                .filter-card:hover {
+                    box-shadow: 0 8px 30px rgba(30, 136, 229, 0.15);
+                    transform: translateY(-2px);
                 }
 
                 .filter-header {
-                    background: #f8f9fa;
-                    padding: 15px 20px;
-                    border-radius: 15px 15px 0 0;
-                    border-bottom: 1px solid #e9ecef;
+                    background: var(--topcv-light);
+                    padding: 18px 20px;
+                    border-radius: 12px 12px 0 0;
+                    border-bottom: 2px solid var(--topcv-primary);
+                }
+
+                .filter-header h5 {
+                    color: var(--topcv-primary);
+                    font-weight: 600;
+                    margin: 0;
                 }
 
                 .filter-body {
@@ -42,62 +71,142 @@
 
                 .form-control,
                 .form-select {
-                    border-radius: 10px;
-                    border: 2px solid #e9ecef;
+                    border-radius: 8px;
+                    border: 2px solid #e0e0e0;
                     transition: all 0.3s ease;
+                    padding: 12px 15px;
                 }
 
                 .form-control:focus,
                 .form-select:focus {
-                    border-color: #667eea;
-                    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+                    border-color: var(--topcv-primary);
+                    box-shadow: 0 0 0 0.2rem rgba(30, 136, 229, 0.25);
+                }
+
+                .form-label {
+                    font-weight: 600;
+                    color: var(--topcv-text);
+                    margin-bottom: 8px;
                 }
 
                 .btn-primary {
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    background: linear-gradient(135deg, var(--topcv-primary) 0%, var(--topcv-secondary) 100%);
                     border: none;
-                    border-radius: 10px;
+                    border-radius: 8px;
                     padding: 12px 30px;
                     font-weight: 600;
+                    transition: all 0.3s ease;
+                }
+
+                .btn-primary:hover {
+                    background: linear-gradient(135deg, var(--topcv-secondary) 0%, var(--topcv-dark) 100%);
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 15px rgba(30, 136, 229, 0.3);
                 }
 
                 .btn-outline-secondary {
-                    border-radius: 10px;
+                    border-radius: 8px;
                     padding: 12px 30px;
+                    border-color: var(--topcv-gray);
+                    color: var(--topcv-gray);
+                }
+
+                .btn-outline-secondary:hover {
+                    background-color: var(--topcv-gray);
+                    border-color: var(--topcv-gray);
+                }
+
+                .btn-outline-primary {
+                    border-radius: 8px;
+                    padding: 12px 30px;
+                    border-color: var(--topcv-primary);
+                    color: var(--topcv-primary);
+                }
+
+                .btn-outline-primary:hover {
+                    background-color: var(--topcv-primary);
+                    border-color: var(--topcv-primary);
                 }
 
                 .suggestion-tag {
                     display: inline-block;
-                    background: #e9ecef;
-                    color: #495057;
-                    padding: 5px 12px;
-                    border-radius: 20px;
-                    margin: 2px;
+                    background: var(--topcv-light);
+                    color: var(--topcv-primary);
+                    padding: 8px 16px;
+                    border-radius: 25px;
+                    margin: 4px;
                     cursor: pointer;
                     transition: all 0.3s ease;
                     font-size: 0.9em;
+                    border: 1px solid var(--topcv-primary);
                 }
 
                 .suggestion-tag:hover {
-                    background: #667eea;
+                    background: var(--topcv-primary);
                     color: white;
+                    transform: translateY(-1px);
                 }
 
                 .stats-card {
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    background: linear-gradient(135deg, var(--topcv-primary) 0%, var(--topcv-secondary) 100%);
                     color: white;
-                    border-radius: 15px;
-                    padding: 20px;
+                    border-radius: 12px;
+                    padding: 25px;
                     margin-bottom: 20px;
+                    box-shadow: 0 4px 20px rgba(30, 136, 229, 0.2);
                 }
 
                 .collapse-toggle {
                     cursor: pointer;
-                    color: #667eea;
+                    color: var(--topcv-primary);
+                    transition: all 0.3s ease;
                 }
 
                 .collapse-toggle:hover {
-                    color: #764ba2;
+                    color: var(--topcv-secondary);
+                }
+
+                .badge {
+                    border-radius: 6px;
+                    padding: 6px 12px;
+                    font-size: 0.85em;
+                }
+
+                .badge.bg-primary {
+                    background-color: var(--topcv-primary) !important;
+                }
+
+                .badge.bg-success {
+                    background-color: #4caf50 !important;
+                }
+
+                .badge.bg-info {
+                    background-color: var(--topcv-accent) !important;
+                }
+
+                .pagination .page-link {
+                    color: var(--topcv-primary);
+                    border-color: #e0e0e0;
+                }
+
+                .pagination .page-item.active .page-link {
+                    background-color: var(--topcv-primary);
+                    border-color: var(--topcv-primary);
+                }
+
+                .pagination .page-link:hover {
+                    background-color: var(--topcv-light);
+                    border-color: var(--topcv-primary);
+                }
+
+                .text-primary {
+                    color: var(--topcv-primary) !important;
+                }
+
+                .alert-info {
+                    background-color: var(--topcv-light);
+                    border-color: var(--topcv-primary);
+                    color: var(--topcv-text);
                 }
             </style>
         </head>
@@ -140,7 +249,7 @@
                                 </div>
                                 <div class="filter-body">
                                     <div class="mb-3">
-                                        <label for="keyword" class="form-label fw-bold">
+                                        <label for="keyword" class="form-label">
                                             <i class="fas fa-key me-2"></i>Từ khóa
                                         </label>
                                         <input type="text" class="form-control" id="keyword" name="keyword"
@@ -148,7 +257,7 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="location" class="form-label fw-bold">
+                                        <label for="location" class="form-label">
                                             <i class="fas fa-map-marker-alt me-2"></i>Địa điểm
                                         </label>
                                         <input type="text" class="form-control" id="location" name="location"
@@ -156,28 +265,11 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="industry" class="form-label fw-bold">
+                                        <label for="industry" class="form-label">
                                             <i class="fas fa-industry me-2"></i>Ngành nghề
                                         </label>
-                                        <select class="form-select" id="industry" name="industry">
-                                            <option value="">Tất cả ngành nghề</option>
-                                            <option value="IT/Software" ${param.industry=='IT/Software' ? 'selected'
-                                                : '' }>IT/Phần mềm</option>
-                                            <option value="Marketing" ${param.industry=='Marketing' ? 'selected' : '' }>
-                                                Marketing</option>
-                                            <option value="Finance" ${param.industry=='Finance' ? 'selected' : '' }>Tài
-                                                chính</option>
-                                            <option value="Education" ${param.industry=='Education' ? 'selected' : '' }>
-                                                Giáo dục</option>
-                                            <option value="Healthcare" ${param.industry=='Healthcare' ? 'selected' : ''
-                                                }>Y tế</option>
-                                            <option value="Manufacturing" ${param.industry=='Manufacturing' ? 'selected'
-                                                : '' }>Sản xuất</option>
-                                            <option value="Retail" ${param.industry=='Retail' ? 'selected' : '' }>Bán lẻ
-                                            </option>
-                                            <option value="Other" ${param.industry=='Other' ? 'selected' : '' }>Khác
-                                            </option>
-                                        </select>
+                                        <input type="text" class="form-control" id="industry" name="industry"
+                                            placeholder="Nhập ngành nghề..." value="${param.industry}">
                                     </div>
                                 </div>
                             </div>
@@ -192,56 +284,44 @@
                                 </div>
                                 <div class="filter-body">
                                     <div class="mb-3">
-                                        <label for="jobType" class="form-label fw-bold">
-                                            <i class="fas fa-clock me-2"></i>Loại công việc
+                                        <label for="jobType" class="form-label">
+                                            <i class="fas fa-clock me-2"></i>Loại hình công việc
                                         </label>
                                         <select class="form-select" id="jobType" name="jobType">
                                             <option value="">Tất cả loại</option>
-                                            <option value="full_time" ${param.jobType=='full_time' ? 'selected' : '' }>
-                                                Toàn thời gian</option>
-                                            <option value="part_time" ${param.jobType=='part_time' ? 'selected' : '' }>
-                                                Bán thời gian</option>
-                                            <option value="contract" ${param.jobType=='contract' ? 'selected' : '' }>Hợp
+                                            <option value="Full-time" ${param.jobType=='Full-time' ? 'selected' : '' }>
+                                                Full-time</option>
+                                            <option value="Part-time" ${param.jobType=='Part-time' ? 'selected' : '' }>
+                                                Part-time</option>
+                                            <option value="Contract" ${param.jobType=='Contract' ? 'selected' : '' }>Hợp
                                                 đồng</option>
-                                            <option value="internship" ${param.jobType=='internship' ? 'selected' : ''
+                                            <option value="Internship" ${param.jobType=='Internship' ? 'selected' : ''
                                                 }>Thực tập</option>
-                                            <option value="freelance" ${param.jobType=='freelance' ? 'selected' : '' }>
-                                                Freelance</option>
                                         </select>
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="experienceLevel" class="form-label fw-bold">
+                                        <label for="experience" class="form-label">
                                             <i class="fas fa-star me-2"></i>Kinh nghiệm
                                         </label>
-                                        <select class="form-select" id="experienceLevel" name="experienceLevel">
-                                            <option value="">Tất cả mức</option>
-                                            <option value="entry" ${param.experienceLevel=='entry' ? 'selected' : '' }>
-                                                Mới tốt nghiệp</option>
-                                            <option value="junior" ${param.experienceLevel=='junior' ? 'selected' : ''
-                                                }>Junior (1-3 năm)</option>
-                                            <option value="mid" ${param.experienceLevel=='mid' ? 'selected' : '' }>
-                                                Mid-level (3-5 năm)</option>
-                                            <option value="senior" ${param.experienceLevel=='senior' ? 'selected' : ''
-                                                }>Senior (5+ năm)</option>
-                                            <option value="lead" ${param.experienceLevel=='lead' ? 'selected' : '' }>
-                                                Lead/Manager</option>
-                                        </select>
+                                        <input type="text" class="form-control" id="experience" name="experience"
+                                            placeholder="Nhập yêu cầu kinh nghiệm..." value="${param.experience}">
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="workType" class="form-label fw-bold">
-                                            <i class="fas fa-home me-2"></i>Hình thức làm việc
+                                        <label for="rank" class="form-label">
+                                            <i class="fas fa-user-tie me-2"></i>Cấp bậc
                                         </label>
-                                        <select class="form-select" id="workType" name="workType">
-                                            <option value="">Tất cả hình thức</option>
-                                            <option value="on_site" ${param.workType=='on_site' ? 'selected' : '' }>Tại
-                                                văn phòng</option>
-                                            <option value="remote" ${param.workType=='remote' ? 'selected' : '' }>Làm từ
-                                                xa</option>
-                                            <option value="hybrid" ${param.workType=='hybrid' ? 'selected' : '' }>Kết
-                                                hợp</option>
-                                        </select>
+                                        <input type="text" class="form-control" id="rank" name="rank"
+                                            placeholder="Nhập cấp bậc..." value="${param.rank}">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="workingTime" class="form-label">
+                                            <i class="fas fa-calendar-alt me-2"></i>Thời gian làm việc
+                                        </label>
+                                        <input type="text" class="form-control" id="workingTime" name="workingTime"
+                                            placeholder="Nhập thời gian làm việc..." value="${param.workingTime}">
                                     </div>
                                 </div>
                             </div>
@@ -255,97 +335,80 @@
                                     </h5>
                                 </div>
                                 <div class="filter-body">
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <label for="minSalary" class="form-label fw-bold">Tối thiểu</label>
-                                            <input type="number" class="form-control" id="minSalary" name="minSalary"
-                                                placeholder="0" value="${param.minSalary}">
-                                        </div>
-                                        <div class="col-6">
-                                            <label for="maxSalary" class="form-label fw-bold">Tối đa</label>
-                                            <input type="number" class="form-control" id="maxSalary" name="maxSalary"
-                                                placeholder="Không giới hạn" value="${param.maxSalary}">
-                                        </div>
+                                    <div class="mb-3">
+                                        <label for="salary" class="form-label">Mức lương</label>
+                                        <input type="text" class="form-control" id="salary" name="salary"
+                                            placeholder="Nhập mức lương..." value="${param.salary}">
                                     </div>
-                                    <small class="text-muted">Đơn vị: triệu VND/tháng</small>
+                                    <small class="text-muted">Ví dụ: 15-25 triệu VND/tháng</small>
                                 </div>
                             </div>
 
-                            <!-- Company & Benefits -->
+                            <!-- Company Information -->
                             <div class="filter-card">
                                 <div class="filter-header">
                                     <h5 class="mb-0 collapse-toggle" data-bs-toggle="collapse"
-                                        data-bs-target="#companyBenefits">
+                                        data-bs-target="#companyInfo">
                                         <i class="fas fa-building me-2"></i>
-                                        Công ty & Phúc lợi
+                                        Thông tin công ty
                                         <i class="fas fa-chevron-down float-end"></i>
                                     </h5>
                                 </div>
-                                <div class="collapse show" id="companyBenefits">
+                                <div class="collapse show" id="companyInfo">
                                     <div class="filter-body">
                                         <div class="mb-3">
-                                            <label for="companySize" class="form-label fw-bold">Quy mô công ty</label>
-                                            <select class="form-select" id="companySize" name="companySize">
-                                                <option value="">Tất cả quy mô</option>
-                                                <option value="startup" ${param.companySize=='startup' ? 'selected' : ''
-                                                    }>Startup (< 50)</option>
-                                                <option value="small" ${param.companySize=='small' ? 'selected' : '' }>
-                                                    Nhỏ (50-200)</option>
-                                                <option value="medium" ${param.companySize=='medium' ? 'selected' : ''
-                                                    }>Vừa (200-1000)</option>
-                                                <option value="large" ${param.companySize=='large' ? 'selected' : '' }>
-                                                    Lớn (1000+)</option>
-                                            </select>
+                                            <label for="companyName" class="form-label">Tên công ty</label>
+                                            <input type="text" class="form-control" id="companyName" name="companyName"
+                                                placeholder="Nhập tên công ty..." value="${param.companyName}">
                                         </div>
 
                                         <div class="mb-3">
-                                            <label for="benefits" class="form-label fw-bold">Phúc lợi</label>
-                                            <input type="text" class="form-control" id="benefits" name="benefits"
-                                                placeholder="Bảo hiểm, thưởng..." value="${param.benefits}">
+                                            <label for="companySize" class="form-label">Quy mô công ty</label>
+                                            <input type="text" class="form-control" id="companySize" name="companySize"
+                                                placeholder="Nhập quy mô công ty..." value="${param.companySize}">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="contactAddress" class="form-label">Địa chỉ làm việc</label>
+                                            <input type="text" class="form-control" id="contactAddress"
+                                                name="contactAddress" placeholder="Nhập địa chỉ làm việc..."
+                                                value="${param.contactAddress}">
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Skills & Requirements -->
+                            <!-- Job Requirements -->
                             <div class="filter-card">
                                 <div class="filter-header">
                                     <h5 class="mb-0 collapse-toggle" data-bs-toggle="collapse"
-                                        data-bs-target="#skillsRequirements">
+                                        data-bs-target="#jobRequirements">
                                         <i class="fas fa-tools me-2"></i>
-                                        Kỹ năng & Yêu cầu
+                                        Yêu cầu công việc
                                         <i class="fas fa-chevron-down float-end"></i>
                                     </h5>
                                 </div>
-                                <div class="collapse" id="skillsRequirements">
+                                <div class="collapse" id="jobRequirements">
                                     <div class="filter-body">
                                         <div class="mb-3">
-                                            <label for="skills" class="form-label fw-bold">Kỹ năng</label>
-                                            <input type="text" class="form-control" id="skills" name="skills"
-                                                placeholder="Java, React, SQL..." value="${param.skills}">
+                                            <label for="requirements" class="form-label">Yêu cầu ứng viên</label>
+                                            <input type="text" class="form-control" id="requirements"
+                                                name="requirements" placeholder="Nhập yêu cầu..."
+                                                value="${param.requirements}">
                                         </div>
 
                                         <div class="mb-3">
-                                            <label for="education" class="form-label fw-bold">Học vấn</label>
-                                            <select class="form-select" id="education" name="education">
-                                                <option value="">Tất cả trình độ</option>
-                                                <option value="high_school" ${param.education=='high_school'
-                                                    ? 'selected' : '' }>Trung học phổ thông</option>
-                                                <option value="college" ${param.education=='college' ? 'selected' : ''
-                                                    }>Cao đẳng</option>
-                                                <option value="bachelor" ${param.education=='bachelor' ? 'selected' : ''
-                                                    }>Đại học</option>
-                                                <option value="master" ${param.education=='master' ? 'selected' : '' }>
-                                                    Thạc sĩ</option>
-                                                <option value="phd" ${param.education=='phd' ? 'selected' : '' }>Tiến sĩ
-                                                </option>
-                                            </select>
+                                            <label for="benefits" class="form-label">Quyền lợi</label>
+                                            <input type="text" class="form-control" id="benefits" name="benefits"
+                                                placeholder="Nhập quyền lợi..." value="${param.benefits}">
                                         </div>
 
                                         <div class="mb-3">
-                                            <label for="language" class="form-label fw-bold">Ngoại ngữ</label>
-                                            <input type="text" class="form-control" id="language" name="language"
-                                                placeholder="Tiếng Anh, Tiếng Nhật..." value="${param.language}">
+                                            <label for="applicationMethod" class="form-label">Cách thức ứng
+                                                tuyển</label>
+                                            <input type="text" class="form-control" id="applicationMethod"
+                                                name="applicationMethod" placeholder="Nhập cách thức ứng tuyển..."
+                                                value="${param.applicationMethod}">
                                         </div>
                                     </div>
                                 </div>
@@ -361,21 +424,23 @@
                                 </div>
                                 <div class="filter-body">
                                     <div class="mb-3">
-                                        <label for="sortBy" class="form-label fw-bold">Sắp xếp theo</label>
+                                        <label for="sortBy" class="form-label">Sắp xếp theo</label>
                                         <select class="form-select" id="sortBy" name="sortBy">
                                             <option value="created_at" ${param.sortBy=='created_at' ? 'selected' : '' }>
                                                 Ngày đăng</option>
-                                            <option value="salary_min" ${param.sortBy=='salary_min' ? 'selected' : '' }>
-                                                Mức lương</option>
                                             <option value="title" ${param.sortBy=='title' ? 'selected' : '' }>Tên công
                                                 việc</option>
                                             <option value="company_name" ${param.sortBy=='company_name' ? 'selected'
                                                 : '' }>Tên công ty</option>
+                                            <option value="salary" ${param.sortBy=='salary' ? 'selected' : '' }>
+                                                Mức lương</option>
+                                            <option value="deadline" ${param.sortBy=='deadline' ? 'selected' : '' }>
+                                                Hạn nộp hồ sơ</option>
                                         </select>
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="sortOrder" class="form-label fw-bold">Thứ tự</label>
+                                        <label for="sortOrder" class="form-label">Thứ tự</label>
                                         <select class="form-select" id="sortOrder" name="sortOrder">
                                             <option value="DESC" ${param.sortOrder=='DESC' ? 'selected' : '' }>Giảm dần
                                             </option>
@@ -461,6 +526,16 @@
                                             Minh</span>
                                         <span class="suggestion-tag" onclick="setLocation('Đà Nẵng')">Đà Nẵng</span>
                                         <span class="suggestion-tag" onclick="setLocation('Cần Thơ')">Cần Thơ</span>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Loại hình công việc:</strong>
+                                    <div class="mt-2">
+                                        <span class="suggestion-tag" onclick="setJobType('Full-time')">Full-time</span>
+                                        <span class="suggestion-tag" onclick="setJobType('Part-time')">Part-time</span>
+                                        <span class="suggestion-tag" onclick="setJobType('Contract')">Contract</span>
+                                        <span class="suggestion-tag"
+                                            onclick="setJobType('Internship')">Internship</span>
                                     </div>
                                 </div>
                             </div>
@@ -562,6 +637,11 @@
                 // Set location from suggestion
                 function setLocation(location) {
                     document.getElementById('location').value = location;
+                }
+
+                // Set job type from suggestion
+                function setJobType(jobType) {
+                    document.getElementById('jobType').value = jobType;
                 }
 
                 // Clear all filters

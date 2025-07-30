@@ -24,20 +24,22 @@ public class EmailHistoryDAO {
      * Lưu lịch sử email
      */
     public boolean saveEmailHistory(EmailHistory emailHistory) {
-        String sql = "INSERT INTO Email_History (application_id, interview_schedule_id, template_name, recipient_email, subject, body_html, status, error_message, sent_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Email_History (application_id, interview_schedule_id, recruiter_id, template_name, recipient_email, subject, body_html, status, error_message, sent_at, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         try (Connection conn = new DBContext().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             
             ps.setObject(1, emailHistory.getApplicationId());
             ps.setObject(2, emailHistory.getInterviewScheduleId());
-            ps.setString(3, emailHistory.getTemplateName());
-            ps.setString(4, emailHistory.getRecipientEmail());
-            ps.setString(5, emailHistory.getSubject());
-            ps.setString(6, emailHistory.getBodyHtml());
-            ps.setString(7, emailHistory.getStatus());
-            ps.setString(8, emailHistory.getErrorMessage());
-            ps.setTimestamp(9, emailHistory.getSentAt());
+            ps.setObject(3, emailHistory.getRecruiterId());
+            ps.setString(4, emailHistory.getTemplateName());
+            ps.setString(5, emailHistory.getRecipientEmail());
+            ps.setString(6, emailHistory.getSubject());
+            ps.setString(7, emailHistory.getBodyHtml());
+            ps.setString(8, emailHistory.getStatus());
+            ps.setString(9, emailHistory.getErrorMessage());
+            ps.setTimestamp(10, emailHistory.getSentAt());
+            ps.setTimestamp(11, emailHistory.getCreatedAt());
             
             int affectedRows = ps.executeUpdate();
             if (affectedRows > 0) {
@@ -50,6 +52,7 @@ public class EmailHistoryDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error saving email history", e);
+            e.printStackTrace();
         }
         return false;
     }
@@ -225,6 +228,201 @@ public class EmailHistoryDAO {
     }
 
     /**
+     * Lấy lịch sử email theo recruiter với filter và pagination
+     */
+    public List<EmailHistory> getEmailHistoryByRecruiter(int recruiterId, String status, String emailType, 
+                                                        String sortBy, String keyword, int limit, int offset) {
+        List<EmailHistory> history = new ArrayList<>();
+        StringBuilder sql = new StringBuilder();
+        
+        // Query to get emails for specific recruiter using direct recruiter_id
+        sql.append("SELECT eh.* FROM Email_History eh ");
+        sql.append("WHERE eh.recruiter_id = ? ");
+        
+        List<Object> params = new ArrayList<>();
+        params.add(recruiterId);
+        
+        if (status != null && !status.trim().isEmpty()) {
+            sql.append("AND eh.status = ? ");
+            params.add(status);
+        }
+        
+        if (emailType != null && !emailType.trim().isEmpty()) {
+            sql.append("AND eh.template_name LIKE ? ");
+            params.add("%" + emailType + "%");
+        }
+        
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append("AND (eh.recipient_email LIKE ? OR eh.subject LIKE ?) ");
+            params.add("%" + keyword + "%");
+            params.add("%" + keyword + "%");
+        }
+        
+        // Add sorting
+        if ("recipient_email".equals(sortBy)) {
+            sql.append("ORDER BY eh.recipient_email ");
+        } else if ("subject".equals(sortBy)) {
+            sql.append("ORDER BY eh.subject ");
+        } else if ("status".equals(sortBy)) {
+            sql.append("ORDER BY eh.status ");
+        } else {
+            sql.append("ORDER BY eh.sent_at DESC ");
+        }
+        
+        sql.append("OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+        params.add(offset);
+        params.add(limit);
+        
+        try (Connection conn = new DBContext().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            
+
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    EmailHistory emailHistory = mapResultSetToEmailHistory(rs);
+                    history.add(emailHistory);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error getting email history by recruiter: " + recruiterId, e);
+            e.printStackTrace();
+        }
+        return history;
+    }
+
+    /**
+     * Đếm tổng số email theo recruiter với filter
+     */
+    public int getTotalEmailCountByRecruiter(int recruiterId, String status, String emailType, String keyword) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT COUNT(*) FROM Email_History eh ");
+        sql.append("WHERE eh.recruiter_id = ? ");
+        
+        List<Object> params = new ArrayList<>();
+        params.add(recruiterId);
+        
+        if (status != null && !status.trim().isEmpty()) {
+            sql.append("AND eh.status = ? ");
+            params.add(status);
+        }
+        
+        if (emailType != null && !emailType.trim().isEmpty()) {
+            sql.append("AND eh.template_name LIKE ? ");
+            params.add("%" + emailType + "%");
+        }
+        
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append("AND (eh.recipient_email LIKE ? OR eh.subject LIKE ?) ");
+            params.add("%" + keyword + "%");
+            params.add("%" + keyword + "%");
+        }
+        
+        try (Connection conn = new DBContext().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            
+
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+        
+                    return count;
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error getting total email count by recruiter: " + recruiterId, e);
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    /**
+     * Đếm số email theo recruiter và trạng thái
+     */
+    public int getEmailCountByRecruiterAndStatus(int recruiterId, String status) {
+        String sql = "SELECT COUNT(*) FROM Email_History eh " +
+                    "WHERE eh.recruiter_id = ? AND eh.status = ?";
+        
+        try (Connection conn = new DBContext().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, recruiterId);
+            ps.setString(2, status);
+            
+
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+                    return count;
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error getting email count by recruiter and status: " + recruiterId + ", " + status, e);
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    /**
+     * Lấy email history theo ID
+     */
+    public EmailHistory getEmailHistoryById(int id) {
+        String sql = "SELECT * FROM Email_History WHERE id = ?";
+        
+        try (Connection conn = new DBContext().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToEmailHistory(rs);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error getting email history by ID: " + id, e);
+        }
+        return null;
+    }
+
+
+
+    /**
+     * Kiểm tra email có thuộc về recruiter không
+     */
+    public boolean isEmailBelongsToRecruiter(int emailId, int recruiterId) {
+        String sql = "SELECT COUNT(*) FROM Email_History eh " +
+                    "INNER JOIN Application a ON eh.application_id = a.application_id " +
+                    "INNER JOIN Post p ON a.post_id = p.post_id " +
+                    "WHERE eh.id = ? AND p.recruiter_id = ?";
+        
+        try (Connection conn = new DBContext().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, emailId);
+            ps.setInt(2, recruiterId);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error checking email ownership: " + emailId + ", " + recruiterId, e);
+        }
+        return false;
+    }
+
+    /**
      * Map ResultSet thành EmailHistory object
      */
     private EmailHistory mapResultSetToEmailHistory(ResultSet rs) throws SQLException {
@@ -232,6 +430,7 @@ public class EmailHistoryDAO {
         emailHistory.setId(rs.getInt("id"));
         emailHistory.setApplicationId(rs.getObject("application_id") != null ? rs.getInt("application_id") : null);
         emailHistory.setInterviewScheduleId(rs.getObject("interview_schedule_id") != null ? rs.getInt("interview_schedule_id") : null);
+        emailHistory.setRecruiterId(rs.getObject("recruiter_id") != null ? rs.getInt("recruiter_id") : null);
         emailHistory.setTemplateName(rs.getString("template_name"));
         emailHistory.setRecipientEmail(rs.getString("recipient_email"));
         emailHistory.setSubject(rs.getString("subject"));

@@ -125,6 +125,15 @@
                                                 required maxlength="200">
                                             <div class="invalid-feedback">Vui lòng nhập thời gian làm việc</div>
                                         </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="updatedAt" class="form-label">Ngày cập nhật</label>
+                                            <input type="datetime-local" class="form-control" id="updatedAt"
+                                                name="updatedAt" min="" onchange="validateUpdatedAt(this)">
+                                            <small class="form-text text-muted">Để trống để sử dụng thời gian hiện
+                                                tại</small>
+                                            <div class="invalid-feedback">Ngày cập nhật không được nhỏ hơn ngày hiện tại
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -134,8 +143,7 @@
                                     <div class="mb-3">
                                         <label for="jobDescription" class="form-label required-field">Mô tả công
                                             việc</label>
-                                        <textarea class="form-control" id="jobDescription"
-                                            name="jobDescription"></textarea>
+                                        <textarea class="form-control" id="default" name="jobDescription"></textarea>
                                         <div class="invalid-feedback">Vui lòng nhập mô tả công việc</div>
                                     </div>
                                     <div class="mb-3">
@@ -231,11 +239,12 @@
             </div>
 
             <!--API TinyMCE -->
-            <script src="tinymce/tinymce.min.js"></script>
+            <script src="./tinymce/tinymce.min.js"></script>
+            <script src="./assets/js/tinymceConfig.js"></script>
             <script>
                 // Khởi tạo TinyMCE cho các textarea cần rich text
                 tinymce.init({
-                    selector: '#jobDescription, #requirements, #benefits',
+                    selector: '#requirements, #benefits',
                     height: 300,
                     menubar: true,
                     plugins: [
@@ -351,6 +360,45 @@
                     }
                 }
 
+                // Set min value for updated_at field
+                function setMinDateTime() {
+                    const updatedAtInput = document.getElementById('updatedAt');
+                    if (updatedAtInput) {
+                        const now = new Date();
+                        const year = now.getFullYear();
+                        const month = String(now.getMonth() + 1).padStart(2, '0');
+                        const day = String(now.getDate()).padStart(2, '0');
+                        const hours = String(now.getHours()).padStart(2, '0');
+                        const minutes = String(now.getMinutes()).padStart(2, '0');
+                        const minDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+                        updatedAtInput.min = minDateTime;
+                    }
+                }
+
+                // Validate updated_at field on change
+                function validateUpdatedAt(input) {
+                    if (input.value.trim()) {
+                        const selectedDate = new Date(input.value);
+                        const currentDate = new Date();
+
+                        if (selectedDate < currentDate) {
+                            input.classList.add('is-invalid');
+                            return false;
+                        } else {
+                            input.classList.remove('is-invalid');
+                            return true;
+                        }
+                    } else {
+                        input.classList.remove('is-invalid');
+                        return true;
+                    }
+                }
+
+                // Initialize min datetime when page loads
+                document.addEventListener('DOMContentLoaded', function () {
+                    setMinDateTime();
+                });
+
                 // Form submission handling
                 document.getElementById('createPostForm').addEventListener('submit', async function (e) {
                     e.preventDefault();
@@ -367,7 +415,7 @@
                         // Check required fields
                         const requiredFields = [
                             'title', 'companyName', 'salary', 'location', 'jobType',
-                            'experience', 'deadline', 'workingTime', 'jobDescription',
+                            'experience', 'deadline', 'workingTime', 'default',
                             'requirements', 'benefits', 'contactAddress', 'applicationMethod',
                             'companyLogo'
                         ];
@@ -386,6 +434,24 @@
                                 }
                             } else {
                                 input.classList.remove('is-invalid');
+                            }
+                        }
+
+                        // Validate updated_at field
+                        const updatedAtInput = document.getElementById('updatedAt');
+                        if (updatedAtInput && updatedAtInput.value.trim()) {
+                            const selectedDate = new Date(updatedAtInput.value);
+                            const currentDate = new Date();
+
+                            if (selectedDate < currentDate) {
+                                isValid = false;
+                                updatedAtInput.classList.add('is-invalid');
+                                alert('Ngày cập nhật không được nhỏ hơn ngày hiện tại. Vui lòng chọn ngày trong tương lai hoặc để trống để sử dụng thời gian hiện tại.');
+                                updatedAtInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                updatedAtInput.focus();
+                                return;
+                            } else {
+                                updatedAtInput.classList.remove('is-invalid');
                             }
                         }
 

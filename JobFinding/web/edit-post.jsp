@@ -19,12 +19,93 @@
                     .tox-tinymce {
                         min-height: 400px;
                     }
+
+                    /* Spacing between header and breadcrumb */
+                    .container.mt-4 {
+                        margin-top: 2rem !important;
+                        padding-top: 1rem;
+                    }
+
+                    /* Breadcrumb styling */
+                    .breadcrumb {
+                        background-color: #f8f9fa;
+                        padding: 0.75rem 1rem;
+                        border-radius: 0.375rem;
+                        margin-bottom: 1.5rem;
+                        border: 1px solid #e9ecef;
+                    }
+
+                    .breadcrumb-item a {
+                        color: #0d6efd;
+                        text-decoration: none;
+                        font-weight: 500;
+                    }
+
+                    .breadcrumb-item a:hover {
+                        color: #0a58ca;
+                        text-decoration: underline;
+                    }
+
+                    .breadcrumb-item.active {
+                        color: #6c757d;
+                        font-weight: 600;
+                    }
+
+                    /* Logo preview styling */
+                    #logoPreview {
+                        border: 2px dashed #dee2e6;
+                        border-radius: 0.375rem;
+                        padding: 1rem;
+                        text-align: center;
+                        background-color: #f8f9fa;
+                        transition: all 0.3s ease;
+                    }
+
+                    #logoPreview:hover {
+                        border-color: #0d6efd;
+                        background-color: #f0f8ff;
+                    }
+
+                    #previewImage {
+                        border-radius: 0.375rem;
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                        transition: transform 0.3s ease;
+                    }
+
+                    #previewImage:hover {
+                        transform: scale(1.05);
+                    }
+
+                    /* Form section spacing */
+                    .card {
+                        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+                        border: 1px solid rgba(0, 0, 0, 0.125);
+                    }
+
+                    .card-title {
+                        color: #2c3e50;
+                        border-bottom: 2px solid #0d6efd;
+                        padding-bottom: 0.5rem;
+                    }
                 </style>
                 <!--API TinyMCE -->
-                <script src="tinymce/tinymce.min.js"></script>
+                <script src="${pageContext.request.contextPath}/tinymce/tinymce.min.js"></script>
+                <script src="${pageContext.request.contextPath}/assets/js/tinymceConfig.js"></script>
             </head>
 
             <body>
+
+                <!-- Preloader Start -->
+                <div id="preloader-active">
+                    <div class="preloader d-flex align-items-center justify-content-center">
+                        <div class="preloader-inner position-relative">
+                            <div class="preloader-circle"></div>
+                            <div class="preloader-img pere-text">
+                                <img src="assets/img/logo/logo.png" alt="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <jsp:include page="header.jsp" />
 
                 <div class="container mt-4">
@@ -51,7 +132,7 @@
                                 </c:if>
 
                                 <form action="${pageContext.request.contextPath}/post/update" method="POST"
-                                    id="editPostForm" enctype="multipart/form-data">
+                                    id="editPostForm" enctype="multipart/form-data" onsubmit="tinymce.triggerSave();">
                                     <input type="hidden" name="id" value="${post.id}">
                                     <input type="hidden" name="parentId" value="${post.parentId}">
                                     <input type="hidden" name="postType" value="${post.postType}">
@@ -135,7 +216,7 @@
                                         <h4>Chi tiết công việc</h4>
                                         <div class="mb-3">
                                             <label for="jobDescription" class="form-label">Mô tả công việc</label>
-                                            <textarea class="form-control" id="jobDescription" name="jobDescription"
+                                            <textarea class="form-control" id="default" name="jobDescription"
                                                 required>${post.jobDescription}</textarea>
                                         </div>
                                         <div class="mb-3">
@@ -252,7 +333,7 @@
                 <script>
                     // Khởi tạo TinyMCE cho các textarea cần rich text
                     tinymce.init({
-                        selector: '#jobDescription, #requirements, #benefits',
+                        selector: '#requirements, #benefits',
                         height: 300,
                         menubar: true,
                         plugins: [
@@ -391,7 +472,7 @@
                         // Check required fields
                         const requiredFields = [
                             'title', 'companyName', 'salary', 'location', 'jobType',
-                            'experience', 'deadline', 'workingTime', 'jobDescription',
+                            'experience', 'deadline', 'workingTime', 'default',
                             'requirements', 'benefits', 'contactAddress', 'applicationMethod'
                         ];
 

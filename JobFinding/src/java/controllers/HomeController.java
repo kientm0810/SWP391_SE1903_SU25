@@ -10,19 +10,20 @@ import java.util.Vector;
 
 import daos.BannerDAO;
 import daos.BlogDAO;
+import daos.FeaturedJobDAO;
 import daos.JobDAO;
+import daos.NotificationDAO;
 import daos.PostsDAO;
-import daos.RecruiterNotificationDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import models.JobListing;
 import models.JobTypeCount;
+import models.Notification;
 import models.Posts;
-import models.RecruiterNotification;
-import utils.Constants;
 
 /**
  *
@@ -58,48 +59,11 @@ public class HomeController extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
 
         try {
-            // Get search parameters
-            String keyword = request.getParameter("keyword");
-            String jobType = request.getParameter("jobType");
-            String location = request.getParameter("location");
+            // Latest job listings for homepage (guest view)
+            List<JobListing> latestJobs = jobDAO.getLatestJobListings(10);
+            request.setAttribute("recentPosts", latestJobs);
             
-            // Get pagination parameters
-            int page = 1;
-            int pageSize = 9; // 3 posts per row, 3 rows
-            try {
-                page = Integer.parseInt(request.getParameter("page"));
-                if (page < 1) page = 1;
-            } catch (NumberFormatException e) {
-                page = 1;
-            }
-            
-            // Get recent posts with pagination
-            List<Posts> recentPosts;
-            int totalPosts;
-            
-            if (keyword != null && !keyword.trim().isEmpty() || 
-                jobType != null && !jobType.trim().isEmpty() || 
-                location != null && !location.trim().isEmpty()) {
-                // Search posts with filters
-                recentPosts = postsDAO.getPostsByPageWithSearch(page, pageSize, keyword, jobType, location);
-                totalPosts = postsDAO.getTotalPostsWithSearch(keyword, jobType, location);
-            } else {
-                // Get latest posts
-                recentPosts = postsDAO.getPostsByPage(page, pageSize);
-                totalPosts = postsDAO.getTotalPosts();
-            }
-            
-            // Calculate pagination info
-            int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
-            
-            // Set attributes for JSP
-            request.setAttribute("recentPosts", recentPosts);
-            request.setAttribute("currentPage", page);
-            request.setAttribute("totalPages", totalPages);
-            request.setAttribute("totalPosts", totalPosts);
-            request.setAttribute("keyword", keyword);
-            request.setAttribute("jobType", jobType);
-            request.setAttribute("location", location);
+            log("sizeof latestJob: " + latestJobs.size());
 
             // Banners for top sections (first two by position)
             request.setAttribute("banners", bannerDAO.getTopBanners(2));
@@ -113,15 +77,26 @@ public class HomeController extends HttpServlet {
             
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("error.jsp");
+            response.sendRedirect(request.getContextPath() + "/error.jsp");
             return;
+        }
+        
+        try {
+            int premium = 3; // check here
+            FeaturedJobDAO fjDao = new FeaturedJobDAO();
+            List<Posts> premiumPost = fjDao.listPostBaseOnFeatureStillActive(premium);
+            
+            log("sizepremium: " + premiumPost.size());
+            
+            request.setAttribute("posts", premiumPost);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         HttpSession session = request.getSession(true);
-
         String role = (String) session.getAttribute("role");
-        if (Constants.RECRUITER_ROLE.equals(role)) {
-            processRecruiter(request, response);
+        if (role != null && !role.equals("admin")) {
+            processQuerry(request, response);
             return;
         }
         // Job seeker sẽ dùng cùng trang home với khách, không dùng dashboard riêng
@@ -130,44 +105,38 @@ public class HomeController extends HttpServlet {
         request.getRequestDispatcher("home.jsp").forward(request, response);
     }
 
-    private void processRecruiter(HttpServletRequest request, HttpServletResponse response)
+    private void processQuerry(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String service = request.getParameter("service");
         if (service == null) {
             service = "list";
         }
+        service = "list";
 
         if (service.equals("list")){
-            listNoticeRecruiter(request, response);
+            listNotice(request, response);
         } else if (service.equals("")){
             
         }
     }
 
-    private void listNoticeRecruiter(HttpServletRequest request, HttpServletResponse response)
+    private void listNotice(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         HttpSession session = request.getSession(true);
         String role = (String) session.getAttribute("role");
         int id = (int) session.getAttribute("userId");
-        RecruiterNotificationDAO dao = new RecruiterNotificationDAO();
+        NotificationDAO dao = new NotificationDAO();
         
         int topk = 5;
-        Vector<RecruiterNotification> list = dao.getNotice(id, topk);
-        Vector<RecruiterNotification> unread = dao.getUnreadNotice(id, topk);
+        Vector<Notification> list = dao.getNotice(id, topk, role);
+        Vector<Notification> unread = dao.getUnreadNotice(id, topk, role);
         request.setAttribute("notice", list);
         request.setAttribute("unread", unread);
-
-//        String sql = "SELECT " + (topk == -1 ? "*" : "TOP (" + topk + ")")
-//                + "  FROM [project_SWP391].[dbo].[RecruiterNotification]\n"
-//                + "  WHERE [recruiter_id] = " + id 
-//                + " ORDER BY created_at DESC";
-//        
-//        log(sql);
+        request.setAttribute("rr", unread.size());
         
-                log("" + list.size());
-//                log("" + id);
-//                response.sendRedirect("admin_dashboard.jsp");
-//                return;
+        log("id recruiter:" + id + " " + role);
+        log("" + list.size());
+                
         request.getRequestDispatcher("home.jsp").forward(request, response);
     }
     

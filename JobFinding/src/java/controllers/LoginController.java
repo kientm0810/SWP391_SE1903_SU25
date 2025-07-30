@@ -150,9 +150,9 @@ public class LoginController extends HttpServlet {
             throws IOException {
         String role = (String) session.getAttribute("role");
         String homePage = switch (role) {
-            case "admin" -> "home";
-            case "recruiter" -> "home";
-            case "job-seeker" -> "home";
+            case "admin" -> "home.jsp";
+            case "recruiter" -> "home.jsp";
+            case "job-seeker" -> "home.jsp";
             default -> "login";
         };
         response.sendRedirect(homePage);

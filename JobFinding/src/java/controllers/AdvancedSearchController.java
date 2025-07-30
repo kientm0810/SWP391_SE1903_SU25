@@ -1,7 +1,6 @@
 package controllers;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -110,36 +109,22 @@ public class AdvancedSearchController extends HttpServlet {
         
         // Job details
         criteria.setJobType(request.getParameter("jobType"));
-        criteria.setExperienceLevel(request.getParameter("experienceLevel"));
-        criteria.setWorkType(request.getParameter("workType"));
+        criteria.setExperience(request.getParameter("experience"));
+        criteria.setRank(request.getParameter("rank"));
+        criteria.setWorkingTime(request.getParameter("workingTime"));
         
-        // Salary range
-        String minSalaryStr = request.getParameter("minSalary");
-        if (minSalaryStr != null && !minSalaryStr.trim().isEmpty()) {
-            try {
-                criteria.setMinSalary(new BigDecimal(minSalaryStr));
-            } catch (NumberFormatException e) {
-                // Ignore invalid salary
-            }
-        }
+        // Salary
+        criteria.setSalary(request.getParameter("salary"));
         
-        String maxSalaryStr = request.getParameter("maxSalary");
-        if (maxSalaryStr != null && !maxSalaryStr.trim().isEmpty()) {
-            try {
-                criteria.setMaxSalary(new BigDecimal(maxSalaryStr));
-            } catch (NumberFormatException e) {
-                // Ignore invalid salary
-            }
-        }
-        
-        // Company & benefits
+        // Company information
+        criteria.setCompanyName(request.getParameter("companyName"));
         criteria.setCompanySize(request.getParameter("companySize"));
-        criteria.setBenefits(request.getParameter("benefits"));
+        criteria.setContactAddress(request.getParameter("contactAddress"));
         
-        // Skills & requirements
-        criteria.setSkills(request.getParameter("skills"));
-        criteria.setEducation(request.getParameter("education"));
-        criteria.setLanguage(request.getParameter("language"));
+        // Job requirements
+        criteria.setRequirements(request.getParameter("requirements"));
+        criteria.setBenefits(request.getParameter("benefits"));
+        criteria.setApplicationMethod(request.getParameter("applicationMethod"));
         
         // Sort options
         criteria.setSortBy(request.getParameter("sortBy"));
@@ -182,12 +167,9 @@ public class AdvancedSearchController extends HttpServlet {
             jobSearch.setKeyword(criteria.getKeyword());
             jobSearch.setLocation(criteria.getLocation());
             jobSearch.setIndustry(criteria.getIndustry());
-            jobSearch.setJobLevel(criteria.getExperienceLevel());
+            jobSearch.setJobLevel(criteria.getExperience());
             jobSearch.setJobType(criteria.getJobType());
-            jobSearch.setMinSalary(criteria.getMinSalary());
-            jobSearch.setMaxSalary(criteria.getMaxSalary());
             jobSearch.setBenefits(criteria.getBenefits());
-            jobSearch.setLanguage(criteria.getLanguage());
             jobSearch.setSortBy(criteria.getSortBy());
             jobSearch.setSortOrder(criteria.getSortOrder());
             jobSearch.setIsSaved(criteria.isSaved() ? true : false);
@@ -221,9 +203,10 @@ public class AdvancedSearchController extends HttpServlet {
         StringBuilder queryString = new StringBuilder();
         
         String[] params = {
-            "keyword", "location", "industry", "jobType", "experienceLevel", 
-            "workType", "minSalary", "maxSalary", "companySize", "benefits",
-            "skills", "education", "language", "sortBy", "sortOrder"
+            "keyword", "location", "industry", "jobType", "experience", 
+            "rank", "workingTime", "salary", "companyName", "companySize", 
+            "contactAddress", "requirements", "benefits", "applicationMethod", 
+            "sortBy", "sortOrder"
         };
         
         for (String param : params) {

@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 import models.Posts;
+import utils.UploadPicture;
 
 @WebServlet(name = "PostController", urlPatterns = {"/post/*"})
 @MultipartConfig(
@@ -117,23 +118,16 @@ public class PostController extends HttpServlet {
                 request.setAttribute("keyword", keyword);
                 request.setAttribute("jobType", jobType);
                 request.setAttribute("location", location);
+                if (view != null) {
+                    request.setAttribute(view, page);
+                }
             }
             request.setAttribute("isMyPosts", isMyPosts);
+            request.setAttribute("showUpdateInfo", true); // Thêm flag để hiển thị thông tin updated_at
             request.getRequestDispatcher("/posts.jsp").forward(request, response);
         } else if (path.equals("/create")) {
             // Show create post form
             request.getRequestDispatcher("/create-post.jsp").forward(request, response);
-        } else if (path.equals("/view")) {
-            // View single post
-            int id = Integer.parseInt(request.getParameter("id"));
-            Posts post = postsDAO.getPostById(id);
-            if (post != null) {
-                postsDAO.incrementViewCount(id); // tang so luot xem
-                request.setAttribute("post", post);
-                request.getRequestDispatcher("/view-post.jsp").forward(request, response);
-            } else {
-                response.sendRedirect(request.getContextPath() + "/post");
-            }
         } else if (path.equals("/edit")) {
             // Show edit form
             int id = Integer.parseInt(request.getParameter("id"));
@@ -249,15 +243,18 @@ public class PostController extends HttpServlet {
                             return;
                         }
 
-                        String fileName = System.currentTimeMillis() + "_" + getSubmittedFileName(filePart);
-                        String uploadPath = getServletContext().getRealPath("") + File.separator + UPLOAD_DIRECTORY;
-                        File uploadDir = new File(uploadPath);
-                        if (!uploadDir.exists()) {
-                            uploadDir.mkdirs();
-                        }
-
-                        filePart.write(uploadPath + File.separator + fileName);
-                        post.setCompanyLogo(UPLOAD_DIRECTORY + "/" + fileName);
+//                        String fileName = System.currentTimeMillis() + "_" + getSubmittedFileName(filePart);
+//                        String uploadPath = getServletContext().getRealPath("") + File.separator + UPLOAD_DIRECTORY;
+//                        File uploadDir = new File(uploadPath);
+//                        if (!uploadDir.exists()) {
+//                            uploadDir.mkdirs();
+//                        }
+//
+//                        filePart.write(uploadPath + File.separator + fileName);
+                        String basePath = request.getServletContext().getRealPath("/");
+                        String fileName = UploadPicture.uploadImage(filePart, "", basePath);
+//                        post.setCompanyLogo(UPLOAD_DIRECTORY + "/" + fileName);
+                        post.setCompanyLogo(fileName);
                     } else {
                         response.setContentType("application/json");
                         response.getWriter().write("{\"success\":false,\"message\":\"Vui lòng chọn logo công ty\"}");
@@ -271,6 +268,8 @@ public class PostController extends HttpServlet {
                     return;
                 }
 
+                log("den day van dung nay");
+                
                 // Parse deadline date
                 String deadlineStr = request.getParameter("deadline");
                 if (deadlineStr != null && !deadlineStr.isEmpty()) {
@@ -301,6 +300,33 @@ public class PostController extends HttpServlet {
                 post.setCompanyWebsite(request.getParameter("companyWebsite") != null ? request.getParameter("companyWebsite").trim() : null);
                 post.setCompanyDescription(request.getParameter("companyDescription") != null ? request.getParameter("companyDescription").trim() : null);
                 post.setKeywords(request.getParameter("keywords") != null ? request.getParameter("keywords").trim() : null);
+
+                // Xử lý trường updated_at
+                String updatedAtStr = request.getParameter("updatedAt");
+                if (updatedAtStr != null && !updatedAtStr.trim().isEmpty()) {
+                    try {
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+                        java.util.Date updatedAtDate = sdf.parse(updatedAtStr);
+                        java.util.Date currentDate = new java.util.Date();
+                        
+                        // Kiểm tra nếu updated_at < current date
+                        if (updatedAtDate.before(currentDate)) {
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"success\":false,\"message\":\"Ngày cập nhật không được nhỏ hơn ngày hiện tại. Vui lòng chọn ngày trong tương lai hoặc để trống để sử dụng thời gian hiện tại.\"}");
+                            return;
+                        }
+                        
+                        post.setUpdatedAt(new java.sql.Timestamp(updatedAtDate.getTime()));
+                    } catch (ParseException e) {
+                        System.err.println("Error parsing updated_at: " + e.getMessage());
+                        response.setContentType("application/json");
+                        response.getWriter().write("{\"success\":false,\"message\":\"Định dạng ngày cập nhật không hợp lệ. Vui lòng chọn lại hoặc để trống để sử dụng thời gian hiện tại.\"}");
+                        return;
+                    }
+                } else {
+                    // Nếu không có giá trị thì sử dụng thời gian hiện tại
+                    post.setUpdatedAt(new java.sql.Timestamp(System.currentTimeMillis()));
+                }
 
                 // Xác thực tất cả các trường bắt buộc
                 if (post.getTitle() == null || post.getTitle().trim().isEmpty()
@@ -334,10 +360,14 @@ public class PostController extends HttpServlet {
                     response.getWriter().write("{\"success\":false,\"message\":\"Vui lòng điền đầy đủ thông tin\"}");
                     return;
                 }
+                
+                log("den day van dung");
 
                 // Try to create the post
                 boolean success = postsDAO.createPost(post);
 
+                log("ưtf");
+                
                 if (!success) {
                     System.err.println("Failed to create post. Database connection status: " + (postsDAO != null && postsDAO.getConnection() != null));
                 }
@@ -414,6 +444,8 @@ public class PostController extends HttpServlet {
                     post.setKeywords(request.getParameter("keywords") != null ? request.getParameter("keywords").trim() : null);
 
                     if (postsDAO.updatePost(post)) {
+                        log("update thanh cong");
+                        log(post.getJobDescription());
                         response.setContentType("application/json");
                         response.getWriter().write("{\"success\":true,\"message\":\"Post updated successfully\"}");
                     } else {
@@ -444,6 +476,28 @@ public class PostController extends HttpServlet {
                 }
             } catch (NumberFormatException e) {
                 response.sendRedirect(request.getContextPath() + "/post?error=invalidId");
+            }
+        } else if (path.equals("/delete-old")) {
+           
+            try {
+                
+                int deletedCount = postsDAO.deleteOldPosts();
+                
+                response.setContentType("application/json");
+                response.getWriter().write("{\"success\":true,\"message\":\"Đã xóa " + deletedCount + " bài đăng cũ\",\"deletedCount\":" + deletedCount + "}");
+            } catch (Exception e) {
+                response.setContentType("application/json");
+                response.getWriter().write("{\"success\":false,\"message\":\"Lỗi khi xóa bài đăng cũ: " + e.getMessage() + "\"}");
+            }
+        } else if (path.equals("/old-posts-count")) {
+            
+            try {
+                int oldPostsCount = postsDAO.getOldPostsCount();
+                response.setContentType("application/json");
+                response.getWriter().write("{\"success\":true,\"oldPostsCount\":" + oldPostsCount + "}");
+            } catch (Exception e) {
+                response.setContentType("application/json");
+                response.getWriter().write("{\"success\":false,\"message\":\"Lỗi khi đếm bài đăng cũ: " + e.getMessage() + "\"}");
             }
         }
     }

@@ -9,6 +9,7 @@ public class EmailHistory {
     private int id;
     private Integer applicationId;
     private Integer interviewScheduleId;
+    private Integer recruiterId;
     private String templateName;
     private String recipientEmail;
     private String subject;
@@ -21,13 +22,14 @@ public class EmailHistory {
     public EmailHistory() {
     }
 
-    public EmailHistory(int id, Integer applicationId, Integer interviewScheduleId, 
+    public EmailHistory(int id, Integer applicationId, Integer interviewScheduleId, Integer recruiterId,
                        String templateName, String recipientEmail, String subject, 
                        String bodyHtml, String status, String errorMessage, 
                        Timestamp sentAt, Timestamp createdAt) {
         this.id = id;
         this.applicationId = applicationId;
         this.interviewScheduleId = interviewScheduleId;
+        this.recruiterId = recruiterId;
         this.templateName = templateName;
         this.recipientEmail = recipientEmail;
         this.subject = subject;
@@ -61,6 +63,14 @@ public class EmailHistory {
 
     public void setInterviewScheduleId(Integer interviewScheduleId) {
         this.interviewScheduleId = interviewScheduleId;
+    }
+
+    public Integer getRecruiterId() {
+        return recruiterId;
+    }
+
+    public void setRecruiterId(Integer recruiterId) {
+        this.recruiterId = recruiterId;
     }
 
     public String getTemplateName() {

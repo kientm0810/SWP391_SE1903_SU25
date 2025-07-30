@@ -77,6 +77,9 @@
                     <h4 class="text-success">${specific.title}</h4>
                     <p>${specific.content}</p>
                     <small class="text-muted">Created at: ${specific.created_at}</small>
+                    <a href="${specific.redirect_url}" class="btn btn-secondary">
+                        Redirect link
+                    </a>
                 </c:if>
 
                 <c:if test="${empty specific}">
@@ -90,6 +93,6 @@
 
     <!-- jQuery & Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>-->
 </body>
 </html>

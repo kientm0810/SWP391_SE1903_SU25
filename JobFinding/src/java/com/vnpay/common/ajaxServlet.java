@@ -23,7 +23,7 @@ public class ajaxServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(true);
         String bankCode = request.getParameter("bankCode");
         String paymentType = request.getParameter("paymentType");
         String paymentIdStr = request.getParameter("paymentId");
@@ -130,6 +130,12 @@ public class ajaxServlet extends HttpServlet {
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
         String paymentUrl = Config.vnp_PayUrl + "?" + queryUrl;
         response.sendRedirect(paymentUrl);
+    }
+    
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
+            throws ServletException, IOException {
+        processRequest(req, resp);
     }
     
     @Override

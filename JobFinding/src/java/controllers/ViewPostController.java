@@ -4,8 +4,9 @@
  */
 package controllers;
 
-import daos.PostDAO;
 import java.io.IOException;
+
+import daos.PostDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -25,14 +26,16 @@ public class ViewPostController extends HttpServlet {
             Post post = postDAO.getPostById(postId);
 
             if (post != null) {
+                // Tăng số lượt xem
+                postDAO.incrementViewCount(postId);
                 request.setAttribute("post", post);
                 request.getRequestDispatcher("/view-post.jsp").forward(request, response);
             } else {
-                response.sendRedirect("error.jsp");
+                response.sendRedirect(request.getContextPath() + "/error.jsp");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("error.jsp");
+            response.sendRedirect(request.getContextPath() + "/error.jsp");
         }
     }
 }

@@ -1,18 +1,24 @@
 package controllers;
 
-import java.io.IOException;
-
-import daos.FinancialTransactionDAO;
 import daos.PostPricingDAO;
+import daos.FinancialTransactionDAO;
+import daos.PostsDAO;
+import daos.PromotionProgramDAO;
 import daos.RecruiterDAO;
+import models.PostPricing;
+import models.FinancialTransaction;
+import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import models.FinancialTransaction;
-import models.PostPricing;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import models.Posts;
+import models.PromotionProgram;
 
 @WebServlet("/checkout")
 public class CheckoutServlet extends HttpServlet {
@@ -21,10 +27,14 @@ public class CheckoutServlet extends HttpServlet {
     private FinancialTransactionDAO transactionDAO = new FinancialTransactionDAO();
     private RecruiterDAO recruiterDAO = new RecruiterDAO();
     
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
         String action = request.getParameter("action");
+        
+        if (action == null){
+            response.sendRedirect("home");
+            return;
+        }
         
         if ("registration".equals(action)) {
             handleRegistrationCheckout(request, response);
@@ -34,33 +44,35 @@ public class CheckoutServlet extends HttpServlet {
             showPricingOptions(request, response);
         }
     }
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            processRequest(request, response);
+        } catch (SQLException ex) {
+            Logger.getLogger(CheckoutServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doGet(request, response);
+        try {
+            processRequest(request, response);
+        } catch (SQLException ex) {
+            Logger.getLogger(CheckoutServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     private void handleRegistrationCheckout(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        Integer recruiterId = (Integer) session.getAttribute("recruiterId");
-        
-        if (recruiterId == null) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
+            throws ServletException, IOException, SQLException {
+        HttpSession session = request.getSession(true);
+        Integer recruiterId = Integer.parseInt(request.getParameter("recruiterId"));
         
         // Check if already verified
-        try {
-            boolean isVerified = recruiterDAO.getVerificationStatus(recruiterId);
-            if (isVerified) {
-                response.sendRedirect("recruiter_dashboard.jsp");
-                return;
-            }
-        } catch (java.sql.SQLException e) {
-            e.printStackTrace();
-            // Continue with checkout process if check fails
+        if ("verified".equals(recruiterDAO.getVerificationStatus(recruiterId))) {
+            response.sendRedirect("home");
+            return;
         }
         
         // Get registration pricing
@@ -98,8 +110,15 @@ public class CheckoutServlet extends HttpServlet {
     
     private void handleJobPostCheckout(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        Integer recruiterId = (Integer) session.getAttribute("recruiterId");
+        HttpSession session = request.getSession(true);
+        String role = (String) session.getAttribute("role");
+        
+//        if (!role.equals("recruiter")){
+//            response.sendRedirect("home");
+//            return;
+//        }
+        
+        Integer recruiterId = (Integer) session.getAttribute("userId");
         
         if (recruiterId == null) {
             response.sendRedirect("login.jsp");
@@ -119,8 +138,27 @@ public class CheckoutServlet extends HttpServlet {
             
             // Get pricing info
             PostPricing pricing = pricingDAO.getPricingByCode(positionCode);
+            
+            // Maybe never reach there
             if (pricing == null) {
-                request.setAttribute("error", "Invalid position code");
+                request.setAttribute("error", "Invalid position code!");
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+                return;
+            }
+            
+            // check xem jobId co phai cua dung recruiterID chua
+            PostsDAO postDao = new PostsDAO();
+            Posts post = postDao.getPostById(jobId);
+            if (post.getUserId() != recruiterId){
+                request.setAttribute("error", "Not your post!");
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+                return;
+            }
+            
+            PromotionProgramDAO programDao = new PromotionProgramDAO();
+            PromotionProgram program = programDao.getPromotionProgramById(programDao.findProgramIDBy(positionCode));
+            if (program.getQuantity() == 0){
+                request.setAttribute("error", "Run out of program!");
                 request.getRequestDispatcher("error.jsp").forward(request, response);
                 return;
             }
@@ -136,13 +174,21 @@ public class CheckoutServlet extends HttpServlet {
             
             int transactionId = transactionDAO.createTransaction(transaction);
             
+            log("da di den day cua checkout");
+            
             if (transactionId > 0) {
                 // Store in session for payment callback
+                log("di vao nhanh nay");
                 session.setAttribute("pendingTransactionId", transactionId);
                 session.setAttribute("checkoutType", "jobPost");
                 session.setAttribute("jobId", jobId);
                 session.setAttribute("positionCode", positionCode);
                 session.setAttribute("durationDays", pricing.getDurationDays());
+                // set promotionID cho de insert
+//                PromotionProgramDAO programDao = new PromotionProgramDAO();
+                session.setAttribute("programID", programDao.findProgramIDBy(positionCode));
+                
+                // 
                 
                 // Redirect to VNPay payment
                 response.sendRedirect("payment?totalBill=" + pricing.getPrice() + 
@@ -152,13 +198,15 @@ public class CheckoutServlet extends HttpServlet {
                 request.getRequestDispatcher("error.jsp").forward(request, response);
             }
         } catch (NumberFormatException e) {
-            response.sendRedirect("recruiter_dashboard.jsp");
+            response.sendRedirect("home");
         }
     }
     
     private void showPricingOptions(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String jobId = request.getParameter("jobId");
+        
+        log("size: " + pricingDAO.getJobPostPricing().size());
         
         request.setAttribute("jobId", jobId);
         request.setAttribute("pricingOptions", pricingDAO.getJobPostPricing());

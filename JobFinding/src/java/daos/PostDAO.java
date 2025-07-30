@@ -24,7 +24,8 @@ public class PostDAO {
 
     public List<Post> getPostsByRecruiterId(int recruiterId) throws Exception {
         List<Post> posts = new ArrayList<>();
-        String query = "SELECT * FROM Posts WHERE user_id = ? AND user_type = 'recruiter' ORDER BY created_at DESC";
+        String query = "SELECT * FROM Posts WHERE user_id = ? AND user_type = 'recruiter' AND (updated_at >= created_at OR updated_at IS NULL) ORDER BY created_at DESC"
+                + "";
         cnn = new DBContext().getConnection();
         ps = cnn.prepareStatement(query);
         ps.setInt(1, recruiterId);
@@ -73,7 +74,7 @@ public class PostDAO {
     
     public Post getPostById(int postId) throws Exception {
         Post post = null;
-        String query = "SELECT * FROM Posts WHERE id = ?";
+        String query = "SELECT * FROM Posts WHERE id = ? AND deleted_at IS NULL AND (updated_at >= GETDATE() OR updated_at IS NULL)";
         cnn = new DBContext().getConnection();
         ps = cnn.prepareStatement(query);
         ps.setInt(1, postId);
@@ -117,5 +118,14 @@ public class PostDAO {
             post.setKeywords(rs.getString("keywords"));
         }
         return post;
+    }
+    
+    public boolean incrementViewCount(int postId) throws Exception {
+        String query = "UPDATE Posts SET view_count = view_count + 1 WHERE id = ?";
+        cnn = new DBContext().getConnection();
+        ps = cnn.prepareStatement(query);
+        ps.setInt(1, postId);
+        int result = ps.executeUpdate();
+        return result > 0;
     }
 }

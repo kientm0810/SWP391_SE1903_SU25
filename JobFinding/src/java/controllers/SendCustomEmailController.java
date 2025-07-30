@@ -34,12 +34,15 @@ public class SendCustomEmailController extends HttpServlet {
         try {
             if (emailTemplateDAO == null) {
                 emailTemplateDAO = new EmailTemplateDAO();
+                System.out.println("EmailTemplateDAO initialized");
             }
             if (emailHistoryDAO == null) {
                 emailHistoryDAO = new EmailHistoryDAO();
+                System.out.println("EmailHistoryDAO initialized");
             }
             if (emailService == null) {
                 emailService = new EmailService();
+                System.out.println("EmailService initialized");
             }
         } catch (Exception e) {
             System.err.println("Error in initializeIfNeeded: " + e.getMessage());
@@ -118,12 +121,7 @@ public class SendCustomEmailController extends HttpServlet {
             emailContent = emailContentHidden;
         }
         
-        // Debug logging for form data
-        System.out.println("Form data received:");
-        System.out.println("emailType: " + emailType);
-        System.out.println("subject: " + subject);
-        System.out.println("emailContent length: " + (emailContent != null ? emailContent.length() : "null"));
-        System.out.println("emailContentHidden length: " + (emailContentHidden != null ? emailContentHidden.length() : "null"));
+        
         
         // Get additional form fields for different email types
         // Interview invitation fields
@@ -201,14 +199,20 @@ public class SendCustomEmailController extends HttpServlet {
             
             // Send email
             emailSent = JavaMail.sendEmail(recipientEmail, processedSubject, processedContent);
-            successMessage = "Email đã được gửi thành công!";
             
-            // Save email history
-            saveEmailHistory(recipientEmail, processedSubject, processedContent, 
-                           applicationIdStr, template.getTemplateName(), emailType.trim());
+            // Save email history with correct status
+            String emailStatus = emailSent ? "sent" : "failed";
+            boolean saved = saveEmailHistory(request, recipientEmail, processedSubject, processedContent, 
+                           applicationIdStr, template.getTemplateName(), emailType.trim(), emailStatus);
+            
+            System.out.println("Email sent: " + emailSent + ", Email saved to history: " + saved);
             
             if (emailSent) {
+                successMessage = "Email đã được gửi thành công!";
                 session.setAttribute("success", successMessage);
+                // Redirect to email history page to show the sent email
+                response.sendRedirect("recruiter-email-history");
+                return;
             } else {
                 session.setAttribute("error", "Không thể gửi email. Vui lòng thử lại sau.");
             }
@@ -220,7 +224,7 @@ public class SendCustomEmailController extends HttpServlet {
             session.setAttribute("error", "Có lỗi xảy ra khi gửi email: " + e.getMessage());
         }
         
-        // Redirect back to applications page
+        // Redirect back to applications page only if there was an error
         response.sendRedirect("applications");
     }
     
@@ -283,27 +287,57 @@ public class SendCustomEmailController extends HttpServlet {
     /**
      * Save email history
      */
-    private void saveEmailHistory(String recipientEmail, String subject, String content, 
-                                 String applicationIdStr, String templateName, String emailType) {
+    private boolean saveEmailHistory(HttpServletRequest request, String recipientEmail, String subject, String content, 
+                                 String applicationIdStr, String templateName, String emailType, String status) {
         try {
+            System.out.println("=== Starting saveEmailHistory ===");
+            System.out.println("Recipient: " + recipientEmail);
+            System.out.println("Subject: " + subject);
+            System.out.println("Template: " + templateName);
+            System.out.println("Status: " + status);
+            
+            if (emailHistoryDAO == null) {
+                System.out.println("ERROR: emailHistoryDAO is null!");
+                return false;
+            }
+            
             EmailHistory emailHistory = new EmailHistory();
             
             if (applicationIdStr != null && !applicationIdStr.trim().isEmpty()) {
                 emailHistory.setApplicationId(Integer.parseInt(applicationIdStr.trim()));
+                System.out.println("Application ID: " + emailHistory.getApplicationId());
+            }
+            
+            // Get recruiter from session
+            HttpSession session = request.getSession(false);
+            if (session != null && session.getAttribute("user") != null && "recruiter".equals(session.getAttribute("role"))) {
+                Recruiter recruiter = (Recruiter) session.getAttribute("user");
+                emailHistory.setRecruiterId(recruiter.getId());
+                System.out.println("Recruiter ID: " + recruiter.getId());
+            } else {
+                System.out.println("ERROR: No recruiter found in session!");
+                return false;
             }
             
             emailHistory.setTemplateName(templateName);
             emailHistory.setRecipientEmail(recipientEmail);
             emailHistory.setSubject(subject);
             emailHistory.setBodyHtml(content);
-            emailHistory.setStatus("sent");
+            emailHistory.setStatus(status);
             emailHistory.setSentAt(new Timestamp(System.currentTimeMillis()));
             emailHistory.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             
-            emailHistoryDAO.saveEmailHistory(emailHistory);
+            System.out.println("EmailHistory object created: " + emailHistory.toString());
+            
+            boolean saved = emailHistoryDAO.saveEmailHistory(emailHistory);
+            System.out.println("Email history save result: " + saved);
+            System.out.println("=== End saveEmailHistory ===");
+            return saved;
             
         } catch (Exception e) {
+            System.out.println("Error saving email history: " + e.getMessage());
             e.printStackTrace();
+            return false;
         }
     }
 } 

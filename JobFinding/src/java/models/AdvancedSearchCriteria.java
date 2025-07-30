@@ -1,21 +1,20 @@
 package models;
 
-import java.math.BigDecimal;
-
 public class AdvancedSearchCriteria {
     private String keyword;
     private String location;
     private String industry;
     private String jobType;
-    private String experienceLevel;
-    private BigDecimal minSalary;
-    private BigDecimal maxSalary;
+    private String experience;
+    private String rank;
+    private String workingTime;
+    private String salary;
+    private String companyName;
     private String companySize;
-    private String workType; // remote, hybrid, on-site
-    private String education;
-    private String skills;
+    private String contactAddress;
+    private String requirements;
     private String benefits;
-    private String language;
+    private String applicationMethod;
     private String sortBy;
     private String sortOrder;
     private int page;
@@ -65,28 +64,44 @@ public class AdvancedSearchCriteria {
         this.jobType = jobType;
     }
     
-    public String getExperienceLevel() {
-        return experienceLevel;
+    public String getExperience() {
+        return experience;
     }
     
-    public void setExperienceLevel(String experienceLevel) {
-        this.experienceLevel = experienceLevel;
+    public void setExperience(String experience) {
+        this.experience = experience;
     }
     
-    public BigDecimal getMinSalary() {
-        return minSalary;
+    public String getRank() {
+        return rank;
     }
     
-    public void setMinSalary(BigDecimal minSalary) {
-        this.minSalary = minSalary;
+    public void setRank(String rank) {
+        this.rank = rank;
     }
     
-    public BigDecimal getMaxSalary() {
-        return maxSalary;
+    public String getWorkingTime() {
+        return workingTime;
     }
     
-    public void setMaxSalary(BigDecimal maxSalary) {
-        this.maxSalary = maxSalary;
+    public void setWorkingTime(String workingTime) {
+        this.workingTime = workingTime;
+    }
+    
+    public String getSalary() {
+        return salary;
+    }
+    
+    public void setSalary(String salary) {
+        this.salary = salary;
+    }
+    
+    public String getCompanyName() {
+        return companyName;
+    }
+    
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
     
     public String getCompanySize() {
@@ -97,28 +112,20 @@ public class AdvancedSearchCriteria {
         this.companySize = companySize;
     }
     
-    public String getWorkType() {
-        return workType;
+    public String getContactAddress() {
+        return contactAddress;
     }
     
-    public void setWorkType(String workType) {
-        this.workType = workType;
+    public void setContactAddress(String contactAddress) {
+        this.contactAddress = contactAddress;
     }
     
-    public String getEducation() {
-        return education;
+    public String getRequirements() {
+        return requirements;
     }
     
-    public void setEducation(String education) {
-        this.education = education;
-    }
-    
-    public String getSkills() {
-        return skills;
-    }
-    
-    public void setSkills(String skills) {
-        this.skills = skills;
+    public void setRequirements(String requirements) {
+        this.requirements = requirements;
     }
     
     public String getBenefits() {
@@ -129,12 +136,12 @@ public class AdvancedSearchCriteria {
         this.benefits = benefits;
     }
     
-    public String getLanguage() {
-        return language;
+    public String getApplicationMethod() {
+        return applicationMethod;
     }
     
-    public void setLanguage(String language) {
-        this.language = language;
+    public void setApplicationMethod(String applicationMethod) {
+        this.applicationMethod = applicationMethod;
     }
     
     public String getSortBy() {
@@ -191,15 +198,16 @@ public class AdvancedSearchCriteria {
                (location != null && !location.trim().isEmpty()) ||
                (industry != null && !industry.trim().isEmpty()) ||
                (jobType != null && !jobType.trim().isEmpty()) ||
-               (experienceLevel != null && !experienceLevel.trim().isEmpty()) ||
-               (minSalary != null && minSalary.compareTo(BigDecimal.ZERO) > 0) ||
-               (maxSalary != null && maxSalary.compareTo(BigDecimal.ZERO) > 0) ||
+               (experience != null && !experience.trim().isEmpty()) ||
+               (rank != null && !rank.trim().isEmpty()) ||
+               (workingTime != null && !workingTime.trim().isEmpty()) ||
+               (salary != null && !salary.trim().isEmpty()) ||
+               (companyName != null && !companyName.trim().isEmpty()) ||
                (companySize != null && !companySize.trim().isEmpty()) ||
-               (workType != null && !workType.trim().isEmpty()) ||
-               (education != null && !education.trim().isEmpty()) ||
-               (skills != null && !skills.trim().isEmpty()) ||
+               (contactAddress != null && !contactAddress.trim().isEmpty()) ||
+               (requirements != null && !requirements.trim().isEmpty()) ||
                (benefits != null && !benefits.trim().isEmpty()) ||
-               (language != null && !language.trim().isEmpty());
+               (applicationMethod != null && !applicationMethod.trim().isEmpty());
     }
     
     public String getSearchSummary() {

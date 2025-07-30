@@ -99,7 +99,7 @@ public class EmailService {
             emailHistory.setSentAt(new Timestamp(System.currentTimeMillis()));
             emailHistory.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             
-            emailHistoryDAO.saveEmailHistory(emailHistory);
+            saveEmailHistoryWithRecruiter(emailHistory, application);
             
             return sent;
             
@@ -109,6 +109,16 @@ public class EmailService {
         }
     }
     
+    /**
+     * Helper method to save email history with recruiter_id
+     */
+    private void saveEmailHistoryWithRecruiter(EmailHistory emailHistory, Application application) {
+        if (application != null && application.getPost() != null) {
+            emailHistory.setRecruiterId(application.getPost().getUserId());
+        }
+        emailHistoryDAO.saveEmailHistory(emailHistory);
+    }
+
     /**
      * Send interview invitation email to job seeker
      */
@@ -173,7 +183,7 @@ public class EmailService {
             emailHistory.setSentAt(new Timestamp(System.currentTimeMillis()));
             emailHistory.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             
-            emailHistoryDAO.saveEmailHistory(emailHistory);
+            saveEmailHistoryWithRecruiter(emailHistory, application);
             
             return sent;
             

@@ -43,7 +43,7 @@
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item"><a
-                                            href="${pageContext.request.contextPath}/home">Home</a>
+                                            href="${pageContext.request.contextPath}/home.jsp">Home</a>
                                     </li>
                                     <li class="breadcrumb-item active" aria-current="page">${post.title}</li>
                                 </ol>
@@ -135,9 +135,13 @@
                                                 <div class="text-muted small"><i class="fas fa-map-marker-alt"></i>
                                                     ${post.location}</div>
                                                 <c:if test="${not empty post.companyWebsite}">
-                                                    <div class="mt-1"><a href="${post.companyWebsite}" target="_blank"
-                                                            class="text-success">Xem trang công ty <i
-                                                                class="fas fa-external-link-alt"></i></a></div>
+                                                    <div class="mt-1">
+                                                        <a href="javascript:void(0)"
+                                                            onclick="openCompanyWebsite('${post.companyWebsite}')"
+                                                            class="text-success" style="cursor: pointer;">
+                                                            Xem trang công ty <i class="fas fa-external-link-alt"></i>
+                                                        </a>
+                                                    </div>
                                                 </c:if>
                                             </div>
                                         </div>
@@ -306,6 +310,20 @@
 
                         <script
                             src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                        
+                        <script>
+                            function openCompanyWebsite(website) {
+                                // Kiểm tra xem website có protocol chưa
+                                let url = website;
+                                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                                    url = 'https://' + url;
+                                }
+                                
+                                // Mở link trong tab mới
+                                window.open(url, '_blank');
+                            }
+                        </script>
+                        
                         <jsp:include page="footer.jsp" />
 
                 </body>

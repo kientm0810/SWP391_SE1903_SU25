@@ -17,7 +17,7 @@
                 <div class="collapse navbar-collapse" id="navbarMain">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" href="home">
+                            <a class="nav-link" href="home.jsp">
                                 <i class="fas fa-home"></i> Home
                             </a>
                         </li>
@@ -69,7 +69,7 @@
                                 </ul>
                             </li>
                         </c:if>
-<!--                        <li class="nav-item">
+                        <!--                        <li class="nav-item">
                             <a class="nav-link" href="about">
                                 <i class="fas fa-info-circle"></i> About
                             </a>
@@ -184,6 +184,8 @@
                                                     Saved Jobs</a></li>
                                             <li><a class="dropdown-item" href="recruitment_dashboard.jsp"><i
                                                         class="fas fa-tachometer-alt"></i> Dashboard Control</a></li>
+                                            <li><a class="dropdown-item" href="recruiter-email-history"><i
+                                                        class="fas fa-envelope-open"></i> Email History</a></li>
                                         </c:if>
 
                                         <c:if test="${sessionScope.role == 'admin'}">

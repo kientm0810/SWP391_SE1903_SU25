@@ -8,13 +8,11 @@ package daos;
  *
  * @author thaison
  */
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Vector;
-
 import context.DBContext;
+import java.sql.*;
 import models.Recruiter;
+import context.DBContext;
+import java.util.Vector;
 
 public class RecruiterDAO extends DBContext {
 
@@ -560,45 +558,95 @@ public class RecruiterDAO extends DBContext {
         return result;
     }
 
-    public Recruiter getRecruiterById(int recruiterId) throws SQLException {
-        String sql = "SELECT * FROM [project_SWP391].[dbo].[Recruiter] WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+    // Thêm vào RecruiterDAO.java
+    public String getVerificationStatus(int recruiterId) {
+        String sql = "SELECT verification_status FROM [project_SWP391].[dbo].[Recruiter] WHERE id = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, recruiterId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return mapResultSetToRecruiter(rs);
-                }
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString("verification_status");
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "pending";
+    }
+
+    public String getRecruiterEmail(int recruiterId) {
+        String sql = "SELECT email FROM [project_SWP391].[dbo].[Recruiter] WHERE id = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, recruiterId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString("email");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return null;
     }
-
-    public String getRecruiterEmail(int recruiterId) throws SQLException {
-        String sql = "SELECT email FROM Recruiters WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, recruiterId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getString("email");
-                }
+    
+    public Recruiter getSpeccificRecruiterByEmail(String email){
+        String sql = "SELECT *\n"
+            + "  FROM [project_SWP391].[dbo].[Recruiter]"
+            + " WHERE email = ?";
+        
+        Recruiter p = new Recruiter();
+        try {
+            PreparedStatement ptm = connection.prepareStatement(sql);
+            ptm.setString(1, email);
+            ResultSet res = ptm.executeQuery();
+            while (res.next()) {
+//                p = new Recruiter(res.getInt(1),
+//                        res.getString(2),
+//                        res.getString(3),
+//                        res.getString(4),
+//                        res.getString(5),
+//                        res.getString(6),
+//                        res.getDate(7),
+//                        res.getString(8),
+//                        res.getString(9),
+//                        res.getString(10),
+//                        res.getString(11),
+//                        res.getString(12),
+//                        res.getString(13),
+//                        res.getString(14),
+//                        res.getString(15),
+//                        res.getString(16),
+//                        res.getString(17),
+//                        res.getString(18),
+//                        res.getDouble(19),
+//                        res.getString(20),
+//                        res.getDate(21),
+//                        res.getDate(22),
+//                        res.getBoolean(23));
+                p = mapResultSetToRecruiter(res);
             }
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            ex.getStackTrace();
         }
-        return null;
+        
+        return p;
     }
-
-    public boolean getVerificationStatus(int recruiterId) throws SQLException {
-        String sql = "SELECT is_verified FROM Recruiters WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, recruiterId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getBoolean("is_verified");
-                }
+    
+    public int countActiveRecruiters() {
+        String sql = "SELECT COUNT(*) FROM [project_SWP391].[dbo].[Recruiter] WHERE [is_active] = 1";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return false;
+        return 0;
     }
-
+    
     public boolean updateRecruiter(Recruiter recruiter) throws SQLException {
         String sql = "UPDATE [project_SWP391].[dbo].[Recruiter] SET " +
                      "full_name = ?, phone = ?, date_of_birth = ?, gender = ?, address = ?, " +
@@ -627,8 +675,8 @@ public class RecruiterDAO extends DBContext {
             return ps.executeUpdate() > 0;
         }
     }
-
-    public boolean updateRecruiterVerification(int recruiterId, boolean isVerified) throws SQLException {
+    
+     public boolean updateRecruiterVerification(int recruiterId, boolean isVerified) throws SQLException {
         String sql = "UPDATE [project_SWP391].[dbo].[Recruiter] SET is_verified = ? WHERE id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setBoolean(1, isVerified);
@@ -636,5 +684,20 @@ public class RecruiterDAO extends DBContext {
             return ps.executeUpdate() > 0;
         }
     }
+     
+        public Recruiter getRecruiterById(int recruiterId) throws SQLException {
+        String sql = "SELECT * FROM [project_SWP391].[dbo].[Recruiter] WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, recruiterId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToRecruiter(rs);
+                }
+            }
+        }
+        return null;
+    }
+
+
 
 }

@@ -33,7 +33,7 @@ public class PostsDAO {
     // Lấy list all posts
     public List<Posts> getAllPosts() {
         List<Posts> posts = new ArrayList<>();
-        String query = "SELECT * FROM Posts WHERE deleted_at IS NULL ORDER BY created_at DESC";
+        String query = "SELECT * FROM Posts WHERE deleted_at IS NULL AND (updated_at >= GETDATE()  OR updated_at IS NULL) ORDER BY created_at DESC";
         try {
             ps = conn.prepareStatement(query);
             rs = ps.executeQuery();
@@ -83,7 +83,7 @@ public class PostsDAO {
     // Lấy list posts của 1 người dùng cụ thể
     public List<Posts> getPostsByUserId(int userId) {
         List<Posts> posts = new ArrayList<>();
-        String query = "SELECT * FROM Posts WHERE user_id = ? AND deleted_at IS NULL ORDER BY created_at DESC";
+        String query = "SELECT * FROM Posts WHERE user_id = ? AND deleted_at IS NULL AND (updated_at >= GETDATE() OR updated_at IS NULL) ORDER BY created_at DESC";
         try {
             ps = conn.prepareStatement(query);
             ps.setInt(1, userId);
@@ -133,7 +133,7 @@ public class PostsDAO {
 
     // Lấy details info của 1 post
     public Posts getPostById(int id) {
-        String query = "SELECT * FROM Posts WHERE id = ? AND deleted_at IS NULL";
+        String query = "SELECT * FROM Posts WHERE id = ? AND deleted_at IS NULL AND (updated_at >= GETDATE() OR updated_at IS NULL)";
         try {
             ps = conn.prepareStatement(query);
             ps.setInt(1, id);
@@ -192,7 +192,7 @@ public class PostsDAO {
                 + "view_count, like_count, comment_count, experience, deadline, working_time, "
                 + "job_description, requirements, benefits, contact_address, application_method, "
                 + "company_name, salary, location, job_type, company_logo, created_at, updated_at, rank, industry, contact_person, company_size, company_website, company_description, keywords, salary_min, salary_max, experience_years) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try {
             // Thiết lập giá trị mặc định cho các trường bắt buộc nếu chúng là null
@@ -300,16 +300,21 @@ public class PostsDAO {
             ps.setString(20, post.getLocation());
             ps.setString(21, post.getJobType());
             ps.setString(22, post.getCompanyLogo());
-            ps.setString(23, post.getRank());
-            ps.setString(24, post.getIndustry());
-            ps.setString(25, post.getContactPerson());
-            ps.setString(26, post.getCompanySize());
-            ps.setString(27, post.getCompanyWebsite());
-            ps.setString(28, post.getCompanyDescription());
-            ps.setString(29, post.getKeywords());
-            ps.setObject(30, post.getSalaryMin());
-            ps.setObject(31, post.getSalaryMax());
-            ps.setObject(32, post.getExperienceYears());
+            if (post.getUpdatedAt() != null) {
+                ps.setTimestamp(23, new java.sql.Timestamp(post.getUpdatedAt().getTime()));
+            } else {
+                ps.setTimestamp(23, new java.sql.Timestamp(System.currentTimeMillis()));
+            }
+            ps.setString(24, post.getRank());
+            ps.setString(25, post.getIndustry());
+            ps.setString(26, post.getContactPerson());
+            ps.setString(27, post.getCompanySize());
+            ps.setString(28, post.getCompanyWebsite());
+            ps.setString(29, post.getCompanyDescription());
+            ps.setString(30, post.getKeywords());
+            ps.setObject(31, post.getSalaryMin());
+            ps.setObject(32, post.getSalaryMax());
+            ps.setObject(33, post.getExperienceYears());
 
             // Log câu truy vấn SQL và các tham số
             System.out.println("\n=== Executing SQL Query ===");
@@ -401,6 +406,36 @@ public class PostsDAO {
         }
     }
 
+    // Delete posts with updated_at < current date (soft delete)
+    public int deleteOldPosts() {
+        String query = "UPDATE Posts SET deleted_at = GETDATE() WHERE updated_at < GETDATE() AND updated_at IS NOT NULL AND deleted_at IS NULL";
+        try {
+            ps = conn.prepareStatement(query);
+            int affectedRows = ps.executeUpdate();
+            System.out.println("Deleted " + affectedRows + " old posts (updated_at < current date)");
+            return affectedRows;
+        } catch (SQLException e) {
+            System.err.println("Error deleting old posts: " + e.getMessage());
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    // Get count of old posts (updated_at < current date)
+    public int getOldPostsCount() {
+        String query = "SELECT COUNT(*) FROM Posts WHERE updated_at < GETDATE() AND updated_at IS NOT NULL AND deleted_at IS NULL";
+        try {
+            ps = conn.prepareStatement(query);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     // Tăng lượt xem post
     public boolean incrementViewCount(int id) {
         String query = "UPDATE Posts SET view_count = view_count + 1 WHERE id = ? AND deleted_at IS NULL";
@@ -416,7 +451,7 @@ public class PostsDAO {
 
     // Get total number of posts
     public int getTotalPosts() {
-        String query = "SELECT COUNT(*) FROM Posts WHERE deleted_at IS NULL";
+        String query = "SELECT COUNT(*) FROM Posts WHERE deleted_at IS NULL AND (updated_at >= GETDATE() OR updated_at IS NULL)";
         try {
             ps = conn.prepareStatement(query);
             rs = ps.executeQuery();
@@ -432,7 +467,7 @@ public class PostsDAO {
     // Get posts by page
     public List<Posts> getPostsByPage(int page, int pageSize) {
         List<Posts> posts = new ArrayList<>();
-        String query = "SELECT * FROM Posts WHERE deleted_at IS NULL ORDER BY created_at DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        String query = "SELECT * FROM Posts WHERE deleted_at IS NULL AND (updated_at >= GETDATE() OR updated_at IS NULL) ORDER BY created_at DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
         try {
             ps = conn.prepareStatement(query);
             ps.setInt(1, (page - 1) * pageSize);
@@ -483,7 +518,7 @@ public class PostsDAO {
 
     // Get total number of posts with search
     public int getTotalPostsWithSearch(String keyword, String jobType, String location) {
-        StringBuilder query = new StringBuilder("SELECT COUNT(*) FROM Posts WHERE deleted_at IS NULL");
+        StringBuilder query = new StringBuilder("SELECT COUNT(*) FROM Posts WHERE deleted_at IS NULL AND (updated_at >= GETDATE() OR updated_at IS NULL)");
         List<Object> params = new ArrayList<>();
 
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -520,7 +555,7 @@ public class PostsDAO {
     // Lấy posts theo tìm kiếm 
     public List<Posts> getPostsByPageWithSearch(int page, int pageSize, String keyword, String jobType, String location) {
         List<Posts> posts = new ArrayList<>();
-        StringBuilder query = new StringBuilder("SELECT * FROM Posts WHERE deleted_at IS NULL");
+        StringBuilder query = new StringBuilder("SELECT * FROM Posts WHERE deleted_at IS NULL AND (updated_at >= GETDATE() OR updated_at IS NULL)");
         List<Object> params = new ArrayList<>();
 
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -611,7 +646,7 @@ public class PostsDAO {
     // Lấy danh sách posts của 1 recruiter
     public List<Posts> getPostsByUserIdWithPaging(int userId, int page, int pageSize) {
         List<Posts> posts = new ArrayList<>();
-        String query = "SELECT * FROM Posts WHERE user_id = ? AND deleted_at IS NULL ORDER BY created_at DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        String query = "SELECT * FROM Posts WHERE user_id = ? AND deleted_at IS NULL AND (updated_at >= GETDATE() OR updated_at IS NULL) ORDER BY created_at DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
         try {
             ps = conn.prepareStatement(query);
             ps.setInt(1, userId);
@@ -685,7 +720,7 @@ public class PostsDAO {
     // Get latest posts for homepage or recommendation
     public List<Posts> getLatestPosts(int limit) {
         List<Posts> posts = new ArrayList<>();
-        String query = "SELECT TOP (?) * FROM Posts WHERE deleted_at IS NULL ORDER BY created_at DESC";
+        String query = "SELECT TOP (?) * FROM Posts WHERE deleted_at IS NULL AND (updated_at >= GETDATE() OR updated_at IS NULL) ORDER BY created_at DESC";
         
         System.out.println("Getting latest posts with query: " + query);
         
@@ -1162,7 +1197,7 @@ public class PostsDAO {
      */
     public List<Posts> getRelatedPostsByRecruiter(int userId, int excludePostId, int limit) {
         List<Posts> posts = new ArrayList<>();
-        String sql = "SELECT TOP(?) * FROM Posts WHERE user_id = ? AND id != ? AND deleted_at IS NULL ORDER BY created_at DESC";
+        String sql = "SELECT TOP(?) * FROM Posts WHERE user_id = ? AND id != ? AND deleted_at IS NULL AND (updated_at >= GETDATE() OR updated_at IS NULL) ORDER BY created_at DESC";
         
         System.out.println("SQL Query: " + sql);
         System.out.println("Parameters: limit=" + limit + ", userId=" + userId + ", excludePostId=" + excludePostId);
@@ -1205,7 +1240,7 @@ public class PostsDAO {
         
         // Kiểm tra xem có bao nhiêu bài đăng trong database
         try {
-            String countSql = "SELECT COUNT(*) FROM Posts WHERE deleted_at IS NULL";
+            String countSql = "SELECT COUNT(*) FROM Posts WHERE deleted_at IS NULL AND (updated_at >= GETDATE() OR updated_at IS NULL)";
             ps = conn.prepareStatement(countSql);
             rs = ps.executeQuery();
             if (rs.next()) {
@@ -1228,7 +1263,7 @@ public class PostsDAO {
             System.out.println("Error counting other recruiter posts: " + e.getMessage());
         }
         
-        String sql = "SELECT TOP(?) * FROM Posts WHERE user_id != ? AND id != ? AND deleted_at IS NULL ORDER BY created_at DESC";
+        String sql = "SELECT TOP(?) * FROM Posts WHERE user_id != ? AND id != ? AND deleted_at IS NULL AND (updated_at >= GETDATE() OR updated_at IS NULL) ORDER BY created_at DESC";
         
         System.out.println("SQL Query: " + sql);
         System.out.println("Parameters: limit=" + limit + ", excludeUserId=" + currentPost.getUserId() + ", excludePostId=" + excludePostId);
@@ -1293,24 +1328,38 @@ public class PostsDAO {
             params.add(criteria.getJobType().trim());
         }
         
-        // Kinh nghiệm
-        if (criteria.getExperienceLevel() != null && !criteria.getExperienceLevel().trim().isEmpty()) {
-            sql.append(" AND experience LIKE ?");
-            params.add("%" + criteria.getExperienceLevel().trim() + "%");
+        // Kinh nghiệm - Tìm kiếm chính xác hơn
+        if (criteria.getExperience() != null && !criteria.getExperience().trim().isEmpty()) {
+            String experienceSearch = criteria.getExperience().trim();
+            // Tìm kiếm chính xác hơn cho kinh nghiệm
+            sql.append(" AND (experience LIKE ? OR experience LIKE ? OR experience LIKE ?)");
+            params.add(experienceSearch + "%"); // Bắt đầu với giá trị tìm kiếm
+            params.add("% " + experienceSearch + "%"); // Có khoảng trắng trước
+            params.add("%" + experienceSearch); // Kết thúc với giá trị tìm kiếm
         }
         
-        // Mức lương tối thiểu
-        if (criteria.getMinSalary() != null && criteria.getMinSalary().compareTo(java.math.BigDecimal.ZERO) > 0) {
-            sql.append(" AND (salary_min >= ? OR CAST(REPLACE(REPLACE(salary, ',', ''), ' ', '') AS DECIMAL(12,2)) >= ?)");
-            params.add(criteria.getMinSalary());
-            params.add(criteria.getMinSalary());
+        // Cấp bậc
+        if (criteria.getRank() != null && !criteria.getRank().trim().isEmpty()) {
+            sql.append(" AND rank LIKE ?");
+            params.add("%" + criteria.getRank().trim() + "%");
         }
         
-        // Mức lương tối đa
-        if (criteria.getMaxSalary() != null && criteria.getMaxSalary().compareTo(java.math.BigDecimal.ZERO) > 0) {
-            sql.append(" AND (salary_max <= ? OR CAST(REPLACE(REPLACE(salary, ',', ''), ' ', '') AS DECIMAL(12,2)) <= ?)");
-            params.add(criteria.getMaxSalary());
-            params.add(criteria.getMaxSalary());
+        // Thời gian làm việc
+        if (criteria.getWorkingTime() != null && !criteria.getWorkingTime().trim().isEmpty()) {
+            sql.append(" AND working_time LIKE ?");
+            params.add("%" + criteria.getWorkingTime().trim() + "%");
+        }
+        
+        // Mức lương
+        if (criteria.getSalary() != null && !criteria.getSalary().trim().isEmpty()) {
+            sql.append(" AND salary LIKE ?");
+            params.add("%" + criteria.getSalary().trim() + "%");
+        }
+        
+        // Tên công ty
+        if (criteria.getCompanyName() != null && !criteria.getCompanyName().trim().isEmpty()) {
+            sql.append(" AND company_name LIKE ?");
+            params.add("%" + criteria.getCompanyName().trim() + "%");
         }
         
         // Quy mô công ty
@@ -1319,24 +1368,16 @@ public class PostsDAO {
             params.add("%" + criteria.getCompanySize().trim() + "%");
         }
         
-        // Hình thức làm việc
-        if (criteria.getWorkType() != null && !criteria.getWorkType().trim().isEmpty()) {
-            sql.append(" AND working_time LIKE ?");
-            params.add("%" + criteria.getWorkType().trim() + "%");
+        // Địa chỉ làm việc
+        if (criteria.getContactAddress() != null && !criteria.getContactAddress().trim().isEmpty()) {
+            sql.append(" AND contact_address LIKE ?");
+            params.add("%" + criteria.getContactAddress().trim() + "%");
         }
         
-        // Học vấn
-        if (criteria.getEducation() != null && !criteria.getEducation().trim().isEmpty()) {
+        // Yêu cầu ứng viên
+        if (criteria.getRequirements() != null && !criteria.getRequirements().trim().isEmpty()) {
             sql.append(" AND requirements LIKE ?");
-            params.add("%" + criteria.getEducation().trim() + "%");
-        }
-        
-        // Kỹ năng
-        if (criteria.getSkills() != null && !criteria.getSkills().trim().isEmpty()) {
-            sql.append(" AND (requirements LIKE ? OR keywords LIKE ?)");
-            String skillsPattern = "%" + criteria.getSkills().trim() + "%";
-            params.add(skillsPattern);
-            params.add(skillsPattern);
+            params.add("%" + criteria.getRequirements().trim() + "%");
         }
         
         // Phúc lợi
@@ -1345,12 +1386,10 @@ public class PostsDAO {
             params.add("%" + criteria.getBenefits().trim() + "%");
         }
         
-        // Ngoại ngữ
-        if (criteria.getLanguage() != null && !criteria.getLanguage().trim().isEmpty()) {
-            sql.append(" AND (requirements LIKE ? OR keywords LIKE ?)");
-            String languagePattern = "%" + criteria.getLanguage().trim() + "%";
-            params.add(languagePattern);
-            params.add(languagePattern);
+        // Cách thức ứng tuyển
+        if (criteria.getApplicationMethod() != null && !criteria.getApplicationMethod().trim().isEmpty()) {
+            sql.append(" AND application_method LIKE ?");
+            params.add("%" + criteria.getApplicationMethod().trim() + "%");
         }
         
         // Sắp xếp
@@ -1416,24 +1455,38 @@ public class PostsDAO {
             params.add(criteria.getJobType().trim());
         }
         
-        // Kinh nghiệm
-        if (criteria.getExperienceLevel() != null && !criteria.getExperienceLevel().trim().isEmpty()) {
-            sql.append(" AND experience LIKE ?");
-            params.add("%" + criteria.getExperienceLevel().trim() + "%");
+        // Kinh nghiệm - Tìm kiếm chính xác hơn
+        if (criteria.getExperience() != null && !criteria.getExperience().trim().isEmpty()) {
+            String experienceSearch = criteria.getExperience().trim();
+            // Tìm kiếm chính xác hơn cho kinh nghiệm
+            sql.append(" AND (experience LIKE ? OR experience LIKE ? OR experience LIKE ?)");
+            params.add(experienceSearch + "%"); // Bắt đầu với giá trị tìm kiếm
+            params.add("% " + experienceSearch + "%"); // Có khoảng trắng trước
+            params.add("%" + experienceSearch); // Kết thúc với giá trị tìm kiếm
         }
         
-        // Mức lương tối thiểu
-        if (criteria.getMinSalary() != null && criteria.getMinSalary().compareTo(java.math.BigDecimal.ZERO) > 0) {
-            sql.append(" AND (salary_min >= ? OR CAST(REPLACE(REPLACE(salary, ',', ''), ' ', '') AS DECIMAL(12,2)) >= ?)");
-            params.add(criteria.getMinSalary());
-            params.add(criteria.getMinSalary());
+        // Cấp bậc
+        if (criteria.getRank() != null && !criteria.getRank().trim().isEmpty()) {
+            sql.append(" AND rank LIKE ?");
+            params.add("%" + criteria.getRank().trim() + "%");
         }
         
-        // Mức lương tối đa
-        if (criteria.getMaxSalary() != null && criteria.getMaxSalary().compareTo(java.math.BigDecimal.ZERO) > 0) {
-            sql.append(" AND (salary_max <= ? OR CAST(REPLACE(REPLACE(salary, ',', ''), ' ', '') AS DECIMAL(12,2)) <= ?)");
-            params.add(criteria.getMaxSalary());
-            params.add(criteria.getMaxSalary());
+        // Thời gian làm việc
+        if (criteria.getWorkingTime() != null && !criteria.getWorkingTime().trim().isEmpty()) {
+            sql.append(" AND working_time LIKE ?");
+            params.add("%" + criteria.getWorkingTime().trim() + "%");
+        }
+        
+        // Mức lương
+        if (criteria.getSalary() != null && !criteria.getSalary().trim().isEmpty()) {
+            sql.append(" AND salary LIKE ?");
+            params.add("%" + criteria.getSalary().trim() + "%");
+        }
+        
+        // Tên công ty
+        if (criteria.getCompanyName() != null && !criteria.getCompanyName().trim().isEmpty()) {
+            sql.append(" AND company_name LIKE ?");
+            params.add("%" + criteria.getCompanyName().trim() + "%");
         }
         
         // Quy mô công ty
@@ -1442,24 +1495,16 @@ public class PostsDAO {
             params.add("%" + criteria.getCompanySize().trim() + "%");
         }
         
-        // Hình thức làm việc
-        if (criteria.getWorkType() != null && !criteria.getWorkType().trim().isEmpty()) {
-            sql.append(" AND working_time LIKE ?");
-            params.add("%" + criteria.getWorkType().trim() + "%");
+        // Địa chỉ làm việc
+        if (criteria.getContactAddress() != null && !criteria.getContactAddress().trim().isEmpty()) {
+            sql.append(" AND contact_address LIKE ?");
+            params.add("%" + criteria.getContactAddress().trim() + "%");
         }
         
-        // Học vấn
-        if (criteria.getEducation() != null && !criteria.getEducation().trim().isEmpty()) {
+        // Yêu cầu ứng viên
+        if (criteria.getRequirements() != null && !criteria.getRequirements().trim().isEmpty()) {
             sql.append(" AND requirements LIKE ?");
-            params.add("%" + criteria.getEducation().trim() + "%");
-        }
-        
-        // Kỹ năng
-        if (criteria.getSkills() != null && !criteria.getSkills().trim().isEmpty()) {
-            sql.append(" AND (requirements LIKE ? OR keywords LIKE ?)");
-            String skillsPattern = "%" + criteria.getSkills().trim() + "%";
-            params.add(skillsPattern);
-            params.add(skillsPattern);
+            params.add("%" + criteria.getRequirements().trim() + "%");
         }
         
         // Phúc lợi
@@ -1468,12 +1513,10 @@ public class PostsDAO {
             params.add("%" + criteria.getBenefits().trim() + "%");
         }
         
-        // Ngoại ngữ
-        if (criteria.getLanguage() != null && !criteria.getLanguage().trim().isEmpty()) {
-            sql.append(" AND (requirements LIKE ? OR keywords LIKE ?)");
-            String languagePattern = "%" + criteria.getLanguage().trim() + "%";
-            params.add(languagePattern);
-            params.add(languagePattern);
+        // Cách thức ứng tuyển
+        if (criteria.getApplicationMethod() != null && !criteria.getApplicationMethod().trim().isEmpty()) {
+            sql.append(" AND application_method LIKE ?");
+            params.add("%" + criteria.getApplicationMethod().trim() + "%");
         }
         
         try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
